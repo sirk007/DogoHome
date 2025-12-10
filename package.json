@@ -1,0 +1,21 @@
+{
+  "name": "dogohome",
+  "version": "1.0.0",
+  "description": "DogoHome - A full-stack platform connecting pet owners and shelters for lost, found and adoptable pets.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sirk007/DogoHome.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sirk007/DogoHome/issues"
+  },
+  "homepage": "https://github.com/sirk007/DogoHome#readme"
+}
