@@ -5,8 +5,8 @@ const cors = require('cors');
 //Load .env in
 require('dotenv').config();
 
-const{ sequelize} = require('./db');
-
+import sequelize from './config/database';
+ 
 // Initialize an instance of express
 const app = express();
 const PORT = process.env.PORT || 3002;
