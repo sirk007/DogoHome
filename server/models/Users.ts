@@ -38,9 +38,9 @@ class Users
   public readonly updatedAt!: Date;
 
   static associate(models: any) {
-    // Users.hasMany(models.Likes, { onDelete: 'cascade' });
-    // Users.hasMany(models.Posts, { onDelete: 'cascade' });
-    // Users.hasMany(models.County, { onDelete: 'cascade' });
+    Users.hasMany(models.Posts, { foreignKey: "userId", onDelete: "CASCADE" });
+    Users.hasMany(models.Comments, { foreignKey: "userId", onDelete: "CASCADE" });
+    Users.hasMany(models.Likes, { foreignKey: "userId", onDelete: "CASCADE" });
   }
 }
 

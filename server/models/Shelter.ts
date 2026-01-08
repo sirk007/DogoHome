@@ -45,10 +45,10 @@ class Shelter
     static associate(models: any) {
         // Define associations here if needed
         // Disabled for now
-        // Shelters.hasMany(models.Likes, { onDelete: 'cascade' });
-        // Shelters.hasMany(models.Posts, { onDelete: 'cascade' });
-        // Shelters.hasMany(models.Animals, { onDelete: 'cascade' });
-        // Shelters.hasMany(models.County, { onDelete: 'cascade' });
+        Shelter.hasMany(models.Likes, { onDelete: 'cascade' });
+        Shelter.hasMany(models.Posts, { onDelete: 'cascade' });
+        Shelter.hasMany(models.Animals, { onDelete: 'cascade' });
+        Shelter.hasMany(models.County, { onDelete: 'cascade' });
     }
 }
 /**
