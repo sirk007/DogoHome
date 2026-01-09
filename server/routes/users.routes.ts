@@ -1,4 +1,4 @@
-import {Router, Request, Response, NextFunction} from 'express';
+import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import dotenv from 'dotenv'; 

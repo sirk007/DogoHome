@@ -8,6 +8,11 @@ declare global {
         username: string;
         userType: string;
       };
+      shelter?: {
+        id: number;
+        username: string;
+        userType: string;
+      };
     }
   }
 }

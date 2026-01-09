@@ -18,6 +18,7 @@ import './models';
 //-----------------------------------------------
 
 import userRoutes from './routes/users.routes';
+import shelterRoutes from './routes/shelters.routes';
 
 //-----------------------------------------------
 // CONFIGURATION
@@ -44,6 +45,7 @@ app.use(cors());
 // ROUTES
 //-----------------------------------------------
 app.use('/api/users', userRoutes);
+app.use('/api/shelters', shelterRoutes);
 
 //Routes for different endpoints 
 
