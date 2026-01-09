@@ -1,35 +1,74 @@
+// ----------------------------------------------
+// Server Entry Point - IMPORT LIBRARIES
+//-----------------------------------------------
+
 // Express.js A web framework for Node.js allows for the creation of server-side applications, routing & handling HTTP requests and responses. 
-import express from 'express';
+import express, {Application, Request, Response} from 'express';
 // CORS (Cross-Origin-Resource-Sharing) Middleware for allowing cross-origin requests
 import cors from 'cors';
+// dotenv Loads environment variables from a .env file into process.env
 import dotenv from 'dotenv';
+// Sequelize ORM for Node.js instance
 import sequelize from './config/database';
+// Import all models to initialize them and set up associations
 import './models';
+
+//-----------------------------------------------
+// SERVER SETUP - IMPORT ROUTES
+//-----------------------------------------------
+
+import userRoutes from './routes/users.routes';
+
+//-----------------------------------------------
+// CONFIGURATION
+//-----------------------------------------------
 
 //Load .env in
 dotenv.config();
 
 // Initialize an instance of express
-const app = express();
+const app: Application = express();
+// Define the port from .env or use 3002 as default
 const PORT = process.env.PORT || 3002;
 
-// express.json is used to parse incoming JSON data in HTTP requests
+//-----------------------------------------------
+// MIDDLEWARE
+//-----------------------------------------------
+// Parse incoming JSON requests
 app.use(express.json());
-// Middleware to enable CORS for all routes
+
+// Enable CORS for all routes
 app.use(cors());
 
+//-----------------------------------------------
+// ROUTES
+//-----------------------------------------------
+app.use('/api/users', userRoutes);
+
 //Routes for different endpoints 
+
+// Health check endpoint
+app.get("/", (req: Request, res: Response) => {
+  res.send("DogoHome Server is running!");
+});
 
 // Sequalize an ORM library for Node.js it enables database interactions using JS objects
 // Sync the models with the database
 // A promise .then is waiting for a callback
 
 // Connect to DB and start server
+
+// -----------------------------------------------
+// DATABASE & SERVER START
+//-----------------------------------------------
+
 (async () => {
   try {
+    // Sync models with database
     await sequelize.sync();
     console.log('Database Connected Successfully');
 
+    // Start the server
     app.listen(PORT, () =>
       console.log(`Server active on port ${PORT}`)
     );

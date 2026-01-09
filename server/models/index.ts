@@ -2,14 +2,14 @@ import { Sequelize } from 'sequelize';
 import sequelize from '../config/database';
 
 // Import models explicitly
-import Users from './Users';
-import Posts from './Posts';
-import Likes from './Likes';
-import County from './County';
-import Comments from './Comments';
-import Animals from './Animals';
-import Admins from './Admins';
-import Shelter from './Shelter';
+import Users from './User.model';
+import Posts from './Post.model';
+import Likes from './Likes.model';
+import County from './County.model';
+import Comments from './Comment.model';
+import Animals from './Animal.model';
+import Admins from './Admin.model';
+import Shelter from './Shelter.model';
 
 const db: any = {};
 
