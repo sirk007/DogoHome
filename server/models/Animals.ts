@@ -9,7 +9,8 @@ interface AnimalAttributes {
     animalName: string;
     animalAge: string;
     animalHealth: string;
-    animalDescription?: string | boolean;
+    animalDescription?: string | null;
+    shelterId: number;
     picture?: Buffer | null;
 }
 
@@ -32,7 +33,8 @@ class Animals
     public animalName!: string;
     public animalAge!: string;
     public animalHealth!: string;
-    public animalDescription!: string | boolean;
+    public animalDescription!: string | null;
+    public shelterId!: number;
     public picture!: Buffer | null;
 
     // timestamps!
@@ -41,7 +43,7 @@ class Animals
 
     static associate(models: any) {
         // Define associations here if needed
-        Animals.belongsTo(models.Shelter, { onDelete: "cascade" });
+        Animals.belongsTo(models.Shelter, {foreignKey: 'shelterId', onDelete: "cascade" });
     }
 }
 
@@ -70,6 +72,12 @@ export default (sequelize: Sequelize) => {
             animalDescription: {
                 type: DataTypes.TEXT,
                 allowNull: true,
+            },
+            shelterId: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                references: { model: 'Shelters', key: 'id' },
+                onDelete: 'CASCADE',
             },
             picture: {
                 type: DataTypes.BLOB('long'),

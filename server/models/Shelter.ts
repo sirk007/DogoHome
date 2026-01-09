@@ -8,7 +8,7 @@ interface ShelterAttributes {
     password: string;
     email: string;
     shelterName: string;
-    county: string;
+    countyId: string;
     address: string;
     phoneNumber: string;
     userType: string;
@@ -33,7 +33,7 @@ class Shelter
     public password!: string;
     public email!: string;
     public shelterName!: string;
-    public county!: string;
+    public countyId!: string;
     public address!: string;
     public phoneNumber!: string;
     public userType!: string;
@@ -45,10 +45,10 @@ class Shelter
     static associate(models: any) {
         // Define associations here if needed
         // Disabled for now
-        Shelter.hasMany(models.Likes, { onDelete: 'cascade' });
-        Shelter.hasMany(models.Posts, { onDelete: 'cascade' });
-        Shelter.hasMany(models.Animals, { onDelete: 'cascade' });
-        Shelter.hasMany(models.County, { onDelete: 'cascade' });
+        Shelter.hasMany(models.Likes, { foreignKey: 'shelterId', onDelete: 'cascade' });
+        Shelter.hasMany(models.Posts, { foreignKey: 'shelterId', onDelete: 'cascade' });
+        Shelter.hasMany(models.Animals, { foreignKey: 'shelterId', onDelete: 'cascade' });
+        Shelter.belongsTo(models.County, { foreignKey: 'countyId' });
     }
 }
 /**
@@ -73,9 +73,10 @@ export default (sequelize: Sequelize) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            county: {
-                type: DataTypes.STRING,
+            countyId: {
+                type: DataTypes.INTEGER,
                 allowNull: false,
+                references: { model: 'Counties', key: 'id' },
             },
             address: {
                 type: DataTypes.STRING,

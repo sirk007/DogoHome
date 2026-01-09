@@ -31,8 +31,8 @@ class County
 
     static associate(models: any) {
         // Define associations here if needed
-        County.hasMany(models.Users, { foreignKey: 'CountyId', onDelete: 'cascade' });
-        County.hasMany(models.Shelter, { foreignKey: 'CountyId', onDelete: 'cascade' });
+        County.hasMany(models.Users, { foreignKey: 'countyId', onDelete: 'cascade' });
+        County.hasMany(models.Shelter, { foreignKey: 'countyId', onDelete: 'cascade' });
         
     }
 }

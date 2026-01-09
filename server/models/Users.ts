@@ -9,6 +9,7 @@ interface UserAttributes {
   password: string;
   email: string;
   age: string;
+  countyId?: number;
   userType: string;
 }
 
@@ -31,6 +32,7 @@ class Users
   public password!: string;
   public email!: string;
   public age!: string;
+  public countyId!: number;
   public userType!: string;
 
   // timestamps!
@@ -41,6 +43,7 @@ class Users
     Users.hasMany(models.Posts, { foreignKey: "userId", onDelete: "CASCADE" });
     Users.hasMany(models.Comments, { foreignKey: "userId", onDelete: "CASCADE" });
     Users.hasMany(models.Likes, { foreignKey: "userId", onDelete: "CASCADE" });
+    Users.belongsTo(models.County, { foreignKey: 'countyId' });
   }
 }
 
@@ -65,6 +68,11 @@ export default (sequelize: Sequelize) => {
       age: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      countyId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: 'Counties', key: 'id' },
       },
       userType: {
         type: DataTypes.STRING,
