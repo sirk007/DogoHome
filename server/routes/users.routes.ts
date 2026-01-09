@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 import db from "../models"; // Import the database connection
 import { validateUserToken } from "../middleware/AuthMiddlewareUser";
-//import { validateAdminToken } from '../middleware/AuthMiddlewareAdmin';
+import { validateAdminToken } from '../middleware/AuthMiddlewareAdmin';
 
 
 dotenv.config(); // Load environment variables
@@ -95,28 +95,28 @@ router.get("/basicinfo/:id", async (req: Request, res: Response) => {
 // ----------------------
 // GET ALL USERS (ADMIN ONLY)
 // ----------------------
-//router.get("/", validateAdminToken, async (req: Request, res: Response) => {
-//   try {
-//     const users = await Users.findAll({ attributes: { exclude: ["password"] } });
-//     res.json(users);
-//   } catch (err) {
-//     console.error(err);
-//    res.status(500).json({ error: "Internal server error" });
-//  }
-//});
+router.get("/", validateAdminToken, async (req: Request, res: Response) => {
+   try {
+     const users = await Users.findAll({ attributes: { exclude: ["password"] } });
+     res.json(users);
+   } catch (err) {
+     console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // ----------------------
 // DELETE USER (ADMIN ONLY)
 // ----------------------
-//router.delete("/:id", validateAdminToken, async (req: Request, res: Response) => {
-//  try {
-//    const { id } = req.params;
-//    await Users.destroy({ where: { id } });
-//    res.json({ message: "User deleted successfully" });
-//  } catch (err) {
-//    console.error(err);
-//    res.status(500).json({ error: "Internal server error" });
-//  }
-//});
+router.delete("/:id", validateAdminToken, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await Users.destroy({ where: { id } });
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 export default router;

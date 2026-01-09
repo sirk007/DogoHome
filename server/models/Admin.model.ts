@@ -67,6 +67,7 @@ export default (sequelize: Sequelize) => {
             userType: {
                 type: DataTypes.STRING,
                 allowNull: false,
+                defaultValue: "admin",
             },
         },
         {

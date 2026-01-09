@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 import db from "../models"; // Import the database connection
 import { validateShelterToken } from "../middleware/AuthMiddlewareShelter";
-//import { validateAdminToken } from '../middleware/AuthMiddlewareAdmin';
+import { validateAdminToken } from '../middleware/AuthMiddlewareAdmin';
 
 dotenv.config(); // Load environment variables
 
@@ -92,5 +92,18 @@ router.get("/basicinfo/:id", async (req: Request, res: Response) => {
   }
 });
 
+// ----------------------
+// DELETE Shelter (ADMIN ONLY)
+// ----------------------
+router.delete("/:id", validateAdminToken, async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+        await Shelter.destroy({ where: { id } });
+        res.json({ message: "Shelter deleted successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 export default router;

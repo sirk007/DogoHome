@@ -13,6 +13,11 @@ declare global {
         username: string;
         userType: string;
       };
+      admin?: {
+        id: number;
+        username: string;
+        userType: string;
+      };
     }
   }
 }

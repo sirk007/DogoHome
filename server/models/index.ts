@@ -8,7 +8,7 @@ import Likes from './Likes.model';
 import County from './County.model';
 import Comments from './Comment.model';
 import Animals from './Animal.model';
-import Admins from './Admin.model';
+import Admin from './Admin.model';
 import Shelter from './Shelter.model';
 
 const db: any = {};
@@ -20,7 +20,7 @@ db.Likes = Likes(sequelize);
 db.County = County(sequelize);
 db.Comments = Comments(sequelize);
 db.Animals = Animals(sequelize);
-db.Admins = Admins(sequelize);
+db.Admin = Admin(sequelize);
 db.Shelter = Shelter(sequelize);
 
 // Run associations

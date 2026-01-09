@@ -19,6 +19,7 @@ import './models';
 
 import userRoutes from './routes/users.routes';
 import shelterRoutes from './routes/shelters.routes';
+import adminRoutes from './routes/admin.routes';
 
 //-----------------------------------------------
 // CONFIGURATION
@@ -46,6 +47,7 @@ app.use(cors());
 //-----------------------------------------------
 app.use('/api/users', userRoutes);
 app.use('/api/shelters', shelterRoutes);
+app.use('/api/admins', adminRoutes);
 
 //Routes for different endpoints 
 
