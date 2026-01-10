@@ -23,6 +23,7 @@ import adminRoutes from './routes/admin.routes';
 import postRoutes from './routes/posts.route';
 import likeRoutes from './routes/likes.route';
 import commentRoutes from './routes/comments.route';
+import animalRoutes from './routes/animals.routes';
 
 //-----------------------------------------------
 // CONFIGURATION
@@ -54,6 +55,7 @@ app.use('/api/admins', adminRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/likes', likeRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/animals', animalRoutes);
 
 //Routes for different endpoints 
 

@@ -10,8 +10,8 @@ interface AnimalAttributes {
     animalAge: string;
     animalHealth: string;
     animalDescription?: string | null;
-    shelterId: number;
     picture?: Buffer | null;
+    shelterId: number;
 }
 
 /**
@@ -34,8 +34,8 @@ class Animals
     public animalAge!: string;
     public animalHealth!: string;
     public animalDescription!: string | null;
-    public shelterId!: number;
     public picture!: Buffer | null;
+    public shelterId!: number;
 
     // timestamps!
     public readonly createdAt!: Date;
@@ -73,15 +73,15 @@ export default (sequelize: Sequelize) => {
                 type: DataTypes.TEXT,
                 allowNull: true,
             },
+            picture: {
+                type: DataTypes.BLOB('long'),
+                allowNull: true,
+            },
             shelterId: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: { model: 'Shelters', key: 'id' },
                 onDelete: 'CASCADE',
-            },
-            picture: {
-                type: DataTypes.BLOB('long'),
-                allowNull: true,
             },
         },
         {
