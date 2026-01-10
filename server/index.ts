@@ -20,6 +20,7 @@ import './models';
 import userRoutes from './routes/users.routes';
 import shelterRoutes from './routes/shelters.routes';
 import adminRoutes from './routes/admin.routes';
+import postRoutes from './routes/posts.route';
 
 //-----------------------------------------------
 // CONFIGURATION
@@ -48,6 +49,7 @@ app.use(cors());
 app.use('/api/users', userRoutes);
 app.use('/api/shelters', shelterRoutes);
 app.use('/api/admins', adminRoutes);
+app.use('/api/posts', postRoutes);
 
 //Routes for different endpoints 
 
