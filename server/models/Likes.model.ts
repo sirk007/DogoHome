@@ -53,13 +53,13 @@ export default (sequelize: Sequelize) => {
             },
             postId: {
                 type: DataTypes.INTEGER,
-                allowNull: false,
+                allowNull: true,
                 references: { model: 'Posts', key: 'id' },
                 onDelete: 'cascade',
             },
             commentId: {
                 type: DataTypes.INTEGER,
-                allowNull: false,
+                allowNull: true,
                 references: { model: 'Comments', key: 'id' },
                 onDelete: 'cascade',
             },

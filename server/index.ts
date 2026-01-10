@@ -21,6 +21,7 @@ import userRoutes from './routes/users.routes';
 import shelterRoutes from './routes/shelters.routes';
 import adminRoutes from './routes/admin.routes';
 import postRoutes from './routes/posts.route';
+import likeRoutes from './routes/likes.route';
 
 //-----------------------------------------------
 // CONFIGURATION
@@ -50,6 +51,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/shelters', shelterRoutes);
 app.use('/api/admins', adminRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/likes', likeRoutes);
 
 //Routes for different endpoints 
 
