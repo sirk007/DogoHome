@@ -56,12 +56,13 @@ router.post("/login", async (req: Request, res: Response) => {
         if (!match)
             return res.status(401).json({ error: "Incorrect password" });
 
-        const {id, userType} = shelter;
+         // Safely get attributes
+        const { id, username: uname, userType } = shelter.get(); 
         // Generate JWT token
-        const accessShelterToken = sign({ id, username, userType }, JWT_SECRET, {
+        const accessShelterToken = sign({ id, username: uname, userType }, JWT_SECRET, {
             expiresIn: "1h",
         });
-        res.json({ token: accessShelterToken, username, id, userType });
+        res.json({ token: accessShelterToken, username: uname, id, userType });
     } catch (error) {
         console.error("Error during shelter login:", error);
         res.status(500).json({ error: "Internal server error" });
