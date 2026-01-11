@@ -24,6 +24,7 @@ import postRoutes from './routes/posts.route';
 import likeRoutes from './routes/likes.route';
 import commentRoutes from './routes/comments.route';
 import animalRoutes from './routes/animals.routes';
+import countyRoutes from './routes/county.routes';
 
 //-----------------------------------------------
 // CONFIGURATION
@@ -56,6 +57,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/likes', likeRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/animals', animalRoutes);
+app.use('/api/counties', countyRoutes);
 
 //Routes for different endpoints 
 

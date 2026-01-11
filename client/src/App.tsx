@@ -1,46 +1,46 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthContext } from './context/AuthContext';
-import LoginUser from './pages/userLogin/LoginUser';
-import LoginShelter from './pages/shelterLogin/LoginShelter';
-import LoginAdmin from './pages/adminLogin/LoginAdmin';
-
-const LandingPage = () => (
-  <div style={{ maxWidth: 500, margin: '2rem auto', textAlign: 'center' }}>
-    <h1>Welcome to DogoHome</h1>
-    <p>Please choose your login type:</p>
-    <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
-      <Link to="/login/user">
-        <button>User Login</button>
-      </Link>
-      <Link to="/login/shelter">
-        <button>Shelter Login</button>
-      </Link>
-      <Link to="/login/admin">
-        <button>Admin Login</button>
-      </Link>
-    </div>
-  </div>
-);
+import Footer from './components/footer/Footer';
+import { Box } from '@mui/material';
+import UserRegistrationPage from './pages/userRegistration/UserRegistration';
+import ShelterRegistrationPage from './pages/shelterRegistration/ShelterRegistration';
+import LandingPage from './pages/LandingPage/LandingPage';
 
 function App() {
   const { authState } = useAuthContext();
 
   return (
     <BrowserRouter>
-      <div style={{ padding: 16 }}>
-        {/* Debug: show current auth state */}
+      {/* Optional: debug auth state */}
+      {/* <div style={{ padding: 16 }}>
         <pre>{JSON.stringify(authState, null, 2)}</pre>
+      </div>*/}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh', // full viewport height
+        }}
+      >
+        {/* Main content grows to push footer down */}
+        <Box component="main" sx={{ flexGrow: 1 }}>
+      <Routes>
+        {/* Public landing page */}
+        <Route path="/" element={<LandingPage />} />
 
-        <Routes>
-          {/* Landing page */}
-          <Route path="/" element={<LandingPage />} />
+        {/* Registration routes */}
+        <Route path="/registration" element={<UserRegistrationPage />} />
+        <Route path="/shelter/registration" element={<ShelterRegistrationPage />} />
 
-          {/* Login routes */}
-          <Route path="/login/user" element={<LoginUser />} />
-          <Route path="/login/shelter" element={<LoginShelter />} />
-          <Route path="/login/admin" element={<LoginAdmin />} />
-        </Routes>
-      </div>
+        {/* Redirect unknown routes */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+
+      </Box>
+
+        {/* Footer always at bottom */}
+        <Footer />
+      </Box>
     </BrowserRouter>
   );
 }

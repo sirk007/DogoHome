@@ -8,7 +8,7 @@ interface ShelterAttributes {
     password: string;
     email: string;
     shelterName: string;
-    countyId: string;
+    countyId: number;
     address: string;
     phoneNumber: string;
     userType: string;
@@ -33,7 +33,7 @@ class Shelter
     public password!: string;
     public email!: string;
     public shelterName!: string;
-    public countyId!: string;
+    public countyId!: number;
     public address!: string;
     public phoneNumber!: string;
     public userType!: string;

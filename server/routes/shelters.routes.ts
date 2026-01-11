@@ -21,25 +21,26 @@ const JWT_SECRET = process.env.SHELTER_JWT_SECRET || "fallbackSecret"; // fallba
 // CREATE A NEW SHELTER
 // ---------------------------
 router.post("/", async (req: Request, res: Response) => {
-    const { username, password, email, shelterName, countyId, address, phoneNumber} = req.body;
-    try {
-        // Hash the password before storing
-        const hash = await bcrypt.hash(password, 10);
-        // Create the shelter in the database
-        await Shelter.create({
-            username,
-            password: hash,
-            email,
-            shelterName,
-            countyId,
-            address,
-            phoneNumber,
-        });
-        res.json({ message: "Shelter created successfully!" });
-    } catch (error) {
-        console.error("Error creating shelter:", error);
-        res.status(500).json({ error: "Failed to create shelter" });
-    }
+  const { username, password, email, shelterName, countyId, address, phoneNumber } = req.body;
+
+  try {
+    const hash = await bcrypt.hash(password, 10);
+
+    const shelter = await Shelter.create({
+      username,
+      password: hash,
+      email,
+      shelterName,
+      countyId, // directly use the numeric ID
+      address,
+      phoneNumber,
+    });
+
+    res.json({ message: "Shelter created successfully!" });
+  } catch (error) {
+    console.error("Error creating shelter:", error);
+    res.status(500).json({ error: "Failed to create shelter" });
+  }
 });
 
 // ---------------------------

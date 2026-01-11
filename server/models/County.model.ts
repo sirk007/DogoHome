@@ -46,6 +46,7 @@ export default (sequelize: Sequelize) => {
             countyName: {
                 type: DataTypes.STRING,
                 allowNull: false,
+                unique: true, // ensures no diplicates
             },
         },
         {
