@@ -6,6 +6,9 @@ import UserRegistrationPage from './pages/userRegistration/UserRegistration';
 import ShelterRegistrationPage from './pages/shelterRegistration/ShelterRegistration';
 import LandingPage from './pages/LandingPage/LandingPage';
 
+import UserLandingPage from './pages/user/UserLandingPage';
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   const { authState } = useAuthContext();
 
@@ -28,10 +31,20 @@ function App() {
         {/* Public landing page */}
         <Route path="/" element={<LandingPage />} />
 
+
         {/* Registration routes */}
         <Route path="/registration" element={<UserRegistrationPage />} />
         <Route path="/shelter/registration" element={<ShelterRegistrationPage />} />
 
+        {/* Protected user landing page */}
+            <Route
+              path="/user"
+              element={
+                <ProtectedRoute allowedRoles={['User']}>
+                  <UserLandingPage />
+                </ProtectedRoute>
+              }
+            />
         {/* Redirect unknown routes */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

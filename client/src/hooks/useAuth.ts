@@ -3,9 +3,8 @@ import type { AxiosResponse } from 'axios';
 import { fetchUserAuth, fetchAdminAuth, fetchShelterAuth } from '../api/auth';
 import type { AuthState, UserRole } from '../types/auth';
 
-const isValidUserRole = (role: any): role is UserRole => {
-  return role === 'User' || role === 'Admin' || role === 'Shelter' || role === '';
-};
+const isValidUserRole = (role: any): role is UserRole =>
+  role === 'User' || role === 'Admin' || role === 'Shelter' || role === '';
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
@@ -14,6 +13,7 @@ export const useAuth = () => {
     userType: '',
     status: false,
   });
+  const [loading, setLoading] = useState(true); // NEW
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -23,8 +23,10 @@ export const useAuth = () => {
         shelter: sessionStorage.getItem('accessShelterToken'),
       };
 
-      // If no token exists, don't call backend
-      if (!tokens.user && !tokens.admin && !tokens.shelter) return;
+      if (!tokens.user && !tokens.admin && !tokens.shelter) {
+        setLoading(false); // no token → done loading
+        return;
+      }
 
       try {
         let response: AxiosResponse<any> | undefined;
@@ -35,7 +37,7 @@ export const useAuth = () => {
 
         if (!response || response.data?.error) {
           setAuthState(prev => ({ ...prev, status: false }));
-          console.warn('Auth check failed:', response?.data?.error);
+          setLoading(false);
           return;
         }
 
@@ -49,12 +51,13 @@ export const useAuth = () => {
         });
       } catch (err) {
         setAuthState(prev => ({ ...prev, status: false }));
-        console.error('Auth check failed', err);
+      } finally {
+        setLoading(false); // done checking
       }
     };
 
     checkAuth();
   }, []);
 
-  return { authState, setAuthState };
+  return { authState, setAuthState, loading }; // return loading
 };

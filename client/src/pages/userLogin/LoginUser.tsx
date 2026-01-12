@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import { loginUser } from '../../api/authUser';
+import { useNavigate } from 'react-router-dom';
 
 const LoginUser: React.FC = () => {
   const { setAuthState } = useAuthContext();
+  const navigate = useNavigate();
 
-  // Local form state
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -13,21 +14,19 @@ const LoginUser: React.FC = () => {
   const handleLogin = async () => {
     try {
       const res = await loginUser(username, password);
-      console.log("Login response:", res.data);
+      console.log('Login response:', res.data);
 
-      // Store token in sessionStorage
       sessionStorage.setItem('accessToken', res.data.token);
 
-      // Update global auth context
       setAuthState({
         username: res.data.username,
         id: res.data.id,
-        userType: 'User',
+        userType: res.data.userType || 'User',
         status: true,
       });
 
       setError('');
-      //window.location.reload(); // Optional: reload for full auth check
+      navigate('/user');
     } catch (err: any) {
       console.error('Login failed', err);
       setError(err.response?.data?.error || 'Login failed');
