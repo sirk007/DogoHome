@@ -6,7 +6,8 @@ import UserRegistrationPage from './pages/userRegistration/UserRegistration';
 import ShelterRegistrationPage from './pages/shelterRegistration/ShelterRegistration';
 import LandingPage from './pages/LandingPage/LandingPage';
 
-import UserLandingPage from './pages/user/UserLandingPage';
+import UserLandingPage from './pages/user/userLandingPage/UserLandingPage';
+import ShelterLandingPage from './pages/shelter/ShelterLandingPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -45,15 +46,26 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/shelter"
+              element={
+                <ProtectedRoute allowedRoles={['Shelter']}>
+                  <ShelterLandingPage />
+                </ProtectedRoute>
+              }>
+
+            </Route>
+
         {/* Redirect unknown routes */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
       </Box>
 
-        {/* Footer always at bottom */}
-        <Footer />
+        
       </Box>
+      {/* Footer always at bottom */}
+        <Footer />
     </BrowserRouter>
   );
 }

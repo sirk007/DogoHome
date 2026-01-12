@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import { loginShelter } from '../../api/authShelter';
+import { useNavigate } from 'react-router-dom';
+import { Box, Button, TextField, Typography } from '@mui/material';
 
 const LoginShelter: React.FC = () => {
   const { setAuthState } = useAuthContext();
+  const navigate = useNavigate();
 
-  // Local form state
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -13,7 +15,7 @@ const LoginShelter: React.FC = () => {
   const handleLogin = async () => {
     try {
       const res = await loginShelter(username, password);
-      console.log("Login response:", res.data);
+      console.log('Login response:', res.data);
 
       // Store token in sessionStorage
       sessionStorage.setItem('accessShelterToken', res.data.token);
@@ -27,7 +29,9 @@ const LoginShelter: React.FC = () => {
       });
 
       setError('');
-      //window.location.reload(); // Optional: reload for full auth check
+
+      // ✅ Redirect to protected shelter landing page
+      navigate('/shelter');
     } catch (err: any) {
       console.error('Login failed', err);
       setError(err.response?.data?.error || 'Login failed');
@@ -40,37 +44,40 @@ const LoginShelter: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '2rem auto', textAlign: 'center' }}>
-      <h2>Shelter Login</h2>
-      <div style={{ marginBottom: '1rem' }}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          style={{ padding: '0.5rem', width: '100%' }}
-        />
-      </div>
-      <div style={{ marginBottom: '1rem' }}>
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          style={{ padding: '0.5rem', width: '100%' }}
-        />
-      </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button
-        onClick={handleLogin}
-        style={{ padding: '0.5rem 1rem', marginRight: '1rem' }}
-      >
-        Login
-      </button>
-      <button onClick={handleLogout} style={{ padding: '0.5rem 1rem' }}>
-        Logout
-      </button>
-    </div>
+    <Box sx={{ maxWidth: 400, margin: '2rem auto', textAlign: 'center' }}>
+      <Typography variant="h5" gutterBottom>
+        Shelter Login
+      </Typography>
+
+      <TextField
+        label="Username"
+        value={username}
+        onChange={e => setUsername(e.target.value)}
+        fullWidth
+        sx={{ mb: 2 }}
+      />
+
+      <TextField
+        label="Password"
+        type="password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        fullWidth
+        sx={{ mb: 2 }}
+      />
+
+      {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
+
+      <Box>
+        <Button variant="contained" onClick={handleLogin} sx={{ mr: 1 }}>
+          Login
+        </Button>
+
+        <Button variant="outlined" color="error" onClick={handleLogout}>
+          Logout
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

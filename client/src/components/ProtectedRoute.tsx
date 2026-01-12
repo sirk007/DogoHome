@@ -6,25 +6,27 @@ import type { ReactNode } from 'react';
 interface Props {
   children: ReactNode;
   allowedRoles?: UserRole[];
-  loading?: boolean;
 }
 
 const ProtectedRoute = ({ children, allowedRoles }: Props) => {
-  const { authState } = useAuthContext();
+  const { authState, loading } = useAuthContext();
 
-  // Show nothing or spinner while checking auth
-  if (authState.status === false) {
-    return <div>Loading...</div>; // <-- wait for useAuth to finish
+  // 1️⃣ Auth still resolving
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  // Not logged in → redirect
-  if (!authState.status) return <Navigate to="/" replace />;
+  // 2️⃣ Not authenticated
+  if (!authState.status) {
+    return <Navigate to="/" replace />;
+  }
 
-  // Logged in but wrong role
+  // 3️⃣ Authenticated but wrong role
   if (allowedRoles && !allowedRoles.includes(authState.userType)) {
     return <Navigate to="/" replace />;
   }
 
+  // 4️⃣ Authorized
   return <>{children}</>;
 };
 
