@@ -13,7 +13,9 @@ import Shelter from "./Shelter.model";
 
 const db: any = {};
 
+// ----------------------------------------------
 // Initialize models
+// ----------------------------------------------
 db.Users = Users(sequelize);
 db.Posts = Posts(sequelize);
 db.Likes = Likes(sequelize);
@@ -23,15 +25,20 @@ db.Animals = Animals(sequelize);
 db.Admin = Admin(sequelize);
 db.Shelter = Shelter(sequelize);
 
-// Run associations
+// ----------------------------------------------
+// Set up associations
+// ----------------------------------------------
 Object.values(db).forEach((model: any) => {
   if (model.associate) {
     model.associate(db);
   }
 });
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+// ----------------------------------------------
+// Export db object
+// ----------------------------------------------
+db.sequelize = sequelize; // raw Sequelize instance
+db.Sequelize = Sequelize; // Sequelize library
 
 export default db;
 export { sequelize };
