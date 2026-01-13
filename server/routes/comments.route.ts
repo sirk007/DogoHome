@@ -11,6 +11,12 @@ const { Comments } = db;
 // ---------------------------
 // CREATE COMMENT
 // ---------------------------
+// Route: POST /
+// Access: Protected (User only)
+// Middleware: validateUserToken
+//   - Ensures request includes a valid JWT
+//   - Populates req.user with the authenticated user's data
+// Description: Allows a user to create a comment associated with a specific post
 router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
   try {
     const { commentBody, postId } = req.body;
@@ -36,6 +42,10 @@ router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
 // ---------------------------
 // GET COMMENTS BY POST ID
 // ---------------------------
+// Route: GET /post/:postId
+// Access: Public
+// Middleware: None
+// Description: Fetches all comments for a given post, ordered by creation date
 router.get("/post/:postId", async (req: AuthRequest, res: Response) => {
   try {
     const { postId } = req.params;
@@ -54,6 +64,13 @@ router.get("/post/:postId", async (req: AuthRequest, res: Response) => {
 // ---------------------------
 // DELETE COMMENT
 // ---------------------------
+// Route: DELETE /:id
+// Access: Protected (User only)
+// Middleware: validateUserToken
+//   - Ensures request includes a valid JWT
+//   - Populates req.user with authenticated user's data
+// Authorization: User can delete their own comments; Admins can delete any comment
+// Description: Deletes a comment if the authenticated user owns it or is an admin
 router.delete(
   "/:id",
   validateUserToken,
