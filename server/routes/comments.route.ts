@@ -1,11 +1,35 @@
+// ----------------------------------------------
+// ----------------   IMPORTS   -----------------
+// ----------------------------------------------
+// Express Router for defining route endpoints
+// Response type for HTTP responses
 import { Router, Response } from "express";
+
+// ----------------------------------------------
+// Database models (Sequelize instance)
+// ----------------------------------------------
+// db is the Sequelize instance that contains all models
+// Importing Comments model from db for CRUD operations
 import db from "../models";
+
+// Middleware to protect user routes
+// validateUserToken checks JWT and sets req.user if valid
+// AuthRequest extends Express Request with user payload
 import {
   validateUserToken,
   AuthRequest,
 } from "../middleware/AuthMiddlewareUser";
 
+// ----------------------------------------------
+// -------------  CONFIG/SETUP    ---------------
+// ----------------------------------------------
+// Create a new Express router instance
 const router = Router();
+
+// ----------------------------------------------
+// -------------  CONFIG/SETUP    ---------------
+// ----------------------------------------------
+// Create a new Express router instance
 const { Comments } = db;
 
 // ---------------------------
@@ -21,19 +45,24 @@ router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
   try {
     const { commentBody, postId } = req.body;
 
+    // Validate required fields
     if (!commentBody || !postId) {
       return res
         .status(400)
         .json({ error: "commentBody and postId are required" });
     }
 
+    // Create new comment tied to authenticated user
     const newComment = await Comments.create({
       commentBody,
       postId,
       userId: req.user!.id,
     });
+
+    // Respond with 201 Created and return the new animal object
     res.status(201).json(newComment);
   } catch (error) {
+    // Log any error and respond with generic 500
     console.error("Error creating comment:", error);
     res.status(500).json({ error: "Failed to create comment" });
   }
@@ -49,13 +78,15 @@ router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
 router.get("/post/:postId", async (req: AuthRequest, res: Response) => {
   try {
     const { postId } = req.params;
-
+    // Fetch comments ordered by creation date
     const comments = await Comments.findAll({
       where: { postId },
       order: [["createdAt", "ASC"]],
     });
+    // Return the list of comments
     res.json(comments);
   } catch (error) {
+    // Log any error and respond with generic 500
     console.error("Error fetching comments:", error);
     res.status(500).json({ error: "Failed to fetch comments" });
   }
@@ -77,22 +108,26 @@ router.delete(
   async (req: AuthRequest, res: Response) => {
     try {
       const { id } = req.params;
-
+      // Find comment by primary key
       const comment = await Comments.findByPk(id);
       if (!comment) {
         return res.status(404).json({ error: "Comment not found" });
       }
 
-      // Ownership or admin check
+      // Ownership or admin authorization check
+      // Return 403 Forbidden if user is not the owner or an admin
       if (comment.userId !== req.user!.id && req.user!.userType !== "Admin") {
         return res
           .status(403)
           .json({ error: "You do not have permission to delete this comment" });
       }
 
+      // Delete comment
       await comment.destroy();
+      // Comfirm delete comment
       res.json({ message: "Comment deleted successfully" });
     } catch (error) {
+      // Log any error and respond with generic 500
       console.error("Error deleting comment:", error);
       res.status(500).json({ error: "Failed to delete comment" });
     }
