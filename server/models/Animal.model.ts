@@ -1,29 +1,32 @@
 import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 
-/**
- * Attributes interface for Animals model
- */
+// ----------------------------------------------
+// Animal Model Attribute Definitions
+// ----------------------------------------------
+// Represents the structure of a pet/animal record
+// ----------------------------------------------
 interface AnimalAttributes {
-  id?: number;
-  animal: string;
-  animalName: string;
-  animalAge: string;
-  animalHealth: string;
-  animalDescription?: string | null;
-  picture?: Buffer | null;
-  shelterId: number;
+  id?: number; // Primary key (auto-generated)
+  animal: string; // Species or type, e.g., "Dog", "Cat"
+  animalName: string; // Given name of the animal
+  animalAge: string; // Age or age description
+  animalHealth: string; // Health status, e.g., "Good", "Needs medication"
+  animalDescription?: string | null; // Optional detailed description
+  picture?: Buffer | null; // Optional image stored as BLOB
+  shelterId: number; // Foreign key -> Shelters table
 }
 
-/**
- * Attributes required at creation time
- * (id is auto-generated)
- */
+// ----------------------------------------------
+// Creation Attributes
+// ----------------------------------------------
+// Optional fields when creating a new animal
+// ----------------------------------------------
 interface AnimalCreationAttributes
   extends Optional<AnimalAttributes, "id" | "animalDescription" | "picture"> {}
 
-/**
- * Animals Model class
- */
+// ----------------------------------------------
+// Animal Model Class
+// ----------------------------------------------
 class Animals
   extends Model<AnimalAttributes, AnimalCreationAttributes>
   implements AnimalAttributes
@@ -37,12 +40,18 @@ class Animals
   public picture!: Buffer | null;
   public shelterId!: number;
 
-  // timestamps!
+  // --------------------------------------------
+  // Timestamps (automatically managed)
+  // --------------------------------------------
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
+  // --------------------------------------------
+  // Model Associations
+  // --------------------------------------------
+  // Each animal belongs to a single shelter
+  // Cascade delete ensures animals are removed if shelter is deleted
   static associate(models: any) {
-    // Define associations here if needed
     Animals.belongsTo(models.Shelter, {
       foreignKey: "shelterId",
       onDelete: "cascade",
@@ -50,9 +59,9 @@ class Animals
   }
 }
 
-/**
- * Model initializer
- */
+// ----------------------------------------------
+// Model Initializer
+// ----------------------------------------------
 export default (sequelize: Sequelize) => {
   Animals.init(
     {
@@ -77,7 +86,7 @@ export default (sequelize: Sequelize) => {
         allowNull: true,
       },
       picture: {
-        type: DataTypes.BLOB("long"),
+        type: DataTypes.BLOB("long"), // Store image as long BLOB
         allowNull: true,
       },
       shelterId: {
@@ -89,8 +98,8 @@ export default (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      modelName: "Animals",
-      tableName: "Animals",
+      modelName: "Animals", // Sequelize internal model name
+      tableName: "Animals", // Actual database table
     }
   );
 
