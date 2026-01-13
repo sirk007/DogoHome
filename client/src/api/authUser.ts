@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 /**
  * --------------------------------------------
@@ -11,7 +11,7 @@ import axios from 'axios';
  * - Centralizes the API base URL so all user requests use the same configuration
  * - Makes it easier to modify the base URL later (e.g., production vs. development)
  */
-const API = axios.create({ baseURL: 'http://localhost:3002/api/users' });
+const API = axios.create({ baseURL: "http://localhost:3002/api/users" });
 
 /**
  * --------------------------------------------
@@ -33,7 +33,7 @@ const API = axios.create({ baseURL: 'http://localhost:3002/api/users' });
  * - Can be used in login forms to authenticate and obtain a session token
  */
 export const loginUser = (username: string, password: string) =>
-  API.post('/login', { username, password });
+  API.post("/login", { username, password });
 
 /**
  * --------------------------------------------
@@ -53,7 +53,7 @@ export const loginUser = (username: string, password: string) =>
  * - Allows front-end forms to create new users safely
  */
 export const registerUser = (username: string, password: string) =>
-  API.post('/register', { username, password });
+  API.post("/register", { username, password });
 
 /**
  * --------------------------------------------
@@ -74,4 +74,4 @@ export const registerUser = (username: string, password: string) =>
  * - Supports persistent login after page refresh
  */
 export const fetchUserAuth = (token: string) =>
-  API.get('/auth', { headers: { accessToken: token } });
+  API.get("/auth", { headers: { accessToken: token } });

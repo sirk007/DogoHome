@@ -11,7 +11,8 @@ export interface ShelterAuthRequest extends Request {
 }
 
 // Read Shelter JWT secret from .env
-const SHELTER_JWT_SECRET = process.env.SHELTER_JWT_SECRET || "defaultShelterSecret";
+const SHELTER_JWT_SECRET =
+  process.env.SHELTER_JWT_SECRET || "defaultShelterSecret";
 
 export const validateShelterToken = (
   req: ShelterAuthRequest,

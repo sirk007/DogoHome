@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize, Optional } from 'sequelize';
+import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 
 /**
  * Attributes stored in DB
@@ -18,7 +18,7 @@ interface UserAttributes {
  * (id is auto-generated)
  */
 interface UserCreationAttributes
-  extends Optional<UserAttributes, 'id' | 'userType'> {}
+  extends Optional<UserAttributes, "id" | "userType"> {}
 
 /**
  * User Model class
@@ -41,9 +41,12 @@ class Users
 
   static associate(models: any) {
     Users.hasMany(models.Posts, { foreignKey: "userId", onDelete: "CASCADE" });
-    Users.hasMany(models.Comments, { foreignKey: "userId", onDelete: "CASCADE" });
+    Users.hasMany(models.Comments, {
+      foreignKey: "userId",
+      onDelete: "CASCADE",
+    });
     Users.hasMany(models.Likes, { foreignKey: "userId", onDelete: "CASCADE" });
-    Users.belongsTo(models.County, { foreignKey: 'countyId' });
+    Users.belongsTo(models.County, { foreignKey: "countyId" });
   }
 }
 
@@ -72,17 +75,17 @@ export default (sequelize: Sequelize) => {
       countyId: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: { model: 'Counties', key: 'id' },
+        references: { model: "Counties", key: "id" },
       },
       userType: {
         type: DataTypes.STRING,
-        defaultValue: 'User',
+        defaultValue: "User",
       },
     },
     {
       sequelize,
-      modelName: 'Users',
-      tableName: 'Users',
+      modelName: "Users",
+      tableName: "Users",
     }
   );
 

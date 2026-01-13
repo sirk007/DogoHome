@@ -1,7 +1,12 @@
-import React, { createContext, useContext, type FC, type ReactNode } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import type { AuthState } from '../types/auth';
-import type { Dispatch, SetStateAction } from 'react';
+import React, {
+  createContext,
+  useContext,
+  type FC,
+  type ReactNode,
+} from "react";
+import { useAuth } from "../hooks/useAuth";
+import type { AuthState } from "../types/auth";
+import type { Dispatch, SetStateAction } from "react";
 
 /**
  * --------------------------------------------
@@ -28,7 +33,7 @@ interface AuthContextType {
  * AuthContext
  * --------------------------------------------
  * React context that will provide auth info throughout the app.
- * 
+ *
  * Initialized with undefined to enforce using the custom hook
  * (useAuthContext) to consume the context safely.
  */
@@ -54,7 +59,7 @@ interface AuthProviderProps {
  * - setAuthState
  * - loading
  * - logout
- * 
+ *
  * Responsibilities:
  * 1. Calls useAuth hook to get current auth state and helper functions.
  * 2. Provides these values via AuthContext.Provider.
@@ -85,7 +90,7 @@ export const useAuthContext = (): AuthContextType => {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error('useAuthContext must be used within an AuthProvider');
+    throw new Error("useAuthContext must be used within an AuthProvider");
   }
 
   return context;

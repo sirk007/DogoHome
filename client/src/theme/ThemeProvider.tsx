@@ -1,9 +1,5 @@
-import {
-  createTheme,
-  ThemeProvider,
-  CssBaseline,
-} from '@mui/material';
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
 /**
  * --------------------------------------------
@@ -11,7 +7,7 @@ import React, { createContext, useContext, useMemo, useState } from 'react';
  * --------------------------------------------
  * Defines the two possible theme modes: light or dark.
  */
-type Mode = 'light' | 'dark';
+type Mode = "light" | "dark";
 
 /**
  * --------------------------------------------
@@ -44,7 +40,8 @@ const ThemeModeContext = createContext<ThemeContextValue | null>(null);
  */
 export const useThemeMode = () => {
   const ctx = useContext(ThemeModeContext);
-  if (!ctx) throw new Error('useThemeMode must be used within AppThemeProvider');
+  if (!ctx)
+    throw new Error("useThemeMode must be used within AppThemeProvider");
   return ctx;
 };
 
@@ -56,8 +53,8 @@ export const useThemeMode = () => {
  * If a value exists ('light' or 'dark'), use it; otherwise default to 'light'.
  */
 const getInitialMode = (): Mode => {
-  const stored = localStorage.getItem('theme');
-  return stored === 'dark' || stored === 'light' ? stored : 'light';
+  const stored = localStorage.getItem("theme");
+  return stored === "dark" || stored === "light" ? stored : "light";
 };
 
 /**
@@ -73,7 +70,11 @@ const getInitialMode = (): Mode => {
  * 4. Generates MUI theme using createTheme with custom palette for light/dark
  * 5. Wraps children with MUI ThemeProvider and CssBaseline for global styles
  */
-export const AppThemeProvider = ({ children }: { children: React.ReactNode }) => {
+export const AppThemeProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   // -----------------------------
   // State: current theme mode
   // -----------------------------
@@ -83,9 +84,9 @@ export const AppThemeProvider = ({ children }: { children: React.ReactNode }) =>
   // toggleTheme function
   // -----------------------------
   const toggleTheme = () => {
-    const next = mode === 'light' ? 'dark' : 'light';
+    const next = mode === "light" ? "dark" : "light";
     setMode(next);
-    localStorage.setItem('theme', next);
+    localStorage.setItem("theme", next);
   };
   // -----------------------------
   // MUI theme memoization
@@ -100,43 +101,43 @@ export const AppThemeProvider = ({ children }: { children: React.ReactNode }) =>
           // -----------------------------
           // Custom light palette
           // -----------------------------
-          ...(mode === 'light'
+          ...(mode === "light"
             ? {
                 background: {
-                  default: '#f5f7fa',
-                  paper: '#ffffff',
+                  default: "#f5f7fa",
+                  paper: "#ffffff",
                 },
                 text: {
-                  primary: '#1f2933',
-                  secondary: '#4b5563',
+                  primary: "#1f2933",
+                  secondary: "#4b5563",
                 },
                 primary: {
-                  main: '#2563eb',
+                  main: "#2563eb",
                 },
                 secondary: {
-                  main: '#64748b',
+                  main: "#64748b",
                 },
-                divider: '#e5e7eb',
+                divider: "#e5e7eb",
               }
-            // -----------------------------
-            // Custom dark palette
-            // -----------------------------
-            : {
+            : // -----------------------------
+              // Custom dark palette
+              // -----------------------------
+              {
                 background: {
-                  default: '#0f172a',
-                  paper: '#111827',
+                  default: "#0f172a",
+                  paper: "#111827",
                 },
                 text: {
-                  primary: '#f9fafb',
-                  secondary: '#9ca3af',
+                  primary: "#f9fafb",
+                  secondary: "#9ca3af",
                 },
                 primary: {
-                  main: '#60a5fa',
+                  main: "#60a5fa",
                 },
                 secondary: {
-                  main: '#94a3b8',
+                  main: "#94a3b8",
                 },
-                divider: '#1f2937',
+                divider: "#1f2937",
               }),
         },
       }),

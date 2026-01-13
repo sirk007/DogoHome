@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 /**
  * --------------------------------------------
@@ -11,7 +11,7 @@ import axios from 'axios';
  * - Centralizes API configuration for all shelter-related requests
  * - Easy to switch endpoints for production or staging environments
  */
-const API = axios.create({ baseURL: 'http://localhost:3002/api/shelters' });
+const API = axios.create({ baseURL: "http://localhost:3002/api/shelters" });
 
 /**
  * --------------------------------------------
@@ -33,7 +33,7 @@ const API = axios.create({ baseURL: 'http://localhost:3002/api/shelters' });
  * - Used in login forms to obtain a session token
  */
 export const loginShelter = (username: string, password: string) =>
-  API.post('/login', { username, password });
+  API.post("/login", { username, password });
 
 /**
  * --------------------------------------------
@@ -53,7 +53,7 @@ export const loginShelter = (username: string, password: string) =>
  * - Keeps front-end logic clean and separated from API calls
  */
 export const registerShelter = (username: string, password: string) =>
-  API.post('/register', { username, password });
+  API.post("/register", { username, password });
 
 /**
  * --------------------------------------------
@@ -74,4 +74,4 @@ export const registerShelter = (username: string, password: string) =>
  * - Supports role-based access control for shelter-specific routes
  */
 export const fetchShelterAuth = (token: string) =>
-  API.get('/authShelter', { headers: { accessShelterToken: token } });
+  API.get("/authShelter", { headers: { accessShelterToken: token } });

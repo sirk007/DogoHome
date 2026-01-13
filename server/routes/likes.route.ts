@@ -1,6 +1,9 @@
 import { Router, Response } from "express";
 import db from "../models";
-import { validateUserToken, AuthRequest } from "../middleware/AuthMiddlewareUser";
+import {
+  validateUserToken,
+  AuthRequest,
+} from "../middleware/AuthMiddlewareUser";
 
 const router = Router();
 const { Likes } = db;

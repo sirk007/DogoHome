@@ -1,6 +1,6 @@
 // config/database.ts
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
+import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     port: 3306,
-    dialect: (process.env.DB_DIALECT as any) || 'mysql',
+    dialect: (process.env.DB_DIALECT as any) || "mysql",
     logging: false, // set true if you want SQL query logs
   }
 );
@@ -19,7 +19,7 @@ const sequelize = new Sequelize(
 // Optional: immediately test the connection
 sequelize
   .authenticate()
-  .then(() => console.log('Database Connected Successfully'))
-  .catch(err => console.error('Unable to connect to database:', err));
+  .then(() => console.log("Database Connected Successfully"))
+  .catch((err) => console.error("Unable to connect to database:", err));
 
 export default sequelize;

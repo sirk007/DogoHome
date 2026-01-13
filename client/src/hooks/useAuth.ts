@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import type { AxiosResponse } from 'axios';
-import { jwtDecode } from 'jwt-decode'; // used to decode JWT and check expiration
-import { fetchUserAuth, fetchAdminAuth, fetchShelterAuth } from '../api/auth';
-import type { AuthState, UserRole } from '../types/auth';
+import { useState, useEffect } from "react";
+import type { AxiosResponse } from "axios";
+import { jwtDecode } from "jwt-decode"; // used to decode JWT and check expiration
+import { fetchUserAuth, fetchAdminAuth, fetchShelterAuth } from "../api/auth";
+import type { AuthState, UserRole } from "../types/auth";
 
 /**
  * --------------------------------------------
@@ -12,9 +12,9 @@ import type { AuthState, UserRole } from '../types/auth';
  * This allows the hook to check for any active token in a structured way.
  */
 const TOKEN_KEYS = {
-  user: 'accessToken',
-  admin: 'adminAccessToken',
-  shelter: 'accessShelterToken',
+  user: "accessToken",
+  admin: "adminAccessToken",
+  shelter: "accessShelterToken",
 };
 
 /**
@@ -25,7 +25,7 @@ const TOKEN_KEYS = {
  * is a valid UserRole as defined in types/auth.ts
  */
 const isValidUserRole = (role: any): role is UserRole =>
-  role === 'User' || role === 'Admin' || role === 'Shelter';
+  role === "User" || role === "Admin" || role === "Shelter";
 
 /**
  * --------------------------------------------
@@ -55,10 +55,10 @@ export const useAuth = () => {
   // Local state
   // -----------------------------
   const [authState, setAuthState] = useState<AuthState>({
-    username: '',      // username of authenticated user
-    id: 0,             // database ID of user
-    userType: '',      // role: User, Admin, Shelter, or empty string
-    status: false,     // whether user is logged in
+    username: "", // username of authenticated user
+    id: 0, // database ID of user
+    userType: "", // role: User, Admin, Shelter, or empty string
+    status: false, // whether user is logged in
   });
 
   const [loading, setLoading] = useState(true); // tracks whether auth check is in progress
@@ -97,7 +97,7 @@ export const useAuth = () => {
       // 2. No valid token found
       // -----------------------------
       if (!tokenEntry) {
-        setAuthState({ username: '', id: 0, userType: '', status: false });
+        setAuthState({ username: "", id: 0, userType: "", status: false });
         setLoading(false);
         return;
       }
@@ -111,9 +111,9 @@ export const useAuth = () => {
         // -----------------------------
         let response: AxiosResponse<any> | undefined;
 
-        if (role === 'user') response = await fetchUserAuth(token);
-        else if (role === 'admin') response = await fetchAdminAuth(token);
-        else if (role === 'shelter') response = await fetchShelterAuth(token);
+        if (role === "user") response = await fetchUserAuth(token);
+        else if (role === "admin") response = await fetchAdminAuth(token);
+        else if (role === "shelter") response = await fetchShelterAuth(token);
 
         // -----------------------------
         // 4. Invalid response handling
@@ -121,7 +121,7 @@ export const useAuth = () => {
         if (!response || response.data?.error) {
           // Token invalid → remove from sessionStorage and reset auth state
           sessionStorage.removeItem(key);
-          setAuthState({ username: '', id: 0, userType: '', status: false });
+          setAuthState({ username: "", id: 0, userType: "", status: false });
           setLoading(false);
           return;
         }
@@ -131,15 +131,15 @@ export const useAuth = () => {
         // -----------------------------
         const userRole = response.data.userType;
         setAuthState({
-          username: response.data.username ?? '',
+          username: response.data.username ?? "",
           id: response.data.id ?? 0,
-          userType: isValidUserRole(userRole) ? userRole : '',
+          userType: isValidUserRole(userRole) ? userRole : "",
           status: true,
         });
       } catch {
         // Network or unexpected error → treat as unauthenticated
         sessionStorage.removeItem(key);
-        setAuthState({ username: '', id: 0, userType: '', status: false });
+        setAuthState({ username: "", id: 0, userType: "", status: false });
       } finally {
         setLoading(false); // auth check complete
       }
@@ -153,8 +153,8 @@ export const useAuth = () => {
   // -----------------------------
   // Clears all stored tokens and resets auth state
   const logout = () => {
-    Object.values(TOKEN_KEYS).forEach(key => sessionStorage.removeItem(key));
-    setAuthState({ username: '', id: 0, userType: '', status: false });
+    Object.values(TOKEN_KEYS).forEach((key) => sessionStorage.removeItem(key));
+    setAuthState({ username: "", id: 0, userType: "", status: false });
   };
 
   // -----------------------------

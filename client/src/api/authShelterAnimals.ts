@@ -6,9 +6,15 @@ const API = axios.create({ baseURL: "http://localhost:3002/api/animals" });
 export const createAnimal = (data: any, token: string) => {
   const formData = new FormData();
   Object.entries(data).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) formData.append(key, value as any);
+    if (value !== undefined && value !== null)
+      formData.append(key, value as any);
   });
-  return API.post("/", formData, { headers: { accessShelterToken: token, "Content-Type": "multipart/form-data" } });
+  return API.post("/", formData, {
+    headers: {
+      accessShelterToken: token,
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 // Get animals for current shelter

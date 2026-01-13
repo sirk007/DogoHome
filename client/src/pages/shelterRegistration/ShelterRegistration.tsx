@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Paper,
@@ -12,64 +12,96 @@ import {
   InputLabel,
   Select,
   MenuItem,
-} from '@mui/material';
-import { useNavigate, Link } from 'react-router-dom';
-import Navbar from '../../components/navbar/Navbar'
+} from "@mui/material";
+import { useNavigate, Link } from "react-router-dom";
+import Navbar from "../../components/navbar/Navbar";
 
+/**
+ * --------------------------------------------
+ * ShelterRegistrationPage Component
+ * --------------------------------------------
+ * Handles shelter registration:
+ * - Collects username, email, password, confirmPassword
+ * - Shelter-specific info: shelterName, county, address, phoneNumber
+ * - Fetches counties from backend for dropdown
+ * - Basic client-side validation (password match)
+ * - Sends POST request to /shelters endpoint
+ * - Displays success/error alerts
+ * - Redirects to login after success
+ */
 interface County {
   id: number;
   countyName: string;
 }
 
 const ShelterRegistrationPage: React.FC = () => {
+  // -----------------------------
+  // Local form state
+  // -----------------------------
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    shelterName: '',
-    countyId: '',
-    address: '',
-    phoneNumber: '',
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    shelterName: "",
+    countyId: "",
+    address: "",
+    phoneNumber: "",
   });
 
+  // -----------------------------
+  // Counties for dropdown
+  // -----------------------------
   const [counties, setCounties] = useState<County[]>([]);
+
+  // -----------------------------
+  // UI feedback state
+  // -----------------------------
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // -----------------------------
   // Fetch counties from backend
+  // -----------------------------
   useEffect(() => {
-    fetch('/counties')
-      .then(res => res.json())
-      .then(data => setCounties(data))
-      .catch(err => console.error(err));
+    fetch("/counties")
+      .then((res) => res.json())
+      .then((data) => setCounties(data))
+      .catch((err) => console.error(err));
   }, []);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
+  // -----------------------------
+  // Handle input changes
+  // -----------------------------
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | any) => {
     const { name, value } = e.target;
 
-    // Convert countyId to number if needed
-    setFormData(prev => ({
-        ...prev,
-        [name]: name === 'countyId' ? Number(value) : value,
+    // Convert countyId to number for backend
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "countyId" ? Number(value) : value,
     }));
-    };
+  };
 
+  // -----------------------------
+  // Handle form submission
+  // -----------------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
+    // Basic validation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
       return;
     }
 
     try {
-      const res = await fetch('/shelters', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/shelters", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
@@ -77,7 +109,8 @@ const ShelterRegistrationPage: React.FC = () => {
       if (!res.ok) setError(data.error || "Registration failed");
       else {
         setSuccess("Shelter registered successfully!");
-        setTimeout(() => navigate('/login/shelter'), 1500);
+        // Redirect to shelter login after 1.5s
+        setTimeout(() => navigate("/login/shelter"), 1500);
       }
     } catch (err) {
       console.error(err);
@@ -85,19 +118,48 @@ const ShelterRegistrationPage: React.FC = () => {
     }
   };
 
+  // -----------------------------
+  // Render
+  // -----------------------------
   return (
+    // -----------------------------
+    // Navbar wrapper
+    // -----------------------------
+    // Provides consistent navigation/header
     <Navbar>
+      {/*-----------------------------
+      // Centered container
+      // ----------------------------- */}
       <Container maxWidth="sm" sx={{ mt: 6 }}>
+        {/* Paper elevates the form visually */}
         <Paper elevation={4} sx={{ p: 4 }}>
+          {/*-----------------------------
+          // Form Header
+          // ----------------------------- */}
           <Box textAlign="center" mb={3}>
             <Typography variant="h5">Shelter Registration</Typography>
           </Box>
 
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+          {/*------------------------------
+          // Error / Success Alerts
+          // -----------------------------*/}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {success}
+            </Alert>
+          )}
 
+          {/*-----------------------------
+          // Registration Form
+          // ----------------------------- */}
           <Box component="form" onSubmit={handleSubmit}>
             <Stack spacing={2}>
+              {/* Username */}
               <TextField
                 label="Username"
                 name="username"
@@ -107,6 +169,7 @@ const ShelterRegistrationPage: React.FC = () => {
                 fullWidth
               />
 
+              {/* Email */}
               <TextField
                 label="Email"
                 name="email"
@@ -117,6 +180,7 @@ const ShelterRegistrationPage: React.FC = () => {
                 fullWidth
               />
 
+              {/* Shelter Name */}
               <TextField
                 label="Shelter Name"
                 name="shelterName"
@@ -126,6 +190,7 @@ const ShelterRegistrationPage: React.FC = () => {
                 fullWidth
               />
 
+              {/* County dropdown */}
               <FormControl fullWidth required>
                 <InputLabel>County</InputLabel>
                 <Select
@@ -133,12 +198,15 @@ const ShelterRegistrationPage: React.FC = () => {
                   value={formData.countyId}
                   onChange={handleChange}
                 >
-                  {counties.map(c => (
-                    <MenuItem key={c.id} value={c.id}>{c.countyName}</MenuItem>
+                  {counties.map((c) => (
+                    <MenuItem key={c.id} value={c.id}>
+                      {c.countyName}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
 
+              {/* Address */}
               <TextField
                 label="Address"
                 name="address"
@@ -148,6 +216,7 @@ const ShelterRegistrationPage: React.FC = () => {
                 fullWidth
               />
 
+              {/* Phone Number */}
               <TextField
                 label="Phone Number"
                 name="phoneNumber"
@@ -157,6 +226,7 @@ const ShelterRegistrationPage: React.FC = () => {
                 fullWidth
               />
 
+              {/* Password */}
               <TextField
                 label="Password"
                 name="password"
@@ -167,6 +237,7 @@ const ShelterRegistrationPage: React.FC = () => {
                 fullWidth
               />
 
+              {/* Confirm Password */}
               <TextField
                 label="Confirm Password"
                 name="confirmPassword"
@@ -176,16 +247,25 @@ const ShelterRegistrationPage: React.FC = () => {
                 required
                 fullWidth
               />
-
-              <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+              {/* Submit button */}
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                sx={{ mt: 2 }}
+              >
                 Register
               </Button>
             </Stack>
           </Box>
 
+          {/*-----------------------------
+          // Redirect link for existing shelters
+          // ----------------------------- */}
           <Box mt={3} textAlign="center">
             <Typography variant="body2">
-              Already have an account? <Link to="/login/shelter">Login here</Link>
+              Already have an account?{" "}
+              <Link to="/login/shelter">Login here</Link>
             </Typography>
           </Box>
         </Paper>

@@ -4,8 +4,8 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
  * Attributes interface for ImageTest model
  */
 interface ImageTestAttributes {
-    id?: number;
-    picture: Buffer | null;
+  id?: number;
+  picture: Buffer | null;
 }
 
 /**
@@ -13,43 +13,43 @@ interface ImageTestAttributes {
  * (id is auto-generated)
  */
 interface ImageTestCreationAttributes
-    extends Optional<ImageTestAttributes, "id"> {}
+  extends Optional<ImageTestAttributes, "id"> {}
 
 /**
  * ImageTest Model class
  */
 class ImageTest
-    extends Model<ImageTestAttributes, ImageTestCreationAttributes>
-    implements ImageTestAttributes
+  extends Model<ImageTestAttributes, ImageTestCreationAttributes>
+  implements ImageTestAttributes
 {
-    public id!: number;
-    public picture!: Buffer | null;
+  public id!: number;
+  public picture!: Buffer | null;
 
-    // timestamps!
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
+  // timestamps!
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 
-    static associate(models: any) {
-        // Define associations here if needed
-    }
+  static associate(models: any) {
+    // Define associations here if needed
+  }
 }
 
 /**
  * Model initializer
  */
 export default (sequelize: Sequelize) => {
-    ImageTest.init(
-        {
-            picture: {
-                type: DataTypes.BLOB,
-                allowNull: true,
-            },
-        },
-        {
-            sequelize,
-            modelName: "ImageTest",
-            tableName: "ImageTests",
-        }
-    );
-    return ImageTest;
-}
+  ImageTest.init(
+    {
+      picture: {
+        type: DataTypes.BLOB,
+        allowNull: true,
+      },
+    },
+    {
+      sequelize,
+      modelName: "ImageTest",
+      tableName: "ImageTests",
+    }
+  );
+  return ImageTest;
+};

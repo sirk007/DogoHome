@@ -1,23 +1,23 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Box } from '@mui/material';
-import { useAuthContext } from './context/AuthContext';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Box } from "@mui/material";
+import { useAuthContext } from "./context/AuthContext";
 
 // Components & Pages
-import Footer from './components/footer/Footer';
-import ProtectedRoute from './components/ProtectedRoute';
+import Footer from "./components/footer/Footer";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-import LandingPage from './pages/LandingPage/LandingPage';
-import UserRegistrationPage from './pages/userRegistration/UserRegistration';
-import ShelterRegistrationPage from './pages/shelterRegistration/ShelterRegistration';
+import LandingPage from "./pages/LandingPage/LandingPage";
+import UserRegistrationPage from "./pages/userRegistration/UserRegistration";
+import ShelterRegistrationPage from "./pages/shelterRegistration/ShelterRegistration";
 
-import UserLandingPage from './pages/user/userLandingPage/UserLandingPage';
-import ShelterLandingPage from './pages/shelter/ShelterLandingPage';
-import ShelterAnimalPage from './pages/shelter/ShelterAnimalPage';
+import UserLandingPage from "./pages/user/userLandingPage/UserLandingPage";
+import ShelterLandingPage from "./pages/shelter/ShelterLandingPage";
+import ShelterAnimalPage from "./pages/shelter/ShelterAnimalPage";
 
 /**
  * App component - the root of the React application
- * 
+ *
  * Responsibilities:
  * 1. Wraps the app in BrowserRouter for routing.
  * 2. Provides a flex layout to ensure footer sticks to the bottom.
@@ -27,7 +27,7 @@ import ShelterAnimalPage from './pages/shelter/ShelterAnimalPage';
  */
 function App() {
   // Get auth state from context
-  const { authState } = useAuthContext(); 
+  const { authState } = useAuthContext();
   // NOTE: Currently used for optional debugging, could remove in production
 
   return (
@@ -35,9 +35,9 @@ function App() {
       {/* Flex container: main content + footer layout */}
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '100vh', // ensures footer is pushed to bottom
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh", // ensures footer is pushed to bottom
         }}
       >
         {/* Main content grows to fill remaining space above footer */}
@@ -51,7 +51,10 @@ function App() {
 
             {/* Registration routes */}
             <Route path="/registration" element={<UserRegistrationPage />} />
-            <Route path="/shelter/registration" element={<ShelterRegistrationPage />} />
+            <Route
+              path="/shelter/registration"
+              element={<ShelterRegistrationPage />}
+            />
 
             {/* --------------------------------------
                 PROTECTED ROUTES - USER
@@ -60,7 +63,7 @@ function App() {
             <Route
               path="/user"
               element={
-                <ProtectedRoute allowedRoles={['User']}>
+                <ProtectedRoute allowedRoles={["User"]}>
                   <UserLandingPage />
                 </ProtectedRoute>
               }
@@ -73,7 +76,7 @@ function App() {
             <Route
               path="/shelter"
               element={
-                <ProtectedRoute allowedRoles={['Shelter']}>
+                <ProtectedRoute allowedRoles={["Shelter"]}>
                   <ShelterLandingPage />
                 </ProtectedRoute>
               }
@@ -83,7 +86,7 @@ function App() {
             <Route
               path="/shelter/animals/add"
               element={
-                <ProtectedRoute allowedRoles={['Shelter']}>
+                <ProtectedRoute allowedRoles={["Shelter"]}>
                   <ShelterAnimalPage />
                 </ProtectedRoute>
               }
