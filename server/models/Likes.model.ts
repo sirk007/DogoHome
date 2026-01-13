@@ -1,24 +1,27 @@
 import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 
-/**
- * Attributes interface for Likes model
- */
+// ----------------------------------------------
+// Likes Model Attribute Definitions
+// ----------------------------------------------
+// Represents a like from a user on either a post or a comment
+// ----------------------------------------------
 interface LikesAttributes {
-  id?: number;
-  userId?: number;
-  postId?: number | null;
-  commentId?: number | null;
+  id?: number; // Primary key (auto-generated)
+  userId?: number; // FK -> Users table (who liked)
+  postId?: number | null; // FK -> Posts table (what post was liked)
+  commentId?: number | null; // FK -> Comments table (what comment was liked)
 }
 
-/**
- * Attributes required at creation time
- * (id is auto-generated)
- */
+// ----------------------------------------------
+// Creation Attributes
+// ----------------------------------------------
+// Optional fields during creation
+// ----------------------------------------------
 interface LikesCreationAttributes extends Optional<LikesAttributes, "id"> {}
 
-/**
- * Likes Model class
- */
+// ----------------------------------------------
+// Likes Model Class
+// ----------------------------------------------
 class Likes
   extends Model<LikesAttributes, LikesCreationAttributes>
   implements LikesAttributes
@@ -27,20 +30,28 @@ class Likes
   public userId!: number;
   public postId!: number;
 
-  // timestamps!
+  // --------------------------------------------
+  // Timestamps (automatically managed)
+  // --------------------------------------------
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
+  // --------------------------------------------
+  // Model Associations
+  // --------------------------------------------
+  // Each like belongs to:
+  // - a user
+  // - a post (optional)
+  // - a comment (optional)
   static associate(models: any) {
-    // Define associations here if needed
     Likes.belongsTo(models.Users, { foreignKey: "userId" });
     Likes.belongsTo(models.Posts, { foreignKey: "postId" });
     Likes.belongsTo(models.Comments, { foreignKey: "commentId" });
   }
 }
-/**
- * Model initializer
- */
+// ----------------------------------------------
+// Model Initializer
+// ----------------------------------------------
 export default (sequelize: Sequelize) => {
   Likes.init(
     {
@@ -65,16 +76,16 @@ export default (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      modelName: "Likes",
-      tableName: "Likes",
+      modelName: "Likes", // Internal Sequelize name
+      tableName: "Likes", // DB table name
       indexes: [
         {
           unique: true,
-          fields: ["userId", "postId"],
+          fields: ["userId", "postId"], // prevent multiple likes by same user on same post
         },
         {
           unique: true,
-          fields: ["userId", "commentId"],
+          fields: ["userId", "commentId"], // prevent multiple likes by same user on same comment
         },
       ],
     }
