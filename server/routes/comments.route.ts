@@ -26,10 +26,8 @@ import {
 // Create a new Express router instance
 const router = Router();
 
-// ----------------------------------------------
-// -------------  CONFIG/SETUP    ---------------
-// ----------------------------------------------
-// Create a new Express router instance
+// Destructure the Comments model from the Sequelize instance
+// Comments model will be used to query/create/update/delete comments
 const { Comments } = db;
 
 // ---------------------------
