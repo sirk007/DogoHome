@@ -1,15 +1,38 @@
 {
   "compilerOptions": {
+    // Target JavaScript version emitted by TypeScript
+    // ES2020 supports modern features like optional chaining, async/await, etc.
     "target": "ES2020",
+
+    // Use CommonJS modules (required for Node.js / Express)
     "module": "CommonJS",
+
+    // Resolve modules the same way Node.js does
     "moduleResolution": "node",
+
+    // Allows default imports from CommonJS modules (e.g. import express from 'express')
     "esModuleInterop": true,
+
+    // Enable strict type-checking across the entire project
+    // This helps catch bugs early and enforces safer code
     "strict": true,
+
+    // Skips type checking of declaration files (.d.ts)
+    // Improves compile speed and avoids third-party type issues
     "skipLibCheck": true,
+
+    // Ensures file imports respect casing (important for Linux / CI environments)
     "forceConsistentCasingInFileNames": true,
+
+    // Output directory for compiled JavaScript files
     "outDir": "dist",
+
+    // Locations where TypeScript should look for type definitions
+    // Includes default @types packages and custom app-level types
     "typeRoots": ["./node_modules/@types", "./types"]
   },
+  // Include all TypeScript source files in the project
   "include": ["**/*.ts"],
+  // Exclude dependencies from compilation
   "exclude": ["node_modules"]
 }

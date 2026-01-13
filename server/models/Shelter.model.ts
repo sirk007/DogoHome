@@ -1,28 +1,37 @@
 import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 
-// Define the attributes for the User model
+// ----------------------------------------------
+// Shelter Model Attribute Definitions
+// ----------------------------------------------
+// Represents the full shape of a Shelter record in the DB
+// ----------------------------------------------
 interface ShelterAttributes {
-  id?: number;
-  username: string;
-  password: string;
-  email: string;
-  shelterName: string;
-  countyId: number;
-  address: string;
-  phoneNumber: string;
-  userType: string;
+  id?: number; // Primary key (auto-generated)
+  username: string; // Login username
+  password: string; // Hashed password
+  email: string; // Contact email
+  shelterName: string; // Public name of the shelter
+  countyId: number; // Foreign key -> Counties table
+  address: string; // Physical address
+  phoneNumber: string; // Contact phone
+  userType: string; // Role identifier, default: "Shelter"
 }
 
-/**
- * Attributes for creating a new User instance
- */
+// ----------------------------------------------
+// Creation Attributes
+// ----------------------------------------------
+// Fields optional when creating a Shelter.
+// ID auto-generated, userType defaults to "Shelter"
+// ----------------------------------------------
 interface ShelterCreationAttributes
   extends Optional<ShelterAttributes, "id" | "userType"> {}
 
-/**
- * User Model class
- * Represents a shelter in the system
- */
+// ----------------------------------------------
+// Shelter Model Class
+// ----------------------------------------------
+// Maps to the "Shelters" table, provides typed access
+// and ORM functionality
+// ----------------------------------------------
 class Shelter
   extends Model<ShelterAttributes, ShelterCreationAttributes>
   implements ShelterAttributes
@@ -37,13 +46,23 @@ class Shelter
   public phoneNumber!: string;
   public userType!: string;
 
-  // timestamps!
+  // --------------------------------------------
+  // Timestamps (automatically managed)
+  // --------------------------------------------
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
+  // --------------------------------------------
+  // Model Associations
+  // --------------------------------------------
+  // A Shelter:
+  // - Can have many Likes (for posts or animals)
+  // - Can create many Posts
+  // - Can have many Animals
+  // - Belongs to one County
+  // Cascade delete ensures no orphaned data when a shelter is deleted
+  // --------------------------------------------
   static associate(models: any) {
-    // Define associations here if needed
-    // Disabled for now
     Shelter.hasMany(models.Likes, {
       foreignKey: "shelterId",
       onDelete: "cascade",
@@ -59,9 +78,12 @@ class Shelter
     Shelter.belongsTo(models.County, { foreignKey: "countyId" });
   }
 }
-/**
- * Model initializer
- */
+
+// ----------------------------------------------
+// Model Initializer
+// ----------------------------------------------
+// Defines database schema, constraints, and default values
+// ----------------------------------------------
 export default (sequelize: Sequelize) => {
   Shelter.init(
     {
@@ -101,8 +123,8 @@ export default (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      modelName: "Shelter",
-      tableName: "Shelters",
+      modelName: "Shelter", // Sequelize internal model name
+      tableName: "Shelters", // Actual database table name
     }
   );
   return Shelter;
