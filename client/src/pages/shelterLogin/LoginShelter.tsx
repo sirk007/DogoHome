@@ -15,12 +15,15 @@ const LoginShelter: React.FC = () => {
   const handleLogin = async () => {
     try {
       const res = await loginShelter(username, password);
-      console.log('Login response:', res.data);
 
-      // Store token in sessionStorage
-      sessionStorage.setItem('accessShelterToken', res.data.token);
+      const token = res.data.token;
+      if (!token) throw new Error('No token returned');
 
-      // Update global auth context
+      // Clear any other tokens and save this one
+      sessionStorage.clear();
+      sessionStorage.setItem('accessShelterToken', token);
+
+      // Update auth state (without storing token)
       setAuthState({
         username: res.data.username,
         id: res.data.id,
@@ -29,8 +32,6 @@ const LoginShelter: React.FC = () => {
       });
 
       setError('');
-
-      // ✅ Redirect to protected shelter landing page
       navigate('/shelter');
     } catch (err: any) {
       console.error('Login failed', err);

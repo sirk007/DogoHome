@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import db from "../models"; // Import the database connection
 import { validateShelterToken, ShelterAuthRequest } from "../middleware/AuthMiddlewareShelter";
-import { parse } from "dotenv";
+
 
 const router = Router();
 const { Animals } = db; // Destructure Animals model from db
@@ -62,7 +62,7 @@ router.get("/byShelterId/:shelterId", async (req: Request, res: Response) => {
 
 
 // ---------------------------
-// GET ANIMAL BY ID
+// GET ANIMAL BY ID (Public)
 // ---------------------------
 router.get("/byId/:id", async (req: Request, res: Response) => {
     try {
@@ -83,14 +83,29 @@ router.get("/byId/:id", async (req: Request, res: Response) => {
 // ---------------------------
 router.delete("/:id", validateShelterToken, async (req: ShelterAuthRequest, res: Response) => {
     try {
-        const { id } = req.params;
-        await Animals.destroy({ where: { id } });
-        res.json({ message: "Animal deleted successfully" });
+      if (!req.shelter) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const id = Number(req.params.id);
+      const animal = await Animals.findByPk(id);
+
+      if (!animal) {
+        return res.status(404).json({ error: "Animal not found" });
+      }
+
+      if (animal.shelterId !== req.shelter.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      await animal.destroy();
+      res.json({ message: "Animal deleted successfully" });
     } catch (error) {
-        console.error("Error deleting animal:", error);
-        res.status(500).json({ error: "Failed to delete animal" });
+      console.error("Error deleting animal:", error);
+      res.status(500).json({ error: "Failed to delete animal" });
     }
-});
+  }
+);
 
 export default router;
 

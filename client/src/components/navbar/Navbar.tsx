@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -19,37 +19,43 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+
 import { useAuthContext } from '../../context/AuthContext';
 import { useThemeMode } from '../../theme/ThemeProvider';
 
 interface NavbarProps {
   children?: React.ReactNode;
-  onSignInClick?: () => void; // <-- handler for opening sign-in modal
+  onSignInClick?: () => void; // 🔑 modal trigger from parent
 }
 
 const drawerWidth = 240;
 
-const Navbar: React.FC<NavbarProps> = ({ children }) => {
+const Navbar: React.FC<NavbarProps> = ({ children, onSignInClick }) => {
   const { authState, setAuthState } = useAuthContext();
   const navigate = useNavigate();
   const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md')); // >= md shows top navbar
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const { mode, toggleTheme } = useThemeMode();
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+  const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
 
   const handleLogout = () => {
-    if (authState.userType === 'Shelter') sessionStorage.removeItem('accessShelterToken');
-    else sessionStorage.removeItem('accessToken');
+    if (authState.userType === 'Shelter') {
+      sessionStorage.removeItem('accessShelterToken');
+    } else {
+      sessionStorage.removeItem('accessToken');
+    }
 
     setAuthState({ username: '', id: 0, userType: '', status: false });
     navigate('/');
   };
 
-  // Navigation links based on role
+  /* ================= ROLE-BASED NAV ================= */
+
   let navLinks: { label: string; path: string }[] = [];
+
   if (authState.status) {
     switch (authState.userType) {
       case 'User':
@@ -59,6 +65,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
           { label: 'Profile', path: '/user/profile' },
         ];
         break;
+
       case 'Shelter':
         navLinks = [
           { label: 'Dashboard', path: '/shelter' },
@@ -67,6 +74,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
           { label: 'Profile', path: '/shelter/profile' },
         ];
         break;
+
       case 'Admin':
         navLinks = [
           { label: 'Dashboard', path: '/admin' },
@@ -77,7 +85,8 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
     }
   }
 
-  // Drawer content for mobile
+  /* ================= MOBILE DRAWER ================= */
+
   const drawer = (
     <Box
       sx={{
@@ -88,36 +97,47 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
         px: 1,
       }}
     >
-      <Box>
-        <List>
-          {authState.status
-            ? navLinks.map((link) => (
-                <ListItemButton key={link.path} onClick={() => navigate(link.path)}>
-                  <ListItemText primary={link.label} />
-                </ListItemButton>
-              ))
-            : [
-                <ListItemButton key="sign-in" onClick={() => navigate('/')}>
-                  <ListItemText primary="Sign In" />
-                </ListItemButton>,
-                <ListItemButton key="register-user" onClick={() => navigate('/registration')}>
-                  <ListItemText primary="Register User" />
-                </ListItemButton>,
-                <ListItemButton key="register-shelter" onClick={() => navigate('/shelter/registration')}>
-                  <ListItemText primary="Register Shelter" />
-                </ListItemButton>,
-              ]}
-        </List>
-      </Box>
+      <List>
+        {authState.status ? (
+          navLinks.map((link) => (
+            <ListItemButton
+              key={link.path}
+              onClick={() => {
+                navigate(link.path);
+                setMobileOpen(false);
+              }}
+            >
+              <ListItemText primary={link.label} />
+            </ListItemButton>
+          ))
+        ) : (
+          <>
+            <ListItemButton
+              onClick={() => {
+                onSignInClick?.();
+                setMobileOpen(false);
+              }}
+            >
+              <ListItemText primary="Sign In" />
+            </ListItemButton>
+
+            <ListItemButton onClick={() => navigate('/registration')}>
+              <ListItemText primary="Register User" />
+            </ListItemButton>
+
+            <ListItemButton onClick={() => navigate('/shelter/registration')}>
+              <ListItemText primary="Register Shelter" />
+            </ListItemButton>
+          </>
+        )}
+      </List>
 
       {authState.status && (
-        <Box sx={{ mb: 1 }}>
-          <List>
-            <ListItemButton onClick={handleLogout}>
-              <ListItemText primary="Logout" />
-            </ListItemButton>
-          </List>
-        </Box>
+        <List>
+          <ListItemButton onClick={handleLogout}>
+            <ListItemText primary="Logout" />
+          </ListItemButton>
+        </List>
       )}
     </Box>
   );
@@ -126,16 +146,20 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <CssBaseline />
 
-      {/* Desktop Top Navbar */}
+      {/* ================= DESKTOP NAVBAR ================= */}
       {isDesktop && (
         <AppBar position="static">
-          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Toolbar sx={{ justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Typography variant="h5">DogoHome 🐶</Typography>
 
               {authState.status &&
                 navLinks.map((link) => (
-                  <Button key={link.path} color="inherit" onClick={() => navigate(link.path)}>
+                  <Button
+                    key={link.path}
+                    color="inherit"
+                    onClick={() => navigate(link.path)}
+                  >
                     {link.label}
                   </Button>
                 ))}
@@ -151,13 +175,15 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
 
               {authState.status ? (
                 <>
-                  <Typography>Welcome, {authState.username} 🏠🐾</Typography>
+                  <Typography>
+                    Welcome, {authState.username}
+                  </Typography>
                   <Button color="inherit" onClick={handleLogout}>
                     Logout
                   </Button>
                 </>
               ) : (
-                <Button variant="contained" onClick={() => navigate('/')}>
+                <Button variant="contained" onClick={onSignInClick}>
                   Sign In
                 </Button>
               )}
@@ -166,34 +192,39 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
         </AppBar>
       )}
 
-      {/* Mobile Navbar */}
+      {/* ================= MOBILE APPBAR ================= */}
       {!isDesktop && (
         <AppBar position="fixed">
           <Toolbar>
-            <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2 }}>
+            <IconButton color="inherit" edge="start" onClick={handleDrawerToggle}>
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap>
+            <Typography variant="h6" sx={{ ml: 2 }}>
               DogoHome 🐶
             </Typography>
           </Toolbar>
         </AppBar>
       )}
 
-      {/* Mobile Drawer */}
+      {/* ================= MOBILE DRAWER ================= */}
       {!isDesktop && (
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{ keepMounted: true }}
-          sx={{ '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth } }}
+          sx={{
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+            },
+          }}
         >
           {drawer}
         </Drawer>
       )}
 
-      {/* Page content */}
+      {/* ================= PAGE CONTENT ================= */}
       <Box component="main" sx={{ flexGrow: 1, p: 3, mt: !isDesktop ? 7 : 0 }}>
         {children}
       </Box>

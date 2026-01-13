@@ -14,6 +14,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
+import Navbar from '../../components/navbar/Navbar'
 
 interface County {
   id: number;
@@ -85,109 +86,111 @@ const ShelterRegistrationPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 6 }}>
-      <Paper elevation={4} sx={{ p: 4 }}>
-        <Box textAlign="center" mb={3}>
-          <Typography variant="h5">Shelter Registration</Typography>
-        </Box>
+    <Navbar>
+      <Container maxWidth="sm" sx={{ mt: 6 }}>
+        <Paper elevation={4} sx={{ p: 4 }}>
+          <Box textAlign="center" mb={3}>
+            <Typography variant="h5">Shelter Registration</Typography>
+          </Box>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
-        <Box component="form" onSubmit={handleSubmit}>
-          <Stack spacing={2}>
-            <TextField
-              label="Username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
-
-            <TextField
-              label="Email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
-
-            <TextField
-              label="Shelter Name"
-              name="shelterName"
-              value={formData.shelterName}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
-
-            <FormControl fullWidth required>
-              <InputLabel>County</InputLabel>
-              <Select
-                name="countyId"
-                value={formData.countyId}
+          <Box component="form" onSubmit={handleSubmit}>
+            <Stack spacing={2}>
+              <TextField
+                label="Username"
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
-              >
-                {counties.map(c => (
-                  <MenuItem key={c.id} value={c.id}>{c.countyName}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                required
+                fullWidth
+              />
 
-            <TextField
-              label="Address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
+              <TextField
+                label="Email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                fullWidth
+              />
 
-            <TextField
-              label="Phone Number"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
+              <TextField
+                label="Shelter Name"
+                name="shelterName"
+                value={formData.shelterName}
+                onChange={handleChange}
+                required
+                fullWidth
+              />
 
-            <TextField
-              label="Password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
+              <FormControl fullWidth required>
+                <InputLabel>County</InputLabel>
+                <Select
+                  name="countyId"
+                  value={formData.countyId}
+                  onChange={handleChange}
+                >
+                  {counties.map(c => (
+                    <MenuItem key={c.id} value={c.id}>{c.countyName}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-            <TextField
-              label="Confirm Password"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
+              <TextField
+                label="Address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                required
+                fullWidth
+              />
 
-            <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-              Register
-            </Button>
-          </Stack>
-        </Box>
+              <TextField
+                label="Phone Number"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                required
+                fullWidth
+              />
 
-        <Box mt={3} textAlign="center">
-          <Typography variant="body2">
-            Already have an account? <Link to="/login/shelter">Login here</Link>
-          </Typography>
-        </Box>
-      </Paper>
-    </Container>
+              <TextField
+                label="Password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                fullWidth
+              />
+
+              <TextField
+                label="Confirm Password"
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                fullWidth
+              />
+
+              <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+                Register
+              </Button>
+            </Stack>
+          </Box>
+
+          <Box mt={3} textAlign="center">
+            <Typography variant="body2">
+              Already have an account? <Link to="/login/shelter">Login here</Link>
+            </Typography>
+          </Box>
+        </Paper>
+      </Container>
+    </Navbar>
   );
 };
 

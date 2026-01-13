@@ -1,43 +1,62 @@
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthContext } from './context/AuthContext';
-import Footer from './components/footer/Footer';
 import { Box } from '@mui/material';
+import { useAuthContext } from './context/AuthContext';
+
+// Components & Pages
+import Footer from './components/footer/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
+
+import LandingPage from './pages/LandingPage/LandingPage';
 import UserRegistrationPage from './pages/userRegistration/UserRegistration';
 import ShelterRegistrationPage from './pages/shelterRegistration/ShelterRegistration';
-import LandingPage from './pages/LandingPage/LandingPage';
 
 import UserLandingPage from './pages/user/userLandingPage/UserLandingPage';
 import ShelterLandingPage from './pages/shelter/ShelterLandingPage';
-import ProtectedRoute from './components/ProtectedRoute';
+import ShelterAnimalPage from './pages/shelter/ShelterAnimalPage';
 
+/**
+ * App component - the root of the React application
+ * 
+ * Responsibilities:
+ * 1. Wraps the app in BrowserRouter for routing.
+ * 2. Provides a flex layout to ensure footer sticks to the bottom.
+ * 3. Defines public and protected routes.
+ * 4. Ensures role-based access via ProtectedRoute.
+ * 5. Redirects unknown routes to the landing page.
+ */
 function App() {
-  const { authState } = useAuthContext();
+  // Get auth state from context
+  const { authState } = useAuthContext(); 
+  // NOTE: Currently used for optional debugging, could remove in production
 
   return (
     <BrowserRouter>
-      {/* Optional: debug auth state */}
-      {/* <div style={{ padding: 16 }}>
-        <pre>{JSON.stringify(authState, null, 2)}</pre>
-      </div>*/}
+      {/* Flex container: main content + footer layout */}
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          minHeight: '100vh', // full viewport height
+          minHeight: '100vh', // ensures footer is pushed to bottom
         }}
       >
-        {/* Main content grows to push footer down */}
+        {/* Main content grows to fill remaining space above footer */}
         <Box component="main" sx={{ flexGrow: 1 }}>
-      <Routes>
-        {/* Public landing page */}
-        <Route path="/" element={<LandingPage />} />
+          <Routes>
+            {/* --------------------------------------
+                PUBLIC ROUTES
+            -------------------------------------- */}
+            {/* Landing page - accessible by everyone */}
+            <Route path="/" element={<LandingPage />} />
 
+            {/* Registration routes */}
+            <Route path="/registration" element={<UserRegistrationPage />} />
+            <Route path="/shelter/registration" element={<ShelterRegistrationPage />} />
 
-        {/* Registration routes */}
-        <Route path="/registration" element={<UserRegistrationPage />} />
-        <Route path="/shelter/registration" element={<ShelterRegistrationPage />} />
-
-        {/* Protected user landing page */}
+            {/* --------------------------------------
+                PROTECTED ROUTES - USER
+            -------------------------------------- */}
+            {/* Only authenticated users with role 'User' can access */}
             <Route
               path="/user"
               element={
@@ -46,26 +65,44 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* --------------------------------------
+                PROTECTED ROUTES - SHELTER
+            -------------------------------------- */}
+            {/* Shelter-specific routes */}
             <Route
               path="/shelter"
               element={
                 <ProtectedRoute allowedRoles={['Shelter']}>
                   <ShelterLandingPage />
                 </ProtectedRoute>
-              }>
+              }
+            />
 
-            </Route>
+            {/* Add animal page - only accessible to authenticated shelters */}
+            <Route
+              path="/shelter/animals/add"
+              element={
+                <ProtectedRoute allowedRoles={['Shelter']}>
+                  <ShelterAnimalPage />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Redirect unknown routes */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+            {/* --------------------------------------
+                FALLBACK ROUTE
+            -------------------------------------- */}
+            {/* Redirect all unknown routes to the landing page */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Box>
 
-      </Box>
-
-        
-      </Box>
-      {/* Footer always at bottom */}
+        {/* --------------------------------------
+            FOOTER
+            Always sticks to bottom thanks to flex layout
+        -------------------------------------- */}
         <Footer />
+      </Box>
     </BrowserRouter>
   );
 }

@@ -33,7 +33,7 @@ const LandingPage: React.FC = () => {
   ];
 
   return (
-    <Navbar>
+    <Navbar onSignInClick={() => setSignInOpen(true)}>
       {/* ================= DOGS SECTION ================= */}
       <Box sx={{ width: '100%', py: { xs: 4, md: 6 }, bgcolor: 'background.default' }}>
         <Container
