@@ -1,22 +1,19 @@
 import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 
-/**
- * Attributes interface for County model
- */
+// ----------------------------------------------
+// County Model Attributes
+// ----------------------------------------------
 interface CountyAttributes {
-  id?: number;
-  countyName: string;
+  id?: number; // Auto-generated primary key
+  countyName: string; // Auto-generated primary key
 }
 
-/**
- * Attributes required at creation time
- * (id is auto-generated)
- */
+// Optional attributes during creation
 interface CountyCreationAttributes extends Optional<CountyAttributes, "id"> {}
 
-/**
- * County Model class
- */
+// ----------------------------------------------
+// County Model Class
+// ----------------------------------------------
 class County
   extends Model<CountyAttributes, CountyCreationAttributes>
   implements CountyAttributes
@@ -24,39 +21,45 @@ class County
   public id!: number;
   public countyName!: string;
 
-  // timestamps!
+  // --------------------------------------------
+  // Timestamps (automatically managed)
+  // --------------------------------------------
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
+  // --------------------------------------------
+  // Model Associations
+  // --------------------------------------------
+  // Counties can have multiple Users and Shelters
   static associate(models: any) {
     // Define associations here if needed
     County.hasMany(models.Users, {
       foreignKey: "countyId",
-      onDelete: "cascade",
+      onDelete: "cascade", // remove users if county is deleted
     });
     County.hasMany(models.Shelter, {
       foreignKey: "countyId",
-      onDelete: "cascade",
+      onDelete: "cascade", // remove shelters if county is deleted
     });
   }
 }
 
-/**
- * Model initializer
- */
+// ----------------------------------------------
+// Model Initializer
+// ----------------------------------------------
 export default (sequelize: Sequelize) => {
   County.init(
     {
       countyName: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true, // ensures no diplicates
+        unique: true, // ensures no duplicate county names
       },
     },
     {
       sequelize,
-      modelName: "County",
-      tableName: "Counties",
+      modelName: "County", // internal Sequelize model name
+      tableName: "Counties", // table name in DB
     }
   );
   return County;
