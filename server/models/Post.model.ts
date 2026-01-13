@@ -1,26 +1,29 @@
 import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 
-/**
- * Attributes interface for Shelter model
- */
+// ----------------------------------------------
+// Post Model Attribute Definitions
+// ----------------------------------------------
+// Represents a user post in the system (text + optional image)
+// ----------------------------------------------
 interface PostAttributes {
-  id?: number;
-  title: string;
-  postText: string;
-  picture?: string | null;
-  userId: number;
+  id?: number; // Primary key (auto-generated)
+  title: string; // Post title
+  postText: string; // Main post content
+  picture?: string | null; // Optional picture (URL or base64 string)
+  userId: number; // Foreign key -> Users table
 }
 
-/**
- * Attributes required at creation time
- * (id is auto-generated)
- */
+// ----------------------------------------------
+// Creation Attributes
+// ----------------------------------------------
+// Optional fields during creation
+// ----------------------------------------------
 interface PostCreationAttributes
   extends Optional<PostAttributes, "id" | "picture"> {}
 
-/**
- * Posts Model class
- */
+// ----------------------------------------------
+// Posts Model Class
+// ----------------------------------------------
 class Posts
   extends Model<PostAttributes, PostCreationAttributes>
   implements PostAttributes
@@ -31,12 +34,19 @@ class Posts
   public picture!: string | null;
   public userId!: number;
 
-  // timestamps!
+  // --------------------------------------------
+  // Timestamps (automatically managed)
+  // --------------------------------------------
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
+  // --------------------------------------------
+  // Model Associations
+  // --------------------------------------------
+  // Each post belongs to a user
+  // Each post can have many comments and likes
+  // Cascade deletes remove related comments & likes when post is deleted
   static associate(models: any) {
-    // Define associations here if needed
     Posts.belongsTo(models.Users, { foreignKey: "userId" });
     Posts.hasMany(models.Comments, {
       foreignKey: "postId",
@@ -46,9 +56,9 @@ class Posts
   }
 }
 
-/**
- * Model initializer
- */
+// ----------------------------------------------
+// Model Initializer
+// ----------------------------------------------
 export default (sequelize: Sequelize) => {
   Posts.init(
     {
@@ -67,14 +77,14 @@ export default (sequelize: Sequelize) => {
         onDelete: "CASCADE",
       },
       picture: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING, // could store URL or base64 string
         allowNull: true,
       },
     },
     {
       sequelize,
-      modelName: "Posts",
-      tableName: "Posts",
+      modelName: "Posts", // Internal Sequelize name
+      tableName: "Posts", // DB table name
     }
   );
 
