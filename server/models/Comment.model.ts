@@ -1,24 +1,27 @@
 import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 
-/**
- * Attributes interface for Shelter model
- */
+// ----------------------------------------------
+// Comment Model Attribute Definitions
+// ----------------------------------------------
+// Represents a comment made by a user on a post
+// ----------------------------------------------
 interface CommentAttributes {
-  id?: number;
-  commentBody: string;
-  userId: number;
-  postId: number;
+  id?: number; // Primary key (auto-generated)
+  commentBody: string; // Text content of the comment
+  userId: number; // Foreign key -> Users table
+  postId: number; // Foreign key -> Posts table
 }
 
-/**
- * Attributes required at creation time
- * (id is auto-generated)
- */
+// ----------------------------------------------
+// Creation Attributes
+// ----------------------------------------------
+// Optional fields during creation
+// ----------------------------------------------
 interface CommentCreationAttributes extends Optional<CommentAttributes, "id"> {}
 
-/**
- * Comments Model class
- */
+// ----------------------------------------------
+// Comments Model Class
+// ----------------------------------------------
 class Comments
   extends Model<CommentAttributes, CommentCreationAttributes>
   implements CommentAttributes
@@ -28,12 +31,20 @@ class Comments
   public userId!: number;
   public postId!: number;
 
-  // timestamps!
+  // --------------------------------------------
+  // Timestamps (automatically managed)
+  // --------------------------------------------
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
+  // --------------------------------------------
+  // Model Associations
+  // --------------------------------------------
+  // - Each comment belongs to a user
+  // - Each comment belongs to a post
+  // - Each comment can have many likes
+  // - Cascade deletion ensures likes are removed if a comment is deleted
   static associate(models: any) {
-    // Define associations here if needed
     Comments.belongsTo(models.Users, { foreignKey: "userId" });
     Comments.belongsTo(models.Posts, { foreignKey: "postId" });
     Comments.hasMany(models.Likes, {
@@ -43,9 +54,9 @@ class Comments
   }
 }
 
-/**
- * Model initializer
- */
+// ----------------------------------------------
+// Model Initializer
+// ----------------------------------------------
 export default (sequelize: Sequelize) => {
   Comments.init(
     {
@@ -66,8 +77,8 @@ export default (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      modelName: "Comments",
-      tableName: "Comments",
+      modelName: "Comments", // Internal Sequelize name
+      tableName: "Comments", // DB table name
     }
   );
 
