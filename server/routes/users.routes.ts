@@ -20,8 +20,8 @@ import db from "../models";
 // Middleware to protect routes
 // validateUserToken checks JWT and sets req.user if valid
 // validateAdminToken ensures the user is an admin before allowing access
-import { validateUserToken } from "../middleware/AuthMiddlewareUser";
-import { validateAdminToken } from "../middleware/AuthMiddlewareAdmin";
+import { validateUserToken } from "../middleware/user.middleware";
+import { validateAdminToken } from "../middleware/admin.middleware";
 
 // ----------------------------------------------
 // -------------  CONFIG/SETUP    ---------------

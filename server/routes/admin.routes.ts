@@ -19,7 +19,7 @@ import db from "../models";
 
 // Middleware to protect routes
 // validateAdminToken ensures only admins can access certain endpoints
-import { validateAdminToken } from "../middleware/AuthMiddlewareAdmin";
+import { validateAdminToken } from "../middleware/admin.middleware";
 
 // ----------------------------------------------
 // -------------  CONFIG/SETUP    ---------------

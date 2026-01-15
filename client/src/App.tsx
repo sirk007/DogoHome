@@ -4,12 +4,12 @@ import { Box } from "@mui/material";
 import { useAuthContext } from "./context/AuthContext";
 
 // Components & Pages
-import Footer from "./components/footer/Footer";
-import ProtectedRoute from "./components/ProtectedRoute";
+import Footer from "./components/layout/Footer";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
-import LandingPage from "./pages/LandingPage/LandingPage";
-import UserRegistrationPage from "./pages/userRegistration/UserRegistration";
-import ShelterRegistrationPage from "./pages/shelterRegistration/ShelterRegistration";
+import LandingPage from "./pages/public/Landing";
+import UserRegistrationPage from "./pages/auth/User.Registration";
+import ShelterRegistrationPage from "./pages/auth/Shelter.Registration";
 
 import UserLandingPage from "./pages/user/userLandingPage/UserLandingPage";
 import ShelterLandingPage from "./pages/shelter/ShelterLandingPage";

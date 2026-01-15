@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
-import { loginAdmin } from "../../api/authAdmin";
+import { loginAdmin } from "../../api/admin.api";
 
 const LoginAdmin: React.FC = () => {
   const { setAuthState } = useAuthContext();

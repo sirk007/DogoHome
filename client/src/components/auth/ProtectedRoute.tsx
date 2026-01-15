@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
-import { useAuthContext } from "../context/AuthContext";
-import type { UserRole } from "../types/auth";
+import { useAuthContext } from "../../context/AuthContext";
+import type { UserRole } from "../../types/auth.types";
 import type { ReactNode } from "react";
 
 /**

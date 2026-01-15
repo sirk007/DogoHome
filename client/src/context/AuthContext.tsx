@@ -5,7 +5,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { useAuth } from "../hooks/useAuth";
-import type { AuthState } from "../types/auth";
+import type { AuthState } from "../types/auth.types";
 import type { Dispatch, SetStateAction } from "react";
 
 /**

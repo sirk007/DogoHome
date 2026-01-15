@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { AxiosResponse } from "axios";
 import { jwtDecode } from "jwt-decode"; // used to decode JWT and check expiration
 import { fetchUserAuth, fetchAdminAuth, fetchShelterAuth } from "../api/auth";
-import type { AuthState, UserRole } from "../types/auth";
+import type { AuthState, UserRole } from "../types/auth.types";
 
 /**
  * --------------------------------------------

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-import LoginUser from "../userLogin/LoginUser";
-import LoginShelter from "../shelterLogin/LoginShelter";
+import LoginUser from "../auth/User.Login";
+import LoginShelter from "../auth/Shelter.Login";
 
 import {
   Box,
@@ -17,7 +17,7 @@ import {
   Divider,
 } from "@mui/material";
 
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/layout/Navbar";
 
 /**
  * --------------------------------------------

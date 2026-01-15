@@ -115,8 +115,6 @@ Navigate to the server folder:
 - GET /users/ -> Get all User (Admin only)
 - DELETE /users/:id -> Delete a User by ID (Admin only)
 
-<!-- TODO: Update user info, search users, password reset, get user’s posts/comments/likes -->
-
 ### 5.2 Shelter
 
 - POST / -> Create a new Shelter (Public)
@@ -125,16 +123,12 @@ Navigate to the server folder:
 - GET /basicinfo/:id -> Get basic info for Shelter by ID (Public)
 - DELETE /:id -> Delete Shelter by ID (Admin Only)
 
-<!-- TODO: Update shelter info, reset password, search shelters, manage shelter animals/posts. -->
-
 ### 5.3 Admin
 
 - POST / -> Create a new Admin Account (Public)
 - POST /login -> Authenticate Admin and return JWT (Public)
 - GET /authAdmin -> Get authenticated admin info (Protected)
 - GET /basicinfo/:id -> Get basic info for a specific admin (Protected)
-
-<!-- TODO: Update admin info, reset password, search admins. -->
 
 ### 5.4 Animal
 
@@ -144,15 +138,11 @@ Navigate to the server folder:
 - GET /byId/:id -> Get a single animal by ID (Public)
 - DELETE /:id -> Delete an animal (Protected, Shelter only)
 
-<!-- TODO: Update animal, search/filter, upload picture, update health status. -->
-
 ### 5.5 Comment
 
 - POST / -> Create a new comment (Protected, User-Only)
 - GET /post/:postId -> Get all comments for a specific post (Public)
 - DELETE /:id -> Delete a comment (Protected, User-Only)
-
-<!-- TODO: Update comment, get user comments, replies, search comments -->
 
 ### 5.6 Posts
 
@@ -163,19 +153,13 @@ Navigate to the server folder:
 - PUT /:id -> Update a post (Protected, User-Only)
 - DELETE /:id -> Delete a post (Protected, User-Only)
 
-<!-- TODO: Search posts, trending, upload pictures, get posts liked by user, date filters. -->
-
 ### 5.7 Likes
 
 - POST / -> Toggle like/unlike a post (Protected, User-Only)
 
-<!-- TODO: Get likes by post, get likes by user, like counts, trending posts. -->
-
 ### 5.8 County
 
 - GET / -> Get all counties (Public)
-
-<!-- TODO: get county by ID, create/update/delete county (Admin only) -->
 
 ## 6. Database Models & Relationships
 

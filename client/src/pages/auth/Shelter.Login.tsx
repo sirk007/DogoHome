@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
-import { loginShelter } from "../../api/authShelter";
+import { loginShelter } from "../../api/shelter.api";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, TextField, Typography } from "@mui/material";
 

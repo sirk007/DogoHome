@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/layout/Navbar";
 import AnimalForm from "../../components/animals/AnimalForm";
 import AnimalList from "../../components/animals/AnimalList";
 

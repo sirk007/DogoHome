@@ -15,10 +15,7 @@ import db from "../models";
 // Middleware to protect user routes
 // validateUserToken checks JWT and sets req.user if valid
 // AuthRequest extends Express Request with user payload
-import {
-  validateUserToken,
-  AuthRequest,
-} from "../middleware/AuthMiddlewareUser";
+import { validateUserToken, AuthRequest } from "../middleware/user.middleware";
 
 // ----------------------------------------------
 // -------------  CONFIG/SETUP    ---------------

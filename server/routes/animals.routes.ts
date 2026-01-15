@@ -17,7 +17,7 @@ import db from "../models";
 import {
   validateShelterToken,
   ShelterAuthRequest,
-} from "../middleware/AuthMiddlewareShelter";
+} from "../middleware/shelter.middleware";
 
 // ----------------------------------------------
 // -------------  CONFIG/SETUP    ---------------

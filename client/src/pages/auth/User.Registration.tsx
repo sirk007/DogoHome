@@ -10,7 +10,7 @@ import {
   Alert,
 } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/layout/Navbar";
 
 /**
  * --------------------------------------------

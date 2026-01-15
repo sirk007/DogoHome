@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "../../../components/navbar/Navbar";
+import Navbar from "../../../components/layout/Navbar";
 import { Typography, Box, Paper, Button } from "@mui/material";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";

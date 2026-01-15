@@ -20,8 +20,8 @@ import db from "../models";
 // Middleware to protect routes
 // validateShelterToken ensures the request has a valid shelter JWT
 // validateAdminToken ensures only admins can access certain endpoints
-import { validateShelterToken } from "../middleware/AuthMiddlewareShelter";
-import { validateAdminToken } from "../middleware/AuthMiddlewareAdmin";
+import { validateShelterToken } from "../middleware/shelter.middleware";
+import { validateAdminToken } from "../middleware/admin.middleware";
 
 // ----------------------------------------------
 // -------------  CONFIG/SETUP    ---------------
