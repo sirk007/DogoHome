@@ -1,14 +1,19 @@
 import { Navigate } from "react-router-dom";
+import type { ReactNode } from "react";
+
 import { useAuthContext } from "../../context/AuthContext";
 import type { UserRole } from "../../types/auth.types";
-import type { ReactNode } from "react";
 
 /**
  * --------------------------------------------
  * Props for ProtectedRoute
  * --------------------------------------------
- * - children: ReactNode -> The component(s) to render if access is allowed
- * - allowedRoles?: UserRole[] -> Optional list of roles that can access this route
+ * - children: ReactNode
+ *     The component(s) to render if access is granted
+ *
+ * - allowedRoles?: UserRole[]
+ *     Optional list of roles allowed to access this route.
+ *     If omitted, any authenticated user may access.
  */
 interface Props {
   children: ReactNode;
@@ -19,50 +24,62 @@ interface Props {
  * --------------------------------------------
  * ProtectedRoute Component
  * --------------------------------------------
- * Wraps any route to provide role-based access control (RBAC).
- * It ensures only authenticated users with the proper role
- * can access certain pages.
+ * Centralized route guard for the application.
  *
  * Responsibilities:
- * 1. Wait for auth status to finish loading before rendering
- * 2. Redirect unauthenticated users to landing page
- * 3. Redirect authenticated users who don't have required role
- * 4. Render children if user is authorized
+ * 1. Wait for auth state to resolve
+ * 2. Redirect unauthenticated users
+ * 3. Enforce role-based access control (RBAC)
+ * 4. Render protected content when authorized
+ *
+ * This component relies on the unified AuthContext
+ * as the single source of truth for authentication.
  */
 const ProtectedRoute = ({ children, allowedRoles }: Props) => {
+  // --------------------------------------------
+  // 1. Access unified authentication state
+  // --------------------------------------------
   const { authState, loading } = useAuthContext();
 
   // --------------------------------------------
-  // 1. Auth is still resolving
+  // 2. Authentication is still being verified
   // --------------------------------------------
-  // While the useAuth hook is checking tokens or verifying with backend,
-  // we don't want to render the protected content yet
+  // Prevents flashing protected content before auth resolves
   if (loading) {
-    return <div>Loading...</div>; // Could be replaced with a spinner for better UX
+    return <div>Loading...</div>;
   }
 
   // --------------------------------------------
-  // 2. Not authenticated
+  // 3. User is not authenticated
   // --------------------------------------------
-  // If the user is not logged in, redirect them to the landing page
+  // Redirect to public landing or login page
   if (!authState.status) {
     return <Navigate to="/" replace />;
   }
 
   // --------------------------------------------
-  // 3. Authenticated but does not have the required role
+  // 4. Role-based authorization check
   // --------------------------------------------
-  // If allowedRoles is defined, check if the user's role matches.
-  // If not, redirect to landing page (or another route if desired)
-  if (allowedRoles && !allowedRoles.includes(authState.userType)) {
-    return <Navigate to="/" replace />;
+  // If roles are specified, ensure the user has one of them
+  if (allowedRoles && allowedRoles.length > 0) {
+    switch (authState.userType) {
+      case "Admin":
+      case "User":
+      case "Shelter":
+        if (!allowedRoles.includes(authState.userType)) {
+          return <Navigate to="/" replace />;
+        }
+        break;
+
+      default:
+        // Unknown or invalid role → deny access
+        return <Navigate to="/" replace />;
+    }
   }
 
   // --------------------------------------------
-  // 4. Authorized
+  // 5. Access granted
   // --------------------------------------------
-  // User is authenticated and has a valid role (if role check is applied)
-  // Render the protected component(s)
   return <>{children}</>;
 };
 
