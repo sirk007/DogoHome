@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../context/AuthContext";
+import { useAuthContext } from "../../context/AuthContext";
 
 const LogoutButton = () => {
   const { setAuthState } = useAuthContext();
