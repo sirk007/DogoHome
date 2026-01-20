@@ -14,7 +14,7 @@ interface ShelterAttributes {
   countyId: number; // Foreign key -> Counties table
   address: string; // Physical address
   phoneNumber: string; // Contact phone
-  userType: string; // Role identifier, default: "Shelter"
+  userType: "Shelter"; // Role identifier, default: "Shelter"
 }
 
 // ----------------------------------------------
@@ -23,8 +23,10 @@ interface ShelterAttributes {
 // Fields optional when creating a Shelter.
 // ID auto-generated, userType defaults to "Shelter"
 // ----------------------------------------------
-interface ShelterCreationAttributes
-  extends Optional<ShelterAttributes, "id" | "userType"> {}
+interface ShelterCreationAttributes extends Optional<
+  ShelterAttributes,
+  "id" | "userType"
+> {}
 
 // ----------------------------------------------
 // Shelter Model Class
@@ -44,7 +46,7 @@ class Shelter
   public countyId!: number;
   public address!: string;
   public phoneNumber!: string;
-  public userType!: string;
+  public userType!: "Shelter";
 
   // --------------------------------------------
   // Timestamps (automatically managed)
@@ -90,6 +92,7 @@ export default (sequelize: Sequelize) => {
       username: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
       },
       password: {
         type: DataTypes.STRING,
@@ -98,6 +101,7 @@ export default (sequelize: Sequelize) => {
       email: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
       },
       shelterName: {
         type: DataTypes.STRING,
@@ -113,11 +117,11 @@ export default (sequelize: Sequelize) => {
         allowNull: false,
       },
       phoneNumber: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(20),
         allowNull: false,
       },
       userType: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM("Shelter"),
         defaultValue: "Shelter",
       },
     },
@@ -125,7 +129,7 @@ export default (sequelize: Sequelize) => {
       sequelize,
       modelName: "Shelter", // Sequelize internal model name
       tableName: "Shelters", // Actual database table name
-    }
+    },
   );
   return Shelter;
 };
