@@ -123,6 +123,7 @@ export default (sequelize: Sequelize) => {
       userType: {
         type: DataTypes.ENUM("Shelter"),
         defaultValue: "Shelter",
+        allowNull: false,
       },
     },
     {

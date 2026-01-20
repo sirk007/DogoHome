@@ -13,7 +13,7 @@ interface UserAttributes {
   email: string;
   age: number;
   countyId?: number;
-  userType: "User" | "ShelterAdmin" | "Admin";
+  userType: "User";
   // ML / Matching traits
   activityLevel: "Low" | "Medium" | "High";
   hasGarden: boolean;
@@ -62,7 +62,7 @@ class Users
   public password!: string;
   public email!: string;
   public age!: number;
-  public userType!: "User" | "ShelterAdmin" | "Admin";
+  public userType!: "User";
 
   public activityLevel!: "Low" | "Medium" | "High";
   public hasGarden!: boolean;
@@ -127,8 +127,9 @@ export default (sequelize: Sequelize) => {
       },
 
       userType: {
-        type: DataTypes.ENUM("User", "ShelterAdmin", "Admin"),
+        type: DataTypes.ENUM("User"),
         defaultValue: "User",
+        allowNull: false,
       },
 
       activityLevel: {
