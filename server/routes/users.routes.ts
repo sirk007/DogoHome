@@ -40,6 +40,11 @@ const JWT_SECRET = process.env.USER_JWT_SECRET || "fallbackSecret"; // fallback 
 // Users model will be used to query/create/update/delete users
 const { Users } = db;
 
+// Allowed enum values
+const activityLevels = ["Low", "Medium", "High"] as const;
+const petExperienceLevels = ["None", "Beginner", "Experience"] as const;
+const dogSizes = ["Small", "Medium", "Large"] as const;
+
 // ----------------------------------------------
 // ----------------   ROUTES   -----------------
 // ----------------------------------------------
@@ -52,8 +57,51 @@ const { Users } = db;
 // Middleware: None
 // Description: Creates a new user with hashed password
 router.post("/", async (req: Request, res: Response) => {
-  const { username, password, email, age } = req.body;
+  const {
+    username,
+    password,
+    email,
+    age,
+    activityLevel,
+    hasGarden = false,
+    hasOtherPets = false,
+    hasKids = false,
+    petExperienceLevel,
+    maxDogSize,
+    preferredEnergyLevel,
+    preferredAgeRangeMin,
+    preferredAgeRangeMax,
+  } = req.body;
   try {
+    // Validation / Hygiene
+    if (!username || typeof username !== "string" || username.length > 50) {
+      return res.status(400).json({ error: "Invalid username" });
+    }
+    if (!password || typeof password !== "string" || password.length < 6) {
+      return res.status(400).json({ error: "Password too short" });
+    }
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+    if (typeof age !== "number" || age < 0 || age > 120) {
+      return res.status(400).json({ error: "Invalid age" });
+    }
+    if (!activityLevels.includes(activityLevel)) {
+      return res.status(400).json({ error: "Invalid activity level" });
+    }
+    if (!petExperienceLevels.includes(petExperienceLevel)) {
+      return res.status(400).json({ error: "Invalid pet experience level" });
+    }
+    if (!dogSizes.includes(maxDogSize)) {
+      return res.status(400).json({ error: "Invalid max dog size" });
+    }
+    if (
+      preferredEnergyLevel &&
+      !activityLevels.includes(preferredEnergyLevel)
+    ) {
+      return res.status(400).json({ error: "Invalid preferred energy level" });
+    }
+
     // Hash the password with bcrypt before saving
     // Salt rounds = 10 (moderate security, reasonable speed)
     const hash = await bcrypt.hash(password, 10);
@@ -65,6 +113,15 @@ router.post("/", async (req: Request, res: Response) => {
       password: hash,
       email,
       age,
+      activityLevel,
+      hasGarden,
+      hasOtherPets,
+      hasKids,
+      petExperienceLevel,
+      maxDogSize,
+      preferredEnergyLevel: preferredEnergyLevel || null,
+      preferredAgeRangeMin: preferredAgeRangeMin || null,
+      preferredAgeRangeMax: preferredAgeRangeMax || null,
     });
     // Respond with a success message (JSON)
     res.json({ message: "User created successfully!" });
@@ -196,7 +253,7 @@ router.delete(
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     }
-  }
+  },
 );
 
 export default router;
