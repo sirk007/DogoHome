@@ -7,13 +7,23 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // as it exists in the database.
 // ----------------------------------------------
 interface UserAttributes {
-  id?: number; // Primary key (auto-generated)
-  username: string; // Public usernam
-  password: string; // Hashed password
-  email: string; // User email address
-  age: string; // Age stored as string
-  countyId?: number; // FK -> Counties table (optional)
-  userType: string; // Role identifier ("User")
+  id?: number;
+  username: string;
+  password: string;
+  email: string;
+  age: number;
+  countyId?: number;
+  userType: "User" | "ShelterAdmin" | "Admin";
+  // ML / Matching traits
+  activityLevel: "Low" | "Medium" | "High";
+  hasGarden: boolean;
+  hasOtherPets: boolean;
+  hasKids: boolean;
+  petExperienceLevel: "None" | "Beginner" | "Experience";
+  maxDogSize: "Small" | "Medium" | "Large";
+  preferredEnergyLevel?: "Low" | "Medium" | "High";
+  preferredAgeRangeMin?: number;
+  preferredAgeRangeMax?: number;
 }
 
 // ----------------------------------------------
@@ -25,8 +35,15 @@ interface UserAttributes {
 // - id is auto-generated
 // - userType has a default value
 // ----------------------------------------------
-interface UserCreationAttributes
-  extends Optional<UserAttributes, "id" | "userType"> {}
+interface UserCreationAttributes extends Optional<
+  UserAttributes,
+  | "id"
+  | "userType"
+  | "countyId"
+  | "preferredEnergyLevel"
+  | "preferredAgeRangeMin"
+  | "preferredAgeRangeMax"
+> {}
 
 // ----------------------------------------------
 // User Model Class
@@ -44,9 +61,18 @@ class Users
   public username!: string;
   public password!: string;
   public email!: string;
-  public age!: string;
-  public countyId!: number;
-  public userType!: string;
+  public age!: number;
+  public userType!: "User" | "ShelterAdmin" | "Admin";
+
+  public activityLevel!: "Low" | "Medium" | "High";
+  public hasGarden!: boolean;
+  public hasOtherPets!: boolean;
+  public hasKids!: boolean;
+  public petExperienceLevel!: "None" | "Beginner" | "Experience";
+  public maxDogSize!: "Medium" | "Small" | "Large";
+  public preferredEnergyLevel?: "Low" | "Medium" | "High";
+  public preferredAgeRangeMin?: number;
+  public preferredAgeRangeMax?: number;
 
   // --------------------------------------------
   // Timestamps (automatically managed)
@@ -88,37 +114,73 @@ class Users
 export default (sequelize: Sequelize) => {
   Users.init(
     {
-      username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      age: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
+      username: { type: DataTypes.STRING, allowNull: false },
+      password: { type: DataTypes.STRING, allowNull: false },
+      email: { type: DataTypes.STRING, allowNull: false },
+
+      age: { type: DataTypes.INTEGER, allowNull: false },
+
       countyId: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: { model: "Counties", key: "id" },
       },
+
       userType: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM("User", "ShelterAdmin", "Admin"),
         defaultValue: "User",
+      },
+
+      activityLevel: {
+        type: DataTypes.ENUM("Low", "Medium", "High"),
+        allowNull: false,
+      },
+
+      hasGarden: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
+      hasOtherPets: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
+      hasKids: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
+      petExperienceLevel: {
+        type: DataTypes.ENUM("None", "Beginner", "Experience"),
+        allowNull: false,
+      },
+
+      maxDogSize: {
+        type: DataTypes.ENUM("Small", "Medium", "Large"),
+        allowNull: false,
+      },
+
+      preferredEnergyLevel: {
+        type: DataTypes.ENUM("Low", "Medium", "High"),
+        allowNull: true,
+      },
+
+      preferredAgeRangeMin: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+
+      preferredAgeRangeMax: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
     },
     {
       sequelize,
-      modelName: "Users", // Sequelize model name
-      tableName: "Users", // Actual DB table
-    }
+      modelName: "Users",
+      tableName: "Users",
+    },
   );
 
   return Users;
