@@ -52,6 +52,21 @@ const JWT_SECRET = process.env.ADMIN_JWT_SECRET || "fallbackSecret";
 router.post("/", async (req: Request, res: Response) => {
   const { username, password, email, age } = req.body;
   try {
+    if (!username || typeof username !== "string" || username.length > 50) {
+      return res.status(400).json({ error: "Invalid username" });
+    }
+
+    if (!password || typeof password !== "string" || password.length < 8) {
+      return res.status(400).json({ error: "Password too short" });
+    }
+
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+
+    if (typeof age !== "number" || age < 18 || age > 120) {
+      return res.status(400).json({ error: "Invalid age" });
+    }
     // Hash the password with bcrypt before saving
     // Salt rounds = 10 (moderate security, reasonable speed)
     const hash = await bcrypt.hash(password, 10);
@@ -125,7 +140,7 @@ router.get(
     // validateAdminToken sets req.admin from decoded JWT
     // Here we just return it
     res.json(req.admin);
-  }
+  },
 );
 
 // ---------------------------
@@ -158,6 +173,6 @@ router.get(
       console.error("Error fetching admin info:", error);
       res.status(500).json({ error: "Internal server error" });
     }
-  }
+  },
 );
 export default router;

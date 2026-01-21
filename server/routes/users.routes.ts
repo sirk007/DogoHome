@@ -232,6 +232,120 @@ router.get("/", validateAdminToken, async (req: Request, res: Response) => {
 });
 
 // ---------------------------
+// UPDATE AUTHENTICATED USER (Self)
+// ---------------------------
+// Route: PUT /me
+// Access: Protected (User only)
+// Middleware: validateUserToken
+// Description:
+//  - Allows a user to update their own profile/preferences
+//  - Partial updates supported
+router.put(
+  "/me",
+  validateUserToken,
+  async (req: Request | any, res: Response) => {
+    try {
+      const userId = req.user.id;
+
+      const {
+        email,
+        password,
+        age,
+        activityLevel,
+        hasGarden,
+        hasOtherPets,
+        hasKids,
+        petExperienceLevel,
+        maxDogSize,
+        preferredEnergyLevel,
+        preferredAgeRangeMin,
+        preferredAgeRangeMax,
+      } = req.body;
+
+      const updateData: any = {};
+
+      // ---------------------------
+      // Validation (Only if provided)
+      // ---------------------------
+      if (email !== undefined) {
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+          return res.status(400).json({ error: "Invalid email" });
+        }
+        updateData.email = email;
+      }
+
+      if (password !== undefined) {
+        if (typeof password !== "string" || password.length < 6) {
+          return res.status(400).json({ error: "Password too short" });
+        }
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+
+      if (age !== undefined) {
+        if (typeof age !== "number" || age < 0 || age > 120) {
+          return res.status(400).json({ error: "Invalid age" });
+        }
+        updateData.age = age;
+      }
+
+      if (activityLevel !== undefined) {
+        if (!activityLevels.includes(activityLevel)) {
+          return res.status(400).json({ error: "Invalid activity level" });
+        }
+        updateData.activityLevel = activityLevel;
+      }
+
+      if (petExperienceLevel !== undefined) {
+        if (!petExperienceLevels.includes(petExperienceLevel)) {
+          return res
+            .status(400)
+            .json({ error: "Invalid pet experience level" });
+        }
+        updateData.petExperienceLevel = petExperienceLevel;
+      }
+
+      if (maxDogSize !== undefined) {
+        if (!dogSizes.includes(maxDogSize)) {
+          return res.status(400).json({ error: "Invalid max dog size" });
+        }
+        updateData.maxDogSize = maxDogSize;
+      }
+
+      if (preferredEnergyLevel !== undefined) {
+        if (
+          preferredEnergyLevel !== null &&
+          !activityLevels.includes(preferredEnergyLevel)
+        ) {
+          return res
+            .status(400)
+            .json({ error: "Invalid preferred energy level" });
+        }
+        updateData.preferredEnergyLevel = preferredEnergyLevel;
+      }
+
+      if (preferredAgeRangeMin !== undefined)
+        updateData.preferredAgeRangeMin = preferredAgeRangeMin;
+      if (preferredAgeRangeMax !== undefined)
+        updateData.preferredAgeRangeMax = preferredAgeRangeMax;
+
+      if (hasGarden !== undefined) updateData.hasGarden = hasGarden;
+      if (hasOtherPets !== undefined) updateData.hasOtherPets = hasOtherPets;
+      if (hasKids !== undefined) updateData.hasKids = hasKids;
+
+      // ---------------------------
+      // Perform update
+      // ---------------------------
+      await Users.update(updateData, { where: { id: userId } });
+
+      res.json({ message: "Profile updated successfully" });
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
+// ---------------------------
 // DELETE USER BY ID (Admin Only)
 // ---------------------------
 // Route: DELETE /:id

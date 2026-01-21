@@ -44,9 +44,18 @@ const { Posts, Likes } = db;
 //   - Returns the created post object
 router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
   try {
+    // Validation / Hygiene
+
     // Destructure post fields from request body
     // `title` and `postText` are required, `picture` is optional
     const { title, postText, picture } = req.body;
+    if (!title || typeof title !== "string" || title.length > 150) {
+      return res.status(400).json({ error: "Invalid title" });
+    }
+
+    if (!postText || typeof postText !== "string") {
+      return res.status(400).json({ error: "Invalid post content" });
+    }
 
     // Create a new post in the database
     // - title: the post title
@@ -209,7 +218,7 @@ router.put(
       console.error("Error updating post:", error);
       res.status(500).json({ error: "Failed to update post" });
     }
-  }
+  },
 );
 
 // ---------------------------
@@ -252,7 +261,7 @@ router.delete(
       console.error("Error deleting post:", error);
       res.status(500).json({ error: "Failed to delete post" });
     }
-  }
+  },
 );
 
 export default router;
