@@ -212,6 +212,105 @@ router.get("/basicinfo/:id", async (req: Request, res: Response) => {
 });
 
 // ---------------------------
+// UPDATE AUTHENTICATED SHELTER (Self)
+// ---------------------------
+// Route: PUT /me
+// Access: Protected (Shelter only)
+// Middleware: validateShelterToken
+// Description:
+//  - Allows a shelter to update its own profile
+//  - Partial updates supported (only fields provided will be changed)
+router.put(
+  "/me",
+  validateShelterToken,
+  async (req: Request | any, res: Response) => {
+    try {
+      const shelterId = req.shelter.id;
+
+      const {
+        username,
+        password,
+        email,
+        shelterName,
+        countyId,
+        address,
+        phoneNumber,
+      } = req.body;
+
+      const updateData: any = {};
+
+      // ---------------------------
+      // Validation (Only if provided)
+      // ---------------------------
+      if (username !== undefined) {
+        if (
+          typeof username !== "string" ||
+          username.length > MAX_USERNAME_LENGTH
+        ) {
+          return res.status(400).json({ error: "Invalid username" });
+        }
+        updateData.username = username;
+      }
+
+      if (password !== undefined) {
+        if (
+          typeof password !== "string" ||
+          password.length < MIN_PASSWORD_LENGTH
+        ) {
+          return res.status(400).json({ error: "Password too short" });
+        }
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+
+      if (email !== undefined) {
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+          return res.status(400).json({ error: "Invalid email" });
+        }
+        updateData.email = email;
+      }
+
+      if (shelterName !== undefined) {
+        if (typeof shelterName !== "string" || shelterName.trim() === "") {
+          return res.status(400).json({ error: "Invalid shelter name" });
+        }
+        updateData.shelterName = shelterName;
+      }
+
+      if (countyId !== undefined) {
+        if (typeof countyId !== "number" || countyId <= 0) {
+          return res.status(400).json({ error: "Invalid county ID" });
+        }
+        updateData.countyId = countyId;
+      }
+
+      if (address !== undefined) {
+        if (typeof address !== "string" || address.trim() === "") {
+          return res.status(400).json({ error: "Invalid address" });
+        }
+        updateData.address = address;
+      }
+
+      if (phoneNumber !== undefined) {
+        if (!PHONE_REGEX.test(phoneNumber)) {
+          return res.status(400).json({ error: "Invalid phone number" });
+        }
+        updateData.phoneNumber = phoneNumber;
+      }
+
+      // ---------------------------
+      // Perform update
+      // ---------------------------
+      await Shelter.update(updateData, { where: { id: shelterId } });
+
+      res.json({ message: "Shelter profile updated successfully" });
+    } catch (error) {
+      console.error("Error updating shelter:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
+// ---------------------------
 // DELETE SHELTER (ADMIN ONLY)
 // ---------------------------
 // Route: DELETE /:id
