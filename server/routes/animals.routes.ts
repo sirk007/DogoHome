@@ -48,13 +48,53 @@ router.post(
     try {
       // Extract animal info from request body
       const {
-        animal,
-        animalName,
-        animalAge,
-        animalHealth,
-        animalDescription,
-        picture,
+        species,
+        name,
+        age,
+        ageUnit,
+        health,
+        size,
+        activityLevel,
+        goodWithKids = false,
+        goodWithPets = false,
+        description,
+        pictureUrl,
       } = req.body;
+
+      // Validation / Hygiene
+      const speciesValues = ["Dog", "Cat", "Rabbit", "Other"];
+      const ageUnits = ["Months", "Years"];
+      const healthStates = ["Good", "Needs Medication", "Critical"];
+      const sizes = ["Small", "Medium", "Large"];
+      const activityLevels = ["Low", "Medium", "High"];
+
+      if (!speciesValues.includes(species)) {
+        return res.status(400).json({ error: "Invalid species" });
+      }
+
+      if (!name || typeof name !== "string" || name.length > 100) {
+        return res.status(400).json({ error: "Invalid name" });
+      }
+
+      if (typeof age !== "number" || age < 0) {
+        return res.status(400).json({ error: "Invalid age" });
+      }
+
+      if (!ageUnits.includes(ageUnit)) {
+        return res.status(400).json({ error: "Invalid age unit" });
+      }
+
+      if (!healthStates.includes(health)) {
+        return res.status(400).json({ error: "Invalid health state" });
+      }
+
+      if (!sizes.includes(size)) {
+        return res.status(400).json({ error: "Invalid size" });
+      }
+
+      if (!activityLevels.includes(activityLevel)) {
+        return res.status(400).json({ error: "Invalid activity level" });
+      }
 
       // Check if req.shelter exists (set by middleware). If not, return 401 Unauthorized
       if (!req.shelter) {
@@ -65,12 +105,17 @@ router.post(
       // Optional fields (description, picture) default to null if not provided
       // shelterId links the animal to the authenticated shelter
       const newAnimal = await Animals.create({
-        animal,
-        animalName,
-        animalAge,
-        animalHealth,
-        animalDescription: animalDescription || null,
-        picture: picture || null,
+        species,
+        name,
+        age,
+        ageUnit,
+        health,
+        size,
+        activityLevel,
+        goodWithKids,
+        goodWithPets,
+        description: description || null,
+        pictureUrl: pictureUrl || null,
         shelterId: req.shelter.id,
       });
       // Respond with 201 Created and return the new animal object
@@ -80,7 +125,7 @@ router.post(
       console.error("Error creating animal:", error);
       res.status(500).json({ error: "Failed to create animal" });
     }
-  }
+  },
 );
 
 // ---------------------------
@@ -113,7 +158,7 @@ router.get(
       console.error("Error fetching shelter animals:", error);
       res.status(500).json({ error: "Failed to fetch animals" });
     }
-  }
+  },
 );
 
 // ---------------------------
@@ -170,6 +215,113 @@ router.get("/byId/:id", async (req: Request, res: Response) => {
 });
 
 // ---------------------------
+// UPDATE ANIMAL BY ID (Shelter Only)
+// ---------------------------
+// Route: PUT /:id
+// Access: Protected (Shelter only)
+// Middleware: validateShelterToken
+// Description
+//   - Allows a shelter to update one of its own animal resources
+//   - Partial updates supported (Only provided fields are updated)
+//
+router.put(
+  "/:id",
+  validateShelterToken,
+  async (req: ShelterAuthRequest, res: Response) => {
+    try {
+      // Confirm middleware set req.shelter
+      if (!req.shelter) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      // Convert param to number
+      const id = Number(req.params.id);
+
+      // Find the animal by primary key
+      const animal = await Animals.findByPk(id);
+      if (!animal) return res.status(404).json({ error: "Animal not found" });
+
+      // Check ownership
+      if (animal.shelterId !== req.shelter.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      // Extract fields from body
+      const {
+        species,
+        name,
+        age,
+        ageUnit,
+        health,
+        size,
+        activityLevel,
+        goodWithKids,
+        goodWithPets,
+        description,
+        pictureUrl,
+      } = req.body;
+
+      // Validation
+      const speciesValues = ["Dog", "Cat", "Rabbit", "Other"];
+      const ageUnits = ["Months", "Years"];
+      const healthStates = ["Good", "Needs Medication", "Critical"];
+      const sizes = ["Small", "Medium", "Large"];
+      const activityLevels = ["Low", "Medium", "High"];
+
+      const updateData: any = {};
+
+      if (species !== undefined) {
+        if (!speciesValues.includes(species))
+          return res.status(400).json({ error: "Invalid species" });
+        updateData.species = species;
+      }
+      if (name !== undefined) {
+        if (typeof name !== "string" || name.length > 100)
+          return res.status(400).json({ error: "Invalid name" });
+        updateData.name = name;
+      }
+      if (age !== undefined) {
+        if (typeof age !== "number" || age < 0)
+          return res.status(400).json({ error: "Invalid age" });
+        updateData.age = age;
+      }
+      if (ageUnit !== undefined) {
+        if (!ageUnits.includes(ageUnit))
+          return res.status(400).json({ error: "Invalid age unit" });
+        updateData.ageUnit = ageUnit;
+      }
+      if (health !== undefined) {
+        if (!healthStates.includes(health))
+          return res.status(400).json({ error: "Invalid health state" });
+        updateData.health = health;
+      }
+      if (size !== undefined) {
+        if (!sizes.includes(size))
+          return res.status(400).json({ error: "Invalid size" });
+        updateData.size = size;
+      }
+      if (activityLevel !== undefined) {
+        if (!activityLevels.includes(activityLevel))
+          return res.status(400).json({ error: "Invalid activity level" });
+        updateData.activityLevel = activityLevel;
+      }
+      if (goodWithKids !== undefined) updateData.goodWithKids = goodWithKids;
+      if (goodWithPets !== undefined) updateData.goodWithPets = goodWithPets;
+      if (description !== undefined) updateData.description = description;
+      if (pictureUrl !== undefined) updateData.pictureUrl = pictureUrl;
+
+      // Perform the update
+      await animal.update(updateData);
+
+      res.json({ message: "Animal updated successfully", animal });
+    } catch (error) {
+      console.error("Error updating animal:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
+// ---------------------------
 // DELETE ANIMAL BY ID (Shelter Only)
 // ---------------------------
 // Route: DELETE /:id
@@ -213,7 +365,7 @@ router.delete(
       console.error("Error deleting animal:", error);
       res.status(500).json({ error: "Failed to delete animal" });
     }
-  }
+  },
 );
 
 export default router;
