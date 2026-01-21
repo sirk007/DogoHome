@@ -245,7 +245,7 @@ router.put(
   validateUserToken,
   async (req: Request | any, res: Response) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.id; // decoded JWT sets req.user
 
       const {
         email,

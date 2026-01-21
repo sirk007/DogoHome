@@ -225,7 +225,7 @@ router.put(
   validateShelterToken,
   async (req: Request | any, res: Response) => {
     try {
-      const shelterId = req.shelter.id;
+      const shelterId = req.shelter.id; // Decoded JWT sets req.shelter
 
       const {
         username,

@@ -175,4 +175,66 @@ router.get(
     }
   },
 );
+
+// ---------------------------
+// UPDATE AUTHENTICATED ADMIN (Self)
+// ---------------------------
+// Route: PUT /me
+// Access: Protected (Admin only)
+// Middleware: validateAdminToken
+// Description:
+//  -- Allows an admin to update their own profile
+//  -- Supports partial updates (Only fields provided are updated)
+router.put(
+  "/me",
+  validateAdminToken,
+  async (req: Request | any, res: Response) => {
+    try {
+      const adminId = req.admin.id; // decoded JWT sets req.admin
+
+      const { username, email, password, age } = req.body;
+
+      const updateData: any = {};
+
+      // Validation (only if provided)
+      if (username !== undefined) {
+        if (typeof username !== "string" || username.length > 50) {
+          return res.status(400).json({ error: "Invalid username" });
+        }
+        updateData.username = username;
+      }
+
+      if (email !== undefined) {
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+          return res.status(400).json({ error: "Invalid email" });
+        }
+        updateData.email = email;
+      }
+
+      if (password !== undefined) {
+        if (typeof password !== "string" || password.length < 8) {
+          return res.status(400).json({ error: "Password too short" });
+        }
+        // Hash the new password
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+
+      if (age !== undefined) {
+        if (typeof age !== "number" || age < 18 || age > 120) {
+          return res.status(400).json({ error: "Invalid age" });
+        }
+        updateData.age = age;
+      }
+
+      // Perform the update
+      await Admin.update(updateData, { where: { id: adminId } });
+
+      res.json({ message: "Admin profile updated successfully" });
+    } catch (error) {
+      console.error("Error updating admin:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
 export default router;
