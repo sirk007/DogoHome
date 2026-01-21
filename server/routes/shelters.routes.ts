@@ -40,6 +40,10 @@ const { Shelter } = db;
 // Fallback string is only for development if env variable is missing
 const JWT_SECRET = process.env.SHELTER_JWT_SECRET || "fallbackSecret";
 
+const MAX_USERNAME_LENGTH = 50;
+const MIN_PASSWORD_LENGTH = 6;
+const PHONE_REGEX = /^[0-9+\-\s()]{7,20}$/;
+
 // ----------------------------------------------
 // ---------------- SHELTER ROUTES -------------
 // ----------------------------------------------
@@ -62,6 +66,43 @@ router.post("/", async (req: Request, res: Response) => {
     phoneNumber,
   } = req.body;
   try {
+    // Validation / Hygiene
+    if (
+      !username ||
+      typeof username !== "string" ||
+      username.length > MAX_USERNAME_LENGTH
+    ) {
+      return res.status(400).json({ error: "Invalid username" });
+    }
+
+    if (
+      !password ||
+      typeof password !== "string" ||
+      password.length < MIN_PASSWORD_LENGTH
+    ) {
+      return res.status(400).json({ error: "Password too short" });
+    }
+
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+
+    if (!shelterName || typeof shelterName !== "string") {
+      return res.status(400).json({ error: "Invalid shelter name" });
+    }
+
+    if (typeof countyId !== "number" || countyId <= 0) {
+      return res.status(400).json({ error: "Invalid county ID" });
+    }
+
+    if (!address || typeof address !== "string") {
+      return res.status(400).json({ error: "Invalid address" });
+    }
+
+    if (!phoneNumber || !PHONE_REGEX.test(phoneNumber)) {
+      return res.status(400).json({ error: "Invalid phone number" });
+    }
+
     // Hash the password with bcrypt before saving
     // Salt rounds = 10 (moderate security, reasonable speed)
     const hash = await bcrypt.hash(password, 10);
@@ -115,7 +156,7 @@ router.post("/login", async (req: Request, res: Response) => {
       JWT_SECRET,
       {
         expiresIn: "1h",
-      }
+      },
     );
     // Respond with JWT and basic Shelters info
     // Client can store token for authenticated requests
@@ -141,7 +182,7 @@ router.get(
     // validateShelterToken sets req.shelter from decoded JWT
     // Here we just return it
     res.json(req.shelter);
-  }
+  },
 );
 
 // ---------------------------
@@ -193,7 +234,7 @@ router.delete(
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     }
-  }
+  },
 );
 
 export default router;
