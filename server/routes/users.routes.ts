@@ -45,6 +45,14 @@ const activityLevels = ["Low", "Medium", "High"] as const;
 const petExperienceLevels = ["None", "Beginner", "Experience"] as const;
 const dogSizes = ["Small", "Medium", "Large"] as const;
 
+// Backend type for login response
+interface UserLoginResponse {
+  id: number;
+  username: string;
+  userType: "User";
+  token: string;
+}
+
 // ----------------------------------------------
 // ----------------   ROUTES   -----------------
 // ----------------------------------------------
@@ -56,7 +64,7 @@ const dogSizes = ["Small", "Medium", "Large"] as const;
 // Access: Public
 // Middleware: None
 // Description: Creates a new user with hashed password
-router.post("/", async (req: Request, res: Response) => {
+router.post("/register", async (req: Request, res: Response) => {
   const {
     username,
     password,
@@ -159,9 +167,17 @@ router.post("/login", async (req: Request, res: Response) => {
       expiresIn: "1h",
     });
 
+    // Response with backend type
+    const loginResponse: UserLoginResponse = {
+      id,
+      username,
+      userType, // TS will ensure this is "User"
+      token: accessToken,
+    };
+
     // Respond with JWT and basic user info
     // Client can store token for authenticated requests
-    res.json({ token: accessToken, username, id, userType });
+    res.json(loginResponse);
   } catch (error) {
     // Handle DB or unexpected errors
     console.error("Login error:", error);

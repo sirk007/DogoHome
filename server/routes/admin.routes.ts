@@ -38,6 +38,14 @@ const { Admin } = db;
 // Fallback string is only for development if env variable is missing
 const JWT_SECRET = process.env.ADMIN_JWT_SECRET || "fallbackSecret";
 
+// Backend type for login response
+interface AdminLoginResponse {
+  id: number;
+  username: string;
+  userType: "Admin";
+  token: string; // JWT
+}
+
 // ----------------------------------------------
 // ---------------- ADMIN ROUTES ---------------
 // ----------------------------------------------
@@ -116,9 +124,16 @@ router.post("/login", async (req: Request, res: Response) => {
       expiresIn: "1h",
     });
 
+    //Build response object
+    const loginResponse: AdminLoginResponse = {
+      id,
+      username,
+      userType,
+      token: accessAdminToken,
+    };
     // Respond with JWT and basic user info
     // Client can store token for authenticated requests
-    res.json({ token: accessAdminToken, username, id, userType });
+    res.json(loginResponse);
   } catch (error) {
     // Log any error and respond with generic 500
     console.error("Error during admin login:", error);

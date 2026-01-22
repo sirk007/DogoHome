@@ -3,6 +3,7 @@ import { useAuthContext } from "../../context/AuthContext";
 import { loginShelter } from "../../api/shelter.api";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, TextField, Typography } from "@mui/material";
+import type { ShelterLoginResponse } from "../../types/shelter.types";
 
 /**
  * --------------------------------------------
@@ -35,29 +36,32 @@ const LoginShelter: React.FC = () => {
   const handleLogin = async () => {
     try {
       // Call backend login
-      const res = await loginShelter(username, password);
-
-      const token = res.data.token;
-      if (!token) throw new Error("No token returned");
+      const loginResponse: ShelterLoginResponse = await loginShelter(
+        username,
+        password,
+      );
 
       // -----------------------------
       // Store token safely
       // -----------------------------
       // Clear other tokens to prevent cross-role conflicts
       sessionStorage.clear();
-      sessionStorage.setItem("accessShelterToken", token);
+      sessionStorage.setItem("accessShelterToken", loginResponse.token);
 
       // -----------------------------
       // Update global auth state
       // -----------------------------
       setAuthState({
-        username: res.data.username,
-        id: res.data.id,
-        userType: "Shelter",
+        username: loginResponse.username,
+        id: loginResponse.id,
+        userType: loginResponse.userType,
         status: true,
       });
 
       setError(""); // clear previous errors
+      setUsername("");
+      setPassword("");
+
       navigate("/shelter"); // redirect to shelter dashboard
     } catch (err: any) {
       console.error("Login failed", err);
@@ -78,13 +82,10 @@ const LoginShelter: React.FC = () => {
   // -----------------------------
   return (
     <Box sx={{ maxWidth: 400, margin: "2rem auto", textAlign: "center" }}>
-      {/* 1. Page Title */}
       <Typography variant="h5" gutterBottom>
-        {" "}
         Shelter Login
       </Typography>
 
-      {/* 2. Username Input */}
       <TextField
         label="Username"
         value={username}
@@ -93,7 +94,6 @@ const LoginShelter: React.FC = () => {
         sx={{ mb: 2 }}
       />
 
-      {/* 3. Password Input */}
       <TextField
         label="Password"
         type="password"
@@ -103,14 +103,12 @@ const LoginShelter: React.FC = () => {
         sx={{ mb: 2 }}
       />
 
-      {/* 4. Error Message */}
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
         </Typography>
       )}
 
-      {/* 6. Action Buttons */}
       <Box>
         <Button variant="contained" onClick={handleLogin} sx={{ mr: 1 }}>
           Login

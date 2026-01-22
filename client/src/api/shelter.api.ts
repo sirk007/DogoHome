@@ -1,77 +1,89 @@
-import axios from "axios";
-
 /**
  * --------------------------------------------
  * Axios instance for Shelter API
  * --------------------------------------------
- * Creates a pre-configured Axios instance with the base URL
- * pointing to the shelters API endpoint.
+ * Pre-configured Axios instance with the base URL pointing
+ * to the user API endpoint.
  *
- * Why:
- * - Centralizes API configuration for all shelter-related requests
- * - Easy to switch endpoints for production or staging environments
+ * Benefits:
+ * - Centralizes the API base URL for all shelter requests
+ * - Makes it easy to switch between development and production URLs
  */
+
+import axios from "axios";
+import type {
+  ShelterCreationAttributes,
+  ShelterLoginResponse,
+} from "../types/shelter.types";
+
 const API = axios.create({ baseURL: "http://localhost:3002/api/shelters" });
 
 /**
  * --------------------------------------------
  * loginShelter
  * --------------------------------------------
- * Sends a POST request to authenticate a shelter account.
+ * Authenticates a shelter with the backend.
  *
  * Parameters:
- * - username: string -> shelter's login username
- * - password: string -> shelter's login password
+ * - username: string -> the shelter's login username
+ * - password: string -> the shelter's password
  *
  * Returns:
- * - Axios response containing:
- *   - JWT token for session management
+ * - Promise<ShelterLoginResponse> -> object containing:
+ *   - token (JWT)
  *   - shelter info (username, id, role)
  *
- * Why:
- * - Centralized login function for shelters
- * - Used in login forms to obtain a session token
+ * Notes:
+ * - Throws an error if login fails (invalid credentials)
+ * - Centralized for use in login forms
  */
-export const loginShelter = (username: string, password: string) =>
-  API.post("/login", { username, password });
+export const loginShelter = (
+  username: string,
+  password: string,
+): Promise<ShelterLoginResponse> =>
+  API.post("/login", { username, password }).then((res) => res.data);
 
 /**
  * --------------------------------------------
  * registerShelter
  * --------------------------------------------
- * Sends a POST request to create a new shelter account.
+ * Creates a new shelter account.
  *
  * Parameters:
- * - username: string -> desired username
- * - password: string -> desired password
+ * - shelterData: ShelterCreationAttributes -> object containing all shelter registration info
  *
  * Returns:
- * - Axios response with newly created shelter data
+ * - Axios promise -> response containing the newly created shelter info
  *
- * Why:
- * - Provides a safe, centralized way to register new shelters
- * - Keeps front-end logic clean and separated from API calls
+ * Notes:
+ * - Handles front-end registration forms
+ * - Any server validation errors will be thrown as Axios errors
  */
-export const registerShelter = (username: string, password: string) =>
-  API.post("/register", { username, password });
+export const registerShelter = (
+  shelterData: ShelterCreationAttributes,
+): Promise<ShelterLoginResponse> =>
+  API.post("/register", shelterData).then((res) => res.data);
 
 /**
  * --------------------------------------------
  * fetchShelterAuth
  * --------------------------------------------
- * Sends a GET request to verify the shelter's token and fetch its info.
+ * Verifies the shelter's JWT token and fetches current shelter info.
  *
  * Parameters:
  * - token: string -> JWT stored in sessionStorage
  *
  * Returns:
- * - Axios response containing shelter data if token is valid
- * - Error if token is invalid or expired
+ * - Promise<ShelterLoginResponse> -> shelter data if token is valid
+ * - Throws error if token is invalid/expired
  *
- * Why:
- * - Ensures front-end only treats a shelter as authenticated if backend verifies token
- * - Used in useAuth hook to maintain persistent login across refreshes
- * - Supports role-based access control for shelter-specific routes
+ * Notes:
+ * - Used in auth hooks to maintain persistent login
+ * - Front-end should never trust token without verification
  */
-export const fetchShelterAuth = (token: string) =>
-  API.get("/authShelter", { headers: { accessShelterToken: token } });
+export const fetchShelterAuth = (
+  token: string,
+): Promise<ShelterLoginResponse> =>
+  API.get("/authShelter", { headers: { accessShelterToken: token } }).then(
+    (res) => res.data,
+  );

@@ -18,8 +18,7 @@ const { County } = db;
 // ----------------------------------------------
 // Static reference data
 // ----------------------------------------------
-// List of all Irish counties used by shelter registration
-// and other location-based features.
+// List of all Irish counties
 // ----------------------------------------------
 
 const irishCounties = [

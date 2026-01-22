@@ -1,77 +1,86 @@
-import axios from "axios";
-
 /**
  * --------------------------------------------
  * Axios instance for User API
  * --------------------------------------------
- * Creates a pre-configured Axios instance with the base URL
- * pointing to the users API endpoint.
+ * Pre-configured Axios instance with the base URL pointing
+ * to the user API endpoint.
  *
- * Why:
- * - Centralizes the API base URL so all user requests use the same configuration
- * - Makes it easier to modify the base URL later (e.g., production vs. development)
+ * Benefits:
+ * - Centralizes the API base URL for all user requests
+ * - Makes it easy to switch between development and production URLs
  */
+
+import axios from "axios";
+import type {
+  UserCreationAttributes,
+  UserLoginResponse,
+} from "../types/user.types";
+
 const API = axios.create({ baseURL: "http://localhost:3002/api/users" });
 
 /**
  * --------------------------------------------
  * loginUser
  * --------------------------------------------
- * Sends a POST request to the backend to authenticate a user.
+ * Authenticates a user with the backend.
  *
  * Parameters:
  * - username: string -> the user's login username
  * - password: string -> the user's password
  *
  * Returns:
- * - Axios response containing:
+ * - Promise<UserLoginResponse> -> object containing:
  *   - token (JWT)
  *   - user info (username, id, role)
  *
- * Why:
- * - Centralized function for user login
- * - Can be used in login forms to authenticate and obtain a session token
+ * Notes:
+ * - Throws an error if login fails (invalid credentials)
+ * - Centralized for use in login forms
  */
-export const loginUser = (username: string, password: string) =>
-  API.post("/login", { username, password });
+
+export const loginUser = (
+  username: string,
+  password: string,
+): Promise<UserLoginResponse> =>
+  API.post("/login", { username, password }).then((res) => res.data);
 
 /**
  * --------------------------------------------
  * registerUser
  * --------------------------------------------
- * Sends a POST request to the backend to create a new user account.
+ * Creates a new user account.
  *
  * Parameters:
- * - username: string -> desired username for new account
- * - password: string -> desired password for new account
+ * - userData: UserCreationAttributes -> object containing all user registration info
  *
  * Returns:
- * - Axios response with newly created user info
+ * - Axios promise -> response containing the newly created user info
  *
- * Why:
- * - Centralizes user registration API calls
- * - Allows front-end forms to create new users safely
+ * Notes:
+ * - Handles front-end registration forms
+ * - Any server validation errors will be thrown as Axios errors
  */
-export const registerUser = (username: string, password: string) =>
-  API.post("/register", { username, password });
+export const registerUser = (userData: UserCreationAttributes) =>
+  API.post("/register", userData);
 
 /**
  * --------------------------------------------
  * fetchUserAuth
  * --------------------------------------------
- * Sends a GET request to verify the user's token and fetch current user info.
+ * Verifies the user's JWT token and fetches current user info.
  *
  * Parameters:
  * - token: string -> JWT stored in sessionStorage
  *
  * Returns:
- * - Axios response with user data if token is valid
- * - Error if token is invalid or expired
+ * - Promise<UserLoginResponse> -> user data if token is valid
+ * - Throws error if token is invalid/expired
  *
- * Why:
- * - Used in useAuth hook to verify that a session token is valid
- * - Ensures that the front-end never trusts local/session storage blindly
- * - Supports persistent login after page refresh
+ * Notes:
+ * - Used in auth hooks to maintain persistent login
+ * - Front-end should never trust token without verification
  */
 export const fetchUserAuth = (token: string) =>
-  API.get("/auth", { headers: { accessToken: token } });
+  API.get<UserLoginResponse>("/auth", {
+    headers: { accessToken: token },
+  }).then((res) => res.data);

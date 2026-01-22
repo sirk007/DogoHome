@@ -1,3 +1,14 @@
+/**
+ * --------------------------------------------
+ * UserRegistrationPage
+ * --------------------------------------------
+ * Handles user registration:
+ * - Collects User account details: username, email, password, address, preferences
+ * - Sends POST request to backend /register endpoint
+ * - Displays success or error messages to the user
+ * - Redirects to user login page after successful registration
+ */
+
 import React, { useState } from "react";
 import {
   Container,
@@ -8,94 +19,91 @@ import {
   Button,
   Stack,
   Alert,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
-
-/**
- * --------------------------------------------
- * UserRegistrationPage
- * --------------------------------------------
- * Handles user registration flow:
- * - Collects username, email, age, password, confirmPassword
- * - Basic client-side validation (password match)
- * - Sends POST request to /users endpoint
- * - Displays success or error alerts
- * - Redirects to login page after successful registration
- */
-interface FormData {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  age: string;
-}
+import type { UserCreationAttributes } from "../../types/user.types";
+import { registerUser } from "../../api/user.api";
 
 const UserRegistrationPage: React.FC = () => {
+  const navigate = useNavigate();
+
   // -----------------------------
   // Local form state
   // -----------------------------
-  const [formData, setFormData] = useState<FormData>({
+  // Tracks all input values that will be sent to the backend
+  const [formData, setFormData] = useState<UserCreationAttributes>({
     username: "",
-    email: "",
     password: "",
-    confirmPassword: "",
-    age: "",
+    email: "",
+    age: 0,
+    activityLevel: "Medium",
+    petExperienceLevel: "None",
+    maxDogSize: "Medium",
+    hasGarden: false,
+    hasOtherPets: false,
+    hasKids: false,
+    preferredEnergyLevel: undefined,
+    preferredAgeRangeMin: undefined,
+    preferredAgeRangeMax: undefined,
   });
 
   // -----------------------------
-  // Local UI state
+  // UI feedback state
   // -----------------------------
+  // confirmPassword is only used to verify user input locally
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null); // stores errors
   const [success, setSuccess] = useState<string | null>(null); // stores success message
-
-  const navigate = useNavigate(); // redirect after successful registration
 
   // -----------------------------
   // Handle input change
   // -----------------------------
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleTextChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value, type } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        type === "number" ? Number(value) : value === "" ? undefined : value,
+    }));
   };
 
+  const handleCheckbox =
+    (key: keyof UserCreationAttributes) =>
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setFormData((prev) => ({ ...prev, [key]: e.target.checked }));
+
   // -----------------------------
-  // Handle form submit
+  // Form submission handler
   // -----------------------------
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
-    // -----------------------------
-    // Client-side validation
-    // -----------------------------
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
+    // Check passwords match before sending API request
+    if (formData.password !== confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
 
     try {
-      // -----------------------------
-      // Send POST request to backend
-      // -----------------------------
-      const res = await fetch("/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-      // Handle API response
-      if (!res.ok) {
-        setError(data.error || "Registration Failed");
-      } else {
-        setSuccess("User registered successfully!");
-        // Redirect to login after 1.5 seconds delay
-        setTimeout(() => navigate("/login/user"), 1500);
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Internal server error");
+      // Send registration data to backend
+      await registerUser(formData);
+      // Show success message
+      setSuccess("Account created successfully!");
+      // Redicrect to shelter login after 1.5 seconds
+      setTimeout(() => navigate("/login/user"), 1500);
+    } catch (err: any) {
+      // Display error returned from backed or generic feedback
+      setError(err?.response?.data?.error || "Registration failed");
     }
   };
 
@@ -103,118 +111,119 @@ const UserRegistrationPage: React.FC = () => {
   // Render
   // -----------------------------
   return (
-    // -----------------------------
-    // Navbar wraps the page
-    // -----------------------------
-    // Provides consistent navigation across the app.
     <Navbar>
-      {/*-----------------------------
-        // Centered container
-        // ----------------------------- */}
       <Container maxWidth="sm" sx={{ mt: 6 }}>
-        {/* Paper elevates the form visually */}
         <Paper elevation={4} sx={{ p: 4 }}>
-          {/*-----------------------------
-            // Form Header
-            // ----------------------------- */}
-          <Box textAlign="center" mb={3}>
-            <Typography variant="h5" gutterBottom>
-              User Registration
-            </Typography>
-          </Box>
+          {/* Form title */}
+          <Typography variant="h5" textAlign="center" mb={3}>
+            User Registration
+          </Typography>
 
-          {/*-----------------------------
-            // Error / Success Alerts
-            // ----------------------------- */}
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {success}
-            </Alert>
-          )}
+          {/* Error / Success Alerts */}
+          {error && <Alert severity="error">{error}</Alert>}
+          {success && <Alert severity="success">{success}</Alert>}
 
-          {/*-----------------------------
-            // Registration Form
-            // ----------------------------- */}
-          <Box component="form" onSubmit={handleSubmit}>
+          {/* Registration Form */}
+          <Box component="form" onSubmit={handleSubmit} mt={2}>
             <Stack spacing={2}>
-              {/* Username */}
               <TextField
                 label="Username"
                 name="username"
-                value={formData.username}
-                onChange={handleChange}
                 required
-                fullWidth
+                onChange={handleTextChange}
               />
-
-              {/* Email */}
+              <TextField
+                label="Password"
+                type="password"
+                name="password"
+                required
+                onChange={handleTextChange}
+              />
+              <TextField
+                label="Confirm Password"
+                type="password"
+                required
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
               <TextField
                 label="Email"
                 name="email"
                 type="email"
-                value={formData.email}
-                onChange={handleChange}
                 required
-                fullWidth
+                onChange={handleTextChange}
               />
-
-              {/* Age */}
               <TextField
                 label="Age"
                 name="age"
-                type="text"
-                value={formData.age}
-                onChange={handleChange}
+                type="number"
                 required
-                fullWidth
+                onChange={handleTextChange}
               />
 
-              {/* Password */}
               <TextField
-                label="Password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                fullWidth
-              />
-
-              {/* Confirm Password */}
-              <TextField
-                label="Confirm Password"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                fullWidth
-              />
-
-              {/* Submit button */}
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
+                select
+                label="Activity Level"
+                name="activityLevel"
+                value={formData.activityLevel}
+                onChange={handleTextChange}
               >
+                {["Low", "Medium", "High"].map((v) => (
+                  <MenuItem key={v} value={v}>
+                    {v}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                select
+                label="Pet Experience"
+                name="petExperienceLevel"
+                value={formData.petExperienceLevel}
+                onChange={handleTextChange}
+              >
+                {["None", "Beginner", "Experience"].map((v) => (
+                  <MenuItem key={v} value={v}>
+                    {v}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                select
+                label="Max Dog Size"
+                name="maxDogSize"
+                value={formData.maxDogSize}
+                onChange={handleTextChange}
+              >
+                {["Small", "Medium", "Large"].map((v) => (
+                  <MenuItem key={v} value={v}>
+                    {v}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <FormControlLabel
+                control={<Checkbox onChange={handleCheckbox("hasGarden")} />}
+                label="Has Garden"
+              />
+              <FormControlLabel
+                control={<Checkbox onChange={handleCheckbox("hasOtherPets")} />}
+                label="Has Other Pets"
+              />
+              <FormControlLabel
+                control={<Checkbox onChange={handleCheckbox("hasKids")} />}
+                label="Has Kids"
+              />
+
+              <Button type="submit" variant="contained">
                 Register
               </Button>
             </Stack>
           </Box>
 
-          {/*-----------------------------
-            // Redirect link for existing users
-            // ----------------------------- */}
           <Box mt={3} textAlign="center">
             <Typography variant="body2">
-              Already have an account?
-              <Link to="/login">Login here</Link>
+              Already have an account? <Link to="/login/user">Login</Link>
             </Typography>
           </Box>
         </Paper>

@@ -1,63 +1,66 @@
+/**
+ * --------------------------------------------
+ * LoginUser
+ * --------------------------------------------
+ * User login form:
+ * - Collects username and password
+ * - Calls backend /login endpoint for users
+ * - Stores token in sessionStorage
+ * - Updates global auth context
+ */
+
 import React, { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
 import { loginUser } from "../../api/user.api";
 import { useNavigate } from "react-router-dom";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import type { UserLoginResponse } from "../../types/user.types";
 
-/**
- * --------------------------------------------
- * LoginUser Component
- * --------------------------------------------
- * Handles user login functionality:
- * - Accepts username and password
- * - Calls login API
- * - Stores token in sessionStorage
- * - Updates global auth context
- * - Redirects user to /user page
- */
 const LoginUser: React.FC = () => {
-  // -----------------------------
-  // Access Auth Context
-  // -----------------------------
-  const { setAuthState } = useAuthContext(); // to update global auth state after login
-  const navigate = useNavigate(); // for programmatic navigation after login
+  const { setAuthState } = useAuthContext();
+  const navigate = useNavigate();
 
   // -----------------------------
-  // Local component state
+  // Local state
   // -----------------------------
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // stores API or validation errors
+  const [error, setError] = useState("");
 
   // -----------------------------
   // Login handler
   // -----------------------------
   const handleLogin = async () => {
     try {
-      // 1. Call login API
-      const res = await loginUser(username, password);
-      console.log("Login response:", res.data);
+      const loginResponse: UserLoginResponse = await loginUser(
+        username,
+        password,
+      );
 
-      // 2. Store JWT in sessionStorage
-      sessionStorage.setItem("accessToken", res.data.token);
+      // -----------------------------
+      // Store token safely
+      // -----------------------------
+      sessionStorage.clear();
+      sessionStorage.setItem("accessToken", loginResponse.token);
 
-      // 3. Update global auth context
-      // This ensures the rest of the app knows the user is logged in
+      // -----------------------------
+      // Update global auth state
+      // -----------------------------
       setAuthState({
-        username: res.data.username,
-        id: res.data.id,
-        userType: res.data.userType || "User", // default to 'User' if API doesn't provide
+        id: loginResponse.id,
+        username: loginResponse.username,
+        userType: loginResponse.userType,
         status: true,
       });
 
-      // 4. Clear previous errors
-      setError("");
+      setError(""); // clear previous errors
+      setUsername("");
+      setPassword("");
 
-      // 5. Navigate to user landing page
-      navigate("/user");
+      navigate("/user"); // redirect to user dashboard
     } catch (err: any) {
       console.error("Login failed", err);
-      // Show API error or fallback
-      setError(err.response?.data?.error || "Login failed");
+      setError(err?.response?.data?.error || "Login failed");
     }
   };
 
@@ -65,9 +68,7 @@ const LoginUser: React.FC = () => {
   // Logout handler
   // -----------------------------
   const handleLogout = () => {
-    // 1. Remove token from sessionStorage
     sessionStorage.removeItem("accessToken");
-    // 2. Reset auth context
     setAuthState({ username: "", id: 0, userType: "", status: false });
   };
 
@@ -75,67 +76,43 @@ const LoginUser: React.FC = () => {
   // Render
   // -----------------------------
   return (
-    // -----------------------------
-    // Outer container
-    // -----------------------------
-    // Centers the login form and sets a max width for readability.
-    <div style={{ maxWidth: 400, margin: "2rem auto", textAlign: "center" }}>
-      {/*-----------------------------
-      // Header
-      // ----------------------------- */}
-      <h2>User Login</h2>
+    <Box sx={{ maxWidth: 400, margin: "2rem auto", textAlign: "center" }}>
+      <Typography variant="h5" gutterBottom>
+        User Login
+      </Typography>
 
-      {/*-----------------------------
-      // Username input
-      // Controlled input for username
-      // Updates local state 'username on change
-      // ----------------------------- */}
-      <div style={{ marginBottom: "1rem" }}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{ padding: "0.5rem", width: "100%" }}
-        />
-      </div>
+      <TextField
+        label="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        fullWidth
+        sx={{ mb: 2 }}
+      />
 
-      {/*-----------------------------
-      // Password input
-      // Controlled input for password
-      // Updates local state 'password' on change
-      // ----------------------------- */}
-      <div style={{ marginBottom: "1rem" }}>
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: "0.5rem", width: "100%" }}
-        />
-      </div>
+      <TextField
+        label="Password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        fullWidth
+        sx={{ mb: 2 }}
+      />
 
-      {/*-----------------------------
-      // Error display
-      // Shows login error if API fails or credentials are wrong
-      // ----------------------------- */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
 
-      {/* -----------------------------
-      //  Action buttons
-      // handleLogin triggers API call, updates context, navigates
-      // handleLogout clears sessionStorage and context
-      // ----------------------------- */}
-      <button
-        onClick={handleLogin}
-        style={{ padding: "0.5rem 1rem", marginRight: "1rem" }}
-      >
-        Login
-      </button>
-      <button onClick={handleLogout} style={{ padding: "0.5rem 1rem" }}>
-        Logout
-      </button>
-    </div>
+      <Box>
+        <Button variant="contained" onClick={handleLogin} sx={{ mr: 1 }}>
+          Login
+        </Button>
+        <Button variant="outlined" color="error" onClick={handleLogout}>
+          Logout
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

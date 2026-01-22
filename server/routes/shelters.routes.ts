@@ -44,6 +44,14 @@ const MAX_USERNAME_LENGTH = 50;
 const MIN_PASSWORD_LENGTH = 6;
 const PHONE_REGEX = /^[0-9+\-\s()]{7,20}$/;
 
+// Backend type for login response
+interface ShelterLoginResponse {
+  id: number;
+  username: string;
+  userType: "Shelter";
+  token: string; // JWT
+}
+
 // ----------------------------------------------
 // ---------------- SHELTER ROUTES -------------
 // ----------------------------------------------
@@ -55,7 +63,7 @@ const PHONE_REGEX = /^[0-9+\-\s()]{7,20}$/;
 // Access: Public
 // Middleware: None
 // Description: Creates a new shelter account with hashed password
-router.post("/", async (req: Request, res: Response) => {
+router.post("/register", async (req: Request, res: Response) => {
   const {
     username,
     password,
@@ -158,9 +166,18 @@ router.post("/login", async (req: Request, res: Response) => {
         expiresIn: "1h",
       },
     );
+
+    //Build response object
+    const loginResponse: ShelterLoginResponse = {
+      id,
+      username,
+      userType,
+      token: accessShelterToken,
+    };
+
     // Respond with JWT and basic Shelters info
     // Client can store token for authenticated requests
-    res.json({ token: accessShelterToken, username: uname, id, userType });
+    res.json(loginResponse);
   } catch (error) {
     // Log any error and respond with generic 500
     console.error("Error during shelter login:", error);

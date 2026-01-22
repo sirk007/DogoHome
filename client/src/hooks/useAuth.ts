@@ -1,8 +1,28 @@
+/**
+ * --------------------------------------------
+ * useAuth Hook
+ * --------------------------------------------
+ * Centralized authentication management hook for the app.
+ *
+ * Responsibilities:
+ * - Checks for active JWT tokens in sessionStorage for Users, Admins, and Shelters
+ * - Validates token expiration on the client
+ * - Verifies token authenticity with backend APIs
+ * - Maintains auth state (username, id, role, login status)
+ * - Provides a loading state while authentication check is in progress
+ * - Supplies a logout helper to clear tokens and reset state
+ *
+ * Benefits:
+ * - Ensures consistent auth state across all components
+ * - Protects against expired or tampered tokens
+ * - Simplifies login persistence and session management
+ */
+
 import { useState, useEffect } from "react";
 import type { AxiosResponse } from "axios";
 import { jwtDecode } from "jwt-decode"; // used to decode JWT and check expiration
 import { fetchUserAuth, fetchAdminAuth, fetchShelterAuth } from "../api/auth";
-import type { AuthState, UserRole } from "../types/auth.types";
+import type { AuthState, UserRole, AuthIdentity } from "../types/auth.types";
 
 /**
  * --------------------------------------------
@@ -15,7 +35,7 @@ const TOKEN_KEYS = {
   user: "accessToken",
   admin: "adminAccessToken",
   shelter: "accessShelterToken",
-};
+} as const;
 
 /**
  * --------------------------------------------
@@ -57,7 +77,7 @@ export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
     username: "", // username of authenticated user
     id: 0, // database ID of user
-    userType: "", // role: User, Admin, Shelter, or empty string
+    userType: "", // role: User, Admin, Shelter
     status: false, // whether user is logged in
   });
 
@@ -73,7 +93,6 @@ export const useAuth = () => {
       // -----------------------------
       // 1. Check for any active token
       // -----------------------------
-      // Iterate over possible tokens and find the first valid one
       const tokenEntry = Object.entries(TOKEN_KEYS).find(([role, key]) => {
         const token = sessionStorage.getItem(key);
         if (!token) return false;
@@ -109,35 +128,24 @@ export const useAuth = () => {
         // -----------------------------
         // 3. Verify token with backend
         // -----------------------------
-        let response: AxiosResponse<any> | undefined;
+        let response: AxiosResponse<AuthIdentity>;
 
         if (role === "user") response = await fetchUserAuth(token);
         else if (role === "admin") response = await fetchAdminAuth(token);
-        else if (role === "shelter") response = await fetchShelterAuth(token);
+        else response = await fetchShelterAuth(token);
 
         // -----------------------------
-        // 4. Invalid response handling
+        // 4. Update auth state with verified data
         // -----------------------------
-        if (!response || response.data?.error) {
-          // Token invalid → remove from sessionStorage and reset auth state
-          sessionStorage.removeItem(key);
-          setAuthState({ username: "", id: 0, userType: "", status: false });
-          setLoading(false);
-          return;
-        }
-
-        // -----------------------------
-        // 5. Update auth state with verified data
-        // -----------------------------
-        const userRole = response.data.userType;
+        const { id, username, userType } = response.data;
         setAuthState({
-          username: response.data.username ?? "",
-          id: response.data.id ?? 0,
-          userType: isValidUserRole(userRole) ? userRole : "",
+          username,
+          id,
+          userType: isValidUserRole(userType) ? userType : "",
           status: true,
         });
       } catch {
-        // Network or unexpected error → treat as unauthenticated
+        // Network or unexpected error -> treat as unauthenticated
         sessionStorage.removeItem(key);
         setAuthState({ username: "", id: 0, userType: "", status: false });
       } finally {

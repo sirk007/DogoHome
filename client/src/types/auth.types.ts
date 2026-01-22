@@ -1,5 +1,40 @@
 /**
  * ------------------------------------------
+ * Auth Types
+ * ------------------------------------------
+ * Defines types related to authentication and user roles in the app.
+ *
+ * Includes:
+ * - Minimal identity for AuthContext/hooks (AuthIdentity)
+ * - User roles (UserRole)
+ * - Full login responses from the backend (AuthLoginResponse)
+ * - Authentication state structure (AuthState)
+ *
+ * These types help standardize auth handling across the frontend.
+ */
+
+import type { UserBase, UserLoginResponse } from "./user.types";
+import type { ShelterBase, ShelterLoginResponse } from "./shelter.types";
+import type { AdminBase, AdminLoginResponse } from "./admin.types";
+
+/**
+ * ------------------------------------------
+ * AuthLoginResponse type
+ * ------------------------------------------
+ * Represents the full login response from the backend, including JWT.
+ * Can be one of: User, Shelter, or Admin login responses.
+ */
+
+export type AuthIdentity = UserBase | ShelterBase | AdminBase;
+
+// Full login response from backend (includes JWT)
+export type AuthLoginResponse =
+  | UserLoginResponse
+  | ShelterLoginResponse
+  | AdminLoginResponse;
+
+/**
+ * ------------------------------------------
  * UserRole type
  * ------------------------------------------
  * Defines all possible roles a user can have in the system.
@@ -10,10 +45,6 @@
  * - "Admin"   -> system administrator with elevated privileges
  * - "Shelter" -> shelter staff managing animals and shelters
  *
- * Why it's needed:
- * - Strongly types the user role across the app
- * - Helps enforce role-based access control (RBAC)
- * - Works with ProtectedRoute to conditionally render pages
  */
 export type UserRole = "" | "User" | "Admin" | "Shelter";
 
@@ -21,30 +52,16 @@ export type UserRole = "" | "User" | "Admin" | "Shelter";
  * ------------------------------------------
  * AuthState interface
  * ------------------------------------------
- * Represents the shape of the authentication state in the app.
- * This state is typically stored in React context or a global hook.
+ * Represents authentication state in the app.
  *
- * Properties:
- * - username: string
- *     The display name of the authenticated user. Empty string if not logged in.
+ * Default values:
+ * - username: ""  -> no user logged in
+ * - id: 0        -> unauthenticated
+ * - userType: "" -> guest / unauthenticated
+ * - status: false -> not authenticated
  *
- * - id: number
- *     Unique identifier for the user from the database. 0 indicates unauthenticated.
- *
- * - userType: UserRole
- *     Role of the currently authenticated user. Helps determine access to routes/features.
- *
- * - status: boolean
- *     Indicates whether the user is authenticated (true) or not (false).
- *
- * - token?: string
- *     Optional JWT token (currently stored in some implementations for convenience).
- *     NOTE: In the safer version, tokens are stored in sessionStorage instead of state.
- *
- * Why it's needed:
- * - Provides a typed structure for authentication state.
- * - Ensures consistency when updating or reading auth data across components.
- * - Works with hooks like useAuth and context like AuthContext to manage app-wide auth state.
+ * Optional token is only used in some hooks for convenience; production apps
+ * should rely on sessionStorage/localStorage for security.
  */
 export interface AuthState {
   username: string;
