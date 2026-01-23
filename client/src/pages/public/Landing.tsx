@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 import LoginUser from "../auth/User.Login";
@@ -17,29 +17,14 @@ import {
   Divider,
 } from "@mui/material";
 
-import Navbar from "../../components/layout/Navbar";
+import { useModalContext } from "../../context/ModalContext"; // ✅ use global modal context
 
 /**
- * --------------------------------------------
  * LandingPage Component
- * --------------------------------------------
- * The landing page serves as the first page users and shelters see.
- * Responsibilities:
- * 1. Display a showcase of dogs available for adoption
- * 2. Provide a modal for signing in (User or Shelter)
- * 3. Links to registration for new accounts
  */
 const LandingPage: React.FC = () => {
-  // -----------------------------
-  // Modal state
-  // -----------------------------
-  const [signInOpen, setSignInOpen] = useState(false); // controls sign-in modal visibility
-  const [loginType, setLoginType] = useState<"User" | "Shelter">("User"); // switches between User/Shelter login forms
+  const { isLoginOpen, loginType, closeLogin, openLogin } = useModalContext();
 
-  // -----------------------------
-  // Sample dogs for display
-  // -----------------------------
-  // In a real app, this could be fetched from the backend
   const randomDogs = [
     { id: 1, name: "Buddy", shelter: "Happy Tails" },
     { id: 2, name: "Lucy", shelter: "Paws & Co." },
@@ -50,21 +35,8 @@ const LandingPage: React.FC = () => {
   ];
 
   return (
-    // -----------------------------
-    // Navbar wraps the page
-    // -----------------------------
-    // The Navbar provides the site header and navigation.
-    // By passing `onSignInClick`, we allow the Navbar to open the sign-in modal.
-    // This keeps the modal state controlled from the LandingPage while
-    // keeping the Navbar reusable and stateless regarding login state.
-    <Navbar onSignInClick={() => setSignInOpen(true)}>
-      {/* ================= DOGS SECTION ================= 
-      // -----------------------------
-      // Hero / showcase area
-      // -----------------------------
-      // This section highlights some adoptable dogs.
-      // Box + Container layout ensures spacing, max width, and responsiveness.
-      */}
+    <>
+      {/* ================= DOGS SECTION ================= */}
       <Box
         sx={{
           width: "100%",
@@ -80,16 +52,10 @@ const LandingPage: React.FC = () => {
             maxWidth: { xs: 600, sm: 900, md: 1200, lg: 1536 },
           }}
         >
-          {/*-----------------------------
-          // Section title
-          // ----------------------------- */}
           <Typography variant="h4" textAlign="center" gutterBottom>
             Meet Some Dogs Looking for a Home
           </Typography>
 
-          {/*-----------------------------
-          // Dog Cards Grid
-          // ----------------------------- */}
           <Box
             sx={{
               display: "flex",
@@ -98,7 +64,6 @@ const LandingPage: React.FC = () => {
               justifyContent: "center",
             }}
           >
-            {/* Loop through randomDogs to render each card */}
             {randomDogs.map((dog) => (
               <Card
                 key={dog.id}
@@ -113,7 +78,6 @@ const LandingPage: React.FC = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  {/* Placeholder button for potential "view more" details */}
                   <Button size="small" variant="outlined">
                     View More
                   </Button>
@@ -124,15 +88,8 @@ const LandingPage: React.FC = () => {
         </Container>
       </Box>
 
-      {/* ================= SIGN IN MODAL ================= 
-      // -----------------------------
-      // Sign-in modal
-      // -----------------------------
-      // Opens when `signInOpen` is true.
-      // Centered using absolute positioning and transform.
-      // Width is responsive for mobile and desktop.
-      */}
-      <Modal open={signInOpen} onClose={() => setSignInOpen(false)}>
+      {/* ================= SIGN IN MODAL ================= */}
+      <Modal open={isLoginOpen} onClose={closeLogin}>
         <Box
           sx={{
             position: "absolute",
@@ -146,25 +103,21 @@ const LandingPage: React.FC = () => {
             p: 4,
           }}
         >
-          {/*-----------------------------
-          // Modal Header
-          // ----------------------------- */}
           <Typography variant="h6" textAlign="center" gutterBottom>
             Sign In
           </Typography>
-          {/*-----------------------------
-          // User/Shelter Toggle
-          // ----------------------------- */}
+
+          {/* Toggle between User/Shelter */}
           <Stack direction="row" spacing={2} justifyContent="center" mb={2}>
             <Button
               variant={loginType === "User" ? "contained" : "outlined"}
-              onClick={() => setLoginType("User")}
+              onClick={() => openLogin("User")}
             >
               User
             </Button>
             <Button
               variant={loginType === "Shelter" ? "contained" : "outlined"}
-              onClick={() => setLoginType("Shelter")}
+              onClick={() => openLogin("Shelter")}
             >
               Shelter
             </Button>
@@ -172,17 +125,11 @@ const LandingPage: React.FC = () => {
 
           <Divider sx={{ mb: 2 }} />
 
-          {/*-----------------------------
-          // Conditional login form
-          // ----------------------------- */}
-
-          {/* Only render the form relevant to the selected loginType */}
+          {/* Conditionally render forms */}
           {loginType === "User" && <LoginUser />}
           {loginType === "Shelter" && <LoginShelter />}
 
-          {/*-----------------------------
-          // Registration Links
-          // ----------------------------- */}
+          {/* Registration Links */}
           <Box mt={3} textAlign="center">
             {loginType === "User" && (
               <Typography variant="body2">
@@ -199,7 +146,7 @@ const LandingPage: React.FC = () => {
           </Box>
         </Box>
       </Modal>
-    </Navbar>
+    </>
   );
 };
 
