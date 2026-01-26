@@ -203,27 +203,67 @@ router.get(
 );
 
 // ---------------------------
-// GET BASIC SHELTER INFO BY ID
+// GET AUTHENTICATED SHELTER PROFILE (Self)
 // ---------------------------
-// Route: GET /basicinfo/:id
+// Route: GET /profile
+// Access: Protected (Shelter Only)
+// Description:
+//   - Returns the full profile of the currently authenticated shelter
+//   - Shelter ID is derived from the JWT (not from request params)
+//   - Excludes sensitive fields such as password
+router.get(
+  "/profile",
+  validateShelterToken,
+  async (req: any, res: Response) => {
+    try {
+      const shelterId = req.shelter.id;
+
+      const shelter = await Shelter.findByPk(shelterId, {
+        attributes: { exclude: ["password"] },
+      });
+
+      if (!shelter) return res.status(404).json({ error: "Shelter not found" });
+
+      res.json(shelter);
+    } catch (err) {
+      console.error("Error fetching shelter profile:", err);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
+// ---------------------------
+// GET PUBLIC SHELTERS (DISCOVERY / SEARCH)
+// ---------------------------
+// Route: GET /public
 // Access: Public
 // Middleware: None
-// Description: Returns shelter info excluding password
-router.get("/basicinfo/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
+// Description:
+//   - Returns a list of shelters for public discovery
+//   - Can optionally be filtered by county via query parameter (?countyId=)
+//   - Intended for maps, browsing, and general user search
+//   - Only exposes public-facing shelter information
+router.get("/public", async (req: Request, res: Response) => {
+  const { countyId } = req.query;
+
   try {
-    // Find Shelter by primary key (id)
-    const shelter = await Shelter.findByPk(id, {
-      // Exclude password field from the returned object
-      attributes: { exclude: ["password"] },
+    const where = countyId ? { countyId: Number(countyId) } : {};
+
+    const shelters = await Shelter.findAll({
+      where,
+      attributes: [
+        "id",
+        "shelterName",
+        "countyId",
+        "address",
+        "email",
+        "phoneNumber",
+      ],
     });
-    // Return 404 if the requested shelter does not exist in the database
-    if (!shelter) return res.status(404).json({ error: "Shelter not found" });
-    // Respond with shelter data
-    res.json(shelter);
-  } catch (error) {
-    // Log any error and respond with generic 500
-    console.error("Error fetching shelter info:", error);
+
+    res.json(shelters);
+  } catch (err) {
+    console.error("Error fetching public shelters:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });

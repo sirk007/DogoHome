@@ -56,6 +56,7 @@ const LoginShelter: React.FC = () => {
         id: loginResponse.id,
         userType: loginResponse.userType,
         status: true,
+        token: loginResponse.token,
       });
 
       setError(""); // clear previous errors

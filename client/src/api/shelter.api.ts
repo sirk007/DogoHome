@@ -12,6 +12,7 @@
 
 import axios from "axios";
 import type {
+  ShelterProfile,
   ShelterCreationAttributes,
   ShelterLoginResponse,
 } from "../types/shelter.types";
@@ -81,9 +82,18 @@ export const registerShelter = (
  * - Used in auth hooks to maintain persistent login
  * - Front-end should never trust token without verification
  */
-export const fetchShelterAuth = (
-  token: string,
-): Promise<ShelterLoginResponse> =>
-  API.get("/authShelter", { headers: { accessShelterToken: token } }).then(
-    (res) => res.data,
-  );
+export const fetchShelterProfile = (token: string): Promise<ShelterProfile> =>
+  API.get("/profile", {
+    headers: { accessShelterToken: token },
+  }).then((res) => res.data);
+
+// --------------------------------------------
+// fetchPublicShelters (PUBLIC)
+// --------------------------------------------
+// Fetches all shelters, optionally filtered by county
+export const fetchPublicShelters = (
+  countyId?: number,
+): Promise<ShelterProfile[]> =>
+  API.get("/public", {
+    params: countyId ? { countyId } : undefined,
+  }).then((res) => res.data);

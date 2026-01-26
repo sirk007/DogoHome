@@ -79,6 +79,7 @@ export const useAuth = () => {
     id: 0, // database ID of user
     userType: "", // role: User, Admin, Shelter
     status: false, // whether user is logged in
+    token: undefined, // Initially undefined
   });
 
   const [loading, setLoading] = useState(true); // tracks whether auth check is in progress
@@ -143,6 +144,7 @@ export const useAuth = () => {
           id,
           userType: isValidUserRole(userType) ? userType : "",
           status: true,
+          token, // Store the JWT token in the state
         });
       } catch {
         // Network or unexpected error -> treat as unauthenticated

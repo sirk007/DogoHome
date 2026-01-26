@@ -14,6 +14,7 @@ import ShelterRegistrationPage from "./pages/auth/Shelter.Registration";
 
 import UserLandingPage from "./pages/user/userLandingPage/UserLandingPage";
 import ShelterAnimalPage from "./pages/shelter/ShelterAnimalPage";
+import ShelterProfile from "./components/shelter/ShelterProfile";
 import ShelterDashboard from "./pages/shelter/ShelterDashboard";
 import { ModalProvider } from "./context/ModalContext";
 
@@ -83,6 +84,15 @@ function App() {
                 element={
                   <ProtectedRoute allowedRoles={["Shelter"]}>
                     <ShelterDashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/shelter/profile"
+                element={
+                  <ProtectedRoute allowedRoles={["Shelter"]}>
+                    <ShelterProfile />
                   </ProtectedRoute>
                 }
               />

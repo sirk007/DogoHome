@@ -16,6 +16,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 import type { Animal } from "../../types/animal.types";
 
@@ -37,6 +38,7 @@ const mockAnimals: Animal[] = [
 ];
 
 export default function ShelterDashboard() {
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Detect Mobile
   return (
@@ -63,6 +65,14 @@ export default function ShelterDashboard() {
 
         <Button variant="contained">Add Animal</Button>
       </Box>
+      {/* TEMPORARY TEST BUTTON */}
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={() => navigate("/shelter/profile")}
+      >
+        Test Shelter Profile
+      </Button>
 
       {/* ================= TABLE OR CARD VIEW ================= */}
       {isMobile ? (
