@@ -1,85 +1,58 @@
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
-
 import { useAuthContext } from "../../context/AuthContext";
 import type { UserRole } from "../../types/auth.types";
 
-/**
- * --------------------------------------------
- * Props for ProtectedRoute
- * --------------------------------------------
- * - children: ReactNode
- *     The component(s) to render if access is granted
- *
- * - allowedRoles?: UserRole[]
- *     Optional list of roles allowed to access this route.
- *     If omitted, any authenticated user may access.
- */
 interface Props {
   children: ReactNode;
   allowedRoles?: UserRole[];
 }
 
-/**
- * --------------------------------------------
- * ProtectedRoute Component
- * --------------------------------------------
- * Centralized route guard for the application.
- *
- * Responsibilities:
- * 1. Wait for auth state to resolve
- * 2. Redirect unauthenticated users
- * 3. Enforce role-based access control (RBAC)
- * 4. Render protected content when authorized
- *
- * This component relies on the unified AuthContext
- * as the single source of truth for authentication.
- */
 const ProtectedRoute = ({ children, allowedRoles }: Props) => {
-  // --------------------------------------------
-  // 1. Access unified authentication state
-  // --------------------------------------------
   const { authState, loading } = useAuthContext();
 
-  // --------------------------------------------
-  // 2. Authentication is still being verified
-  // --------------------------------------------
-  // Prevents flashing protected content before auth resolves
+  // ----------------------------
+  // Log every render
+  // ----------------------------
+  console.log(
+    "ProtectedRoute render → authState:",
+    authState,
+    "loading:",
+    loading,
+  );
+
+  // ----------------------------
+  // 1. Loading state
+  // ----------------------------
   if (loading) {
+    console.log("ProtectedRoute: still loading, rendering fallback");
     return <div>Loading...</div>;
   }
 
-  // --------------------------------------------
-  // 3. User is not authenticated
-  // --------------------------------------------
-  // Redirect to public landing or login page
+  // ----------------------------
+  // 2. Not authenticated
+  // ----------------------------
   if (!authState.status) {
+    console.log("ProtectedRoute: user not authenticated → redirecting to /");
     return <Navigate to="/" replace />;
   }
 
-  // --------------------------------------------
-  // 4. Role-based authorization check
-  // --------------------------------------------
-  // If roles are specified, ensure the user has one of them
+  // ----------------------------
+  // 3. Role-based authorization
+  // ----------------------------
   if (allowedRoles && allowedRoles.length > 0) {
-    switch (authState.userType) {
-      case "Admin":
-      case "User":
-      case "Shelter":
-        if (!allowedRoles.includes(authState.userType)) {
-          return <Navigate to="/" replace />;
-        }
-        break;
-
-      default:
-        // Unknown or invalid role → deny access
-        return <Navigate to="/" replace />;
+    if (!allowedRoles.includes(authState.userType)) {
+      console.log(
+        `ProtectedRoute: user role "${authState.userType}" not allowed → redirecting to /`,
+      );
+      return <Navigate to="/" replace />;
     }
   }
 
-  // --------------------------------------------
-  // 5. Access granted
-  // --------------------------------------------
+  // ----------------------------
+  // 4. Access granted
+  // ----------------------------
+  console.log("ProtectedRoute: access granted, rendering children");
   return <>{children}</>;
 };
 

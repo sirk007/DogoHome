@@ -17,8 +17,11 @@ import {
   useTheme,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
+import { useAuthContext } from "../../context/AuthContext";
+import { useState, useEffect } from "react";
+import { fetchShelterProfile } from "../../api/shelter.api";
 import type { Animal } from "../../types/animal.types";
+import type { ShelterProfile } from "../../types/shelter.types";
 
 // Mock data for now
 const mockAnimals: Animal[] = [
@@ -39,15 +42,56 @@ const mockAnimals: Animal[] = [
 
 export default function ShelterDashboard() {
   const navigate = useNavigate();
+  const { authState } = useAuthContext();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Detect Mobile
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // -----------------------------
+  // State for full shelter profile
+  // -----------------------------
+  const [profile, setProfile] = useState<ShelterProfile | null>(null);
+
+  useEffect(() => {
+    if (!authState.token) return;
+
+    fetchShelterProfile(authState.token)
+      .then((data) => setProfile(data))
+      .catch((err) => console.error("Failed to fetch shelter profile:", err));
+  }, [authState.token]);
+
   return (
     <Box sx={{ p: 4 }}>
       {/* ================= HEADER ================= */}
+      <Box sx={{ mb: 3 }}>
+        {profile ? (
+          <>
+            <Typography variant="h6">
+              Logged in as: {profile.username}
+            </Typography>
+            <Typography>Email: {profile.email}</Typography>
+            <Typography>Shelter Name: {profile.shelterName}</Typography>
+            <Typography>Address: {profile.address}</Typography>
+            <Typography>Phone: {profile.phoneNumber}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Shelter ID: {profile.id} | Role: {profile.userType}
+            </Typography>
+          </>
+        ) : (
+          <>
+            <Typography variant="h6">
+              Logged in as: {authState.username}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Shelter ID: {authState.id} | Role: {authState.userType}
+            </Typography>
+          </>
+        )}
+      </Box>
+
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", sm: "row" }, // stack on mobile
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", sm: "center" },
           mb: 3,
@@ -65,6 +109,7 @@ export default function ShelterDashboard() {
 
         <Button variant="contained">Add Animal</Button>
       </Box>
+
       {/* TEMPORARY TEST BUTTON */}
       <Button
         variant="contained"
@@ -76,7 +121,6 @@ export default function ShelterDashboard() {
 
       {/* ================= TABLE OR CARD VIEW ================= */}
       {isMobile ? (
-        /* Mobile: show cards stacked */
         <Stack spacing={2}>
           {mockAnimals.map((animal) => (
             <Card key={animal.id}>
@@ -106,7 +150,6 @@ export default function ShelterDashboard() {
           ))}
         </Stack>
       ) : (
-        /* Desktop: show table */
         <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
           <Table>
             <TableHead>

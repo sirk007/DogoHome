@@ -63,7 +63,11 @@ const LoginShelter: React.FC = () => {
       setUsername("");
       setPassword("");
 
-      navigate("/shelter"); // redirect to shelter dashboard
+      //navigate("/shelter"); // redirect to shelter dashboard
+
+      // Delayed navigation – this is the quick test
+
+      navigate("/shelter"); // ← change target if needed
     } catch (err: any) {
       console.error("Login failed", err);
       setError(err.response?.data?.error || "Login failed");

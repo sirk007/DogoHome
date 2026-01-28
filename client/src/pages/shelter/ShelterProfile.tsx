@@ -1,91 +1,171 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Paper, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Paper,
+  Stack,
+  Button,
+  Alert,
+} from "@mui/material";
 import { useAuthContext } from "../../context/AuthContext";
 import { fetchShelterProfile } from "../../api/shelter.api";
-import type { ShelterProfile } from "../../types/shelter.types";
+import type { ShelterProfile as ShelterProfileType } from "../../types/shelter.types";
 
-const ShelterProfile: React.FC = () => {
-  const { authState, loading: authLoading, logout } = useAuthContext();
-  const [profile, setProfile] = useState<ShelterProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+export default function ShelterProfile() {
+  const { authState } = useAuthContext();
+
+  // ────────────────────────────────────────────────────────────────
+  // IMMEDIATE LOGS – these run on every render (should appear first)
+  // ────────────────────────────────────────────────────────────────
+  console.log(
+    "%c[ShelterProfile] COMPONENT MOUNTED / RE-RENDERED",
+    "background: #0066cc; color: white; padding: 4px 8px; font-weight: bold;",
+  );
+  console.log(
+    "[ShelterProfile] authState on render:",
+    JSON.stringify(authState, null, 2),
+  );
+  console.log(
+    "[ShelterProfile] token on render →",
+    authState.token
+      ? "PRESENT (length: " + authState.token.length + ")"
+      : "MISSING / undefined",
+  );
+
+  const [profile, setProfile] = useState<ShelterProfileType | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
+    console.log(
+      "%c[ShelterProfile] useEffect EXECUTED",
+      "background: #00aa00; color: white; padding: 4px 8px;",
+    );
+    console.log(
+      "[ShelterProfile] useEffect – token present?",
+      !!authState.token,
+    );
 
-        const data = await fetchShelterProfile(authState.token!);
-        setProfile(data);
-        setError("");
-      } catch (err: any) {
-        console.error("Error fetching shelter profile:", err);
-
-        setError(
-          err.response?.data?.error || "Failed to fetch shelter profile.",
-        );
-
-        // Force logout if token is invalid or expired
-        if (err.response?.status === 401) {
-          logout();
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Only fetch after auth check completes and shelter is logged in
-    if (!authLoading && authState.status && authState.token) {
-      fetchProfile();
-    } else if (!authLoading && !authState.status) {
-      setError("Please log in to view your profile.");
-      setLoading(false);
+    if (!authState.token) {
+      console.warn("[ShelterProfile] No token detected inside effect");
+      setError("No authentication token available right now.");
+      setProfile(null);
+      return;
     }
-  }, [authState.status, authState.token, authLoading, logout]);
 
-  if (authLoading || loading) {
-    return (
-      <Box sx={{ textAlign: "center", mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+    setLoading(true);
+    setError(null);
 
-  if (error) {
-    return (
-      <Box sx={{ textAlign: "center", mt: 4 }}>
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
+    console.log("[ShelterProfile] Starting fetchShelterProfile...");
 
-  if (!profile) return null;
+    fetchShelterProfile(authState.token)
+      .then((data) => {
+        console.log("[ShelterProfile] Fetch SUCCESS:", data);
+        setProfile(data);
+      })
+      .catch((err: any) => {
+        console.error("[ShelterProfile] Fetch FAILED:", err);
+        const msg =
+          err.response?.data?.error || err.message || "Failed to load profile";
+        setError(msg);
+        setProfile(null);
+      })
+      .finally(() => {
+        console.log("[ShelterProfile] Fetch finished");
+        setLoading(false);
+      });
+  }, [authState.token]);
 
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4 }}>
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          {profile.shelterName} Profile
-        </Typography>
+    <Box sx={{ p: 4, maxWidth: 800, mx: "auto" }}>
+      <Typography variant="h4" fontWeight={600} gutterBottom>
+        Shelter Profile (Diagnostic Mode)
+      </Typography>
 
-        <Typography>
-          <strong>Username:</strong> {profile.username}
+      {/* Show current auth state right on the page */}
+      <Alert severity={authState.token ? "success" : "warning"} sx={{ mb: 3 }}>
+        <strong>Auth state on this render:</strong>
+        <br />
+        Token: {authState.token ? "present" : "missing"}
+        <br />
+        Status: {authState.status ? "logged in" : "not logged in"}
+        <br />
+        UserType: {authState.userType || "none"}
+        <br />
+        Username: {authState.username || "—"}
+      </Alert>
+
+      <Button
+        variant="contained"
+        onClick={() => {
+          console.log("[ShelterProfile] Manual refresh clicked");
+          setError(null);
+          setProfile(null);
+          // Force re-run by changing a dummy state or just call the logic
+          if (authState.token) {
+            setLoading(true);
+            fetchShelterProfile(authState.token)
+              .then(setProfile)
+              .catch((e) => setError(e.message || "Manual fetch failed"))
+              .finally(() => setLoading(false));
+          }
+        }}
+        disabled={loading || !authState.token}
+        sx={{ mb: 3 }}
+      >
+        {loading ? "Loading..." : "Manual Refresh"}
+      </Button>
+
+      {loading && (
+        <Box textAlign="center" my={4}>
+          <CircularProgress />
+          <Typography mt={2}>Loading profile...</Typography>
+        </Box>
+      )}
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
+      {profile && (
+        <Paper sx={{ p: 3 }}>
+          <Stack spacing={1.5}>
+            <Typography>
+              <strong>ID:</strong> {profile.id}
+            </Typography>
+            <Typography>
+              <strong>Username:</strong> {profile.username}
+            </Typography>
+            <Typography>
+              <strong>Shelter Name:</strong> {profile.shelterName}
+            </Typography>
+            <Typography>
+              <strong>Email:</strong> {profile.email}
+            </Typography>
+            <Typography>
+              <strong>County ID:</strong> {profile.countyId}
+            </Typography>
+            <Typography>
+              <strong>Address:</strong> {profile.address}
+            </Typography>
+            <Typography>
+              <strong>Phone:</strong> {profile.phoneNumber}
+            </Typography>
+            <Typography>
+              <strong>User Type:</strong> {profile.userType}
+            </Typography>
+          </Stack>
+        </Paper>
+      )}
+
+      {!loading && !error && !profile && (
+        <Typography color="text.secondary">
+          No profile data loaded yet.
         </Typography>
-        <Typography>
-          <strong>Email:</strong> {profile.email}
-        </Typography>
-        <Typography>
-          <strong>Address:</strong> {profile.address}
-        </Typography>
-        <Typography>
-          <strong>Phone:</strong> {profile.phoneNumber}
-        </Typography>
-        <Typography>
-          <strong>County ID:</strong> {profile.countyId}
-        </Typography>
-      </Paper>
+      )}
     </Box>
   );
-};
-
-export default ShelterProfile;
+}

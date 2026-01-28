@@ -82,6 +82,7 @@ export const registerShelter = (
  * - Used in auth hooks to maintain persistent login
  * - Front-end should never trust token without verification
  */
+
 export const fetchShelterProfile = (token: string): Promise<ShelterProfile> =>
   API.get("/profile", {
     headers: { accessShelterToken: token },

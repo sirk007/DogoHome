@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -22,7 +22,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 
 import { useAuthContext } from "../../context/AuthContext";
 import { useThemeMode } from "../../theme/ThemeProvider";
-import { useModalContext } from "../../context/ModalContext"; // ✅ Import modal context
+import { useModalContext } from "../../context/ModalContext";
 
 const drawerWidth = 240;
 
@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { mode, toggleTheme } = useThemeMode();
-  const { openLogin } = useModalContext(); // ✅ Hook into modal context
+  const { openLogin } = useModalContext();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
@@ -92,10 +92,9 @@ const Navbar: React.FC = () => {
           navLinks.map((link) => (
             <ListItemButton
               key={link.path}
-              onClick={() => {
-                navigate(link.path);
-                setMobileOpen(false);
-              }}
+              component={Link}
+              to={link.path}
+              onClick={() => setMobileOpen(false)}
             >
               <ListItemText primary={link.label} />
             </ListItemButton>
@@ -104,18 +103,18 @@ const Navbar: React.FC = () => {
           <>
             <ListItemButton
               onClick={() => {
-                openLogin("User"); // ✅ Open modal via context
+                openLogin("User");
                 setMobileOpen(false);
               }}
             >
               <ListItemText primary="Sign In" />
             </ListItemButton>
 
-            <ListItemButton onClick={() => navigate("/registration")}>
+            <ListItemButton component={Link} to="/registration">
               <ListItemText primary="Register User" />
             </ListItemButton>
 
-            <ListItemButton onClick={() => navigate("/shelter/registration")}>
+            <ListItemButton component={Link} to="/shelter/registration">
               <ListItemText primary="Register Shelter" />
             </ListItemButton>
           </>
@@ -144,7 +143,8 @@ const Navbar: React.FC = () => {
               <Typography
                 variant="h5"
                 sx={{ cursor: "pointer" }}
-                onClick={() => navigate("/")}
+                component={Link}
+                to="/"
               >
                 DogoHome 🐶
               </Typography>
@@ -153,7 +153,8 @@ const Navbar: React.FC = () => {
                   <Button
                     key={link.path}
                     color="inherit"
-                    onClick={() => navigate(link.path)}
+                    component={Link}
+                    to={link.path}
                   >
                     {link.label}
                   </Button>
@@ -199,7 +200,8 @@ const Navbar: React.FC = () => {
             <Typography
               variant="h6"
               sx={{ ml: 2, cursor: "pointer" }}
-              onClick={() => navigate("/")}
+              component={Link}
+              to="/"
             >
               DogoHome 🐶
             </Typography>
