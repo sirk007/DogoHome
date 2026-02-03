@@ -117,139 +117,131 @@ const ShelterRegistrationPage: React.FC = () => {
   // Render
   // -----------------------------
   return (
-    <Navbar>
-      <Container maxWidth="sm" sx={{ mt: 6 }}>
-        <Paper elevation={4} sx={{ p: 4 }}>
-          <Box textAlign="center" mb={3}>
-            {/* Form title */}
-            <Typography variant="h5">Shelter Registration</Typography>
-          </Box>
+    <Container maxWidth="sm" sx={{ mt: 6 }}>
+      <Paper elevation={4} sx={{ p: 4 }}>
+        <Box textAlign="center" mb={3}>
+          {/* Form title */}
+          <Typography variant="h5">Shelter Registration</Typography>
+        </Box>
 
-          {/* Error / Success Alerts */}
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {success}
-            </Alert>
-          )}
+        {/* Error / Success Alerts */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
 
-          {/* Registration Form */}
-          <Box component="form" onSubmit={handleSubmit} mt={2}>
-            <Stack spacing={2}>
-              {/* Username */}
-              <TextField
-                label="Username"
-                name="username"
-                value={formData.username}
-                onChange={handleTextChange}
-                required
-                fullWidth
-              />
+        {/* Registration Form */}
+        <Box component="form" onSubmit={handleSubmit} mt={2}>
+          <Stack spacing={2}>
+            {/* Username */}
+            <TextField
+              label="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleTextChange}
+              required
+              fullWidth
+            />
 
-              {/* Password */}
-              <TextField
-                label="Password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleTextChange}
-                required
-                fullWidth
-              />
+            {/* Password */}
+            <TextField
+              label="Password"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleTextChange}
+              required
+              fullWidth
+            />
 
-              {/* Confirm Password */}
-              <TextField
-                label="Confirm Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                fullWidth
-              />
+            {/* Confirm Password */}
+            <TextField
+              label="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              fullWidth
+            />
 
-              {/* Email */}
-              <TextField
-                label="Email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleTextChange}
-                required
-                fullWidth
-              />
+            {/* Email */}
+            <TextField
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleTextChange}
+              required
+              fullWidth
+            />
 
-              {/* Shelter Name */}
-              <TextField
-                label="Shelter Name"
-                name="shelterName"
-                value={formData.shelterName}
-                onChange={handleTextChange}
-                required
-                fullWidth
-              />
+            {/* Shelter Name */}
+            <TextField
+              label="Shelter Name"
+              name="shelterName"
+              value={formData.shelterName}
+              onChange={handleTextChange}
+              required
+              fullWidth
+            />
 
-              {/* County */}
-              <FormControl fullWidth required>
-                <InputLabel>County</InputLabel>
-                <Select
-                  name="countyId"
-                  value={formData.countyId}
-                  onChange={handleSelectChange}
-                >
-                  {IrishCounties.map((county, idx) => (
-                    <MenuItem key={county} value={idx + 1}>
-                      {county}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {/* Address */}
-              <TextField
-                label="Address"
-                name="address"
-                value={formData.address}
-                onChange={handleTextChange}
-                required
-                fullWidth
-              />
-
-              {/* Phone Number */}
-              <TextField
-                label="Phone Number"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleTextChange}
-                required
-                fullWidth
-              />
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
+            {/* County */}
+            <FormControl fullWidth required>
+              <InputLabel>County</InputLabel>
+              <Select
+                name="countyId"
+                value={formData.countyId}
+                onChange={handleSelectChange}
               >
-                Register
-              </Button>
-            </Stack>
-          </Box>
+                {IrishCounties.map((county, idx) => (
+                  <MenuItem key={county} value={idx + 1}>
+                    {county}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-          {/* Login Redirect Link */}
-          <Box mt={3} textAlign="center">
-            <Typography variant="body2">
-              Already have an account?{" "}
-              <Link to="/login/shelter">Login here</Link>
-            </Typography>
-          </Box>
-        </Paper>
-      </Container>
-    </Navbar>
+            {/* Address */}
+            <TextField
+              label="Address"
+              name="address"
+              value={formData.address}
+              onChange={handleTextChange}
+              required
+              fullWidth
+            />
+
+            {/* Phone Number */}
+            <TextField
+              label="Phone Number"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleTextChange}
+              required
+              fullWidth
+            />
+
+            {/* Submit Button */}
+            <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+              Register
+            </Button>
+          </Stack>
+        </Box>
+
+        {/* Login Redirect Link */}
+        <Box mt={3} textAlign="center">
+          <Typography variant="body2">
+            Already have an account? <Link to="/login/shelter">Login here</Link>
+          </Typography>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 export default ShelterRegistrationPage;

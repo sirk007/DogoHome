@@ -62,7 +62,7 @@ const Navbar: React.FC = () => {
       case "Shelter":
         navLinks = [
           { label: "Dashboard", path: "/shelter" },
-          { label: "Animals", path: "/shelter/animals" },
+          { label: "Animals", path: "/shelter/animals/add" },
           { label: "Profile", path: "/shelter/profile" },
         ];
         break;
@@ -137,7 +137,7 @@ const Navbar: React.FC = () => {
 
       {/* ================= DESKTOP NAVBAR ================= */}
       {isDesktop && (
-        <AppBar position="static">
+        <AppBar position="fixed">
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <Typography

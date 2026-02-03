@@ -20,25 +20,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
 import { fetchShelterProfile } from "../../api/shelter.api";
+import { fetchMyAnimals } from "../../api/animal.api";
 import type { Animal } from "../../types/animal.types";
 import type { ShelterProfile } from "../../types/shelter.types";
-
-// Mock data for now
-const mockAnimals: Animal[] = [
-  {
-    id: 1,
-    name: "Buddy",
-    species: "Dog",
-    age: 3,
-    ageUnit: "Years",
-    health: "Good",
-    size: "Medium",
-    activityLevel: "High",
-    goodWithKids: true,
-    goodWithPets: true,
-    shelterId: 1,
-  },
-];
 
 export default function ShelterDashboard() {
   const navigate = useNavigate();
@@ -46,17 +30,23 @@ export default function ShelterDashboard() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // -----------------------------
-  // State for full shelter profile
-  // -----------------------------
   const [profile, setProfile] = useState<ShelterProfile | null>(null);
+  const [animals, setAnimals] = useState<Animal[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!authState.token) return;
 
+    // Fetch shelter profile
     fetchShelterProfile(authState.token)
       .then((data) => setProfile(data))
       .catch((err) => console.error("Failed to fetch shelter profile:", err));
+
+    // Fetch shelter animals
+    fetchMyAnimals(authState.token)
+      .then((data) => setAnimals(data))
+      .catch((err) => console.error("Failed to fetch animals:", err))
+      .finally(() => setLoading(false));
   }, [authState.token]);
 
   return (
@@ -77,17 +67,11 @@ export default function ShelterDashboard() {
             </Typography>
           </>
         ) : (
-          <>
-            <Typography variant="h6">
-              Logged in as: {authState.username}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Shelter ID: {authState.id} | Role: {authState.userType}
-            </Typography>
-          </>
+          <Typography>Loading profile...</Typography>
         )}
       </Box>
 
+      {/* ================= DASHBOARD HEADER ================= */}
       <Box
         sx={{
           display: "flex",
@@ -107,22 +91,22 @@ export default function ShelterDashboard() {
           </Typography>
         </Box>
 
-        <Button variant="contained">Add Animal</Button>
+        <Button
+          variant="contained"
+          onClick={() => navigate("/shelter/animals/add")}
+        >
+          Add Animal
+        </Button>
       </Box>
 
-      {/* TEMPORARY TEST BUTTON */}
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={() => navigate("/shelter/profile")}
-      >
-        Test Shelter Profile
-      </Button>
-
       {/* ================= TABLE OR CARD VIEW ================= */}
-      {isMobile ? (
+      {loading ? (
+        <Typography>Loading animals...</Typography>
+      ) : animals.length === 0 ? (
+        <Typography>No animals found. Add some!</Typography>
+      ) : isMobile ? (
         <Stack spacing={2}>
-          {mockAnimals.map((animal) => (
+          {animals.map((animal) => (
             <Card key={animal.id}>
               <CardContent>
                 <Typography variant="h6">{animal.name}</Typography>
@@ -167,7 +151,7 @@ export default function ShelterDashboard() {
             </TableHead>
 
             <TableBody>
-              {mockAnimals.map((animal) => (
+              {animals.map((animal) => (
                 <TableRow key={animal.id}>
                   <TableCell>{animal.name}</TableCell>
                   <TableCell>{animal.species}</TableCell>

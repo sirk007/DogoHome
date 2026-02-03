@@ -1,200 +1,270 @@
-import React, { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { useAuthContext } from "../../context/AuthContext";
+import type { AnimalCreationAttributes } from "../../types/animal.types";
+import { createAnimal } from "../../api/animal.api";
 import {
   Box,
   TextField,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
   Button,
-  Stack,
   Typography,
-  Alert,
 } from "@mui/material";
-import { useAuthContext } from "../../context/AuthContext";
-import { createAnimal } from "../../api/authShelterAnimals";
+import type { SelectChangeEvent } from "@mui/material/Select";
 
-/**
- * ----------------------------
- * AnimalForm Component
- * ----------------------------
- * Form for shelters to add a new animal.
- * Handles:
- * - Form state
- * - File uploads
- * - API request to create animal
- * - Success/error feedback
- * - Optional callback to refresh list
- */
-interface AnimalFormData {
-  animal: string; // Type of animal (Dog, Cat, etc.)
-  animalName: string;
-  animalAge: string;
-  animalHealth: string;
-  animalDescription?: string;
-  picture?: File | null;
+interface AnimalFormProps {
+  onSuccess?: () => void;
 }
 
-interface Props {
-  onAnimalCreated?: () => void; // Callback to refresh AnimalList
-}
+const AnimalForm: React.FC<AnimalFormProps> = ({ onSuccess }) => {
+  const { authState } = useAuthContext();
 
-const AnimalForm: React.FC<Props> = ({ onAnimalCreated }) => {
-  const { authState } = useAuthContext(); // Ensure shelter is logged in
-  const [formData, setFormData] = useState<AnimalFormData>({
-    animal: "",
-    animalName: "",
-    animalAge: "",
-    animalHealth: "",
-    animalDescription: "",
-    picture: null,
+  const [form, setForm] = useState<AnimalCreationAttributes>({
+    species: "Dog",
+    name: "",
+    age: 0,
+    ageUnit: "Years",
+    health: "Good",
+    size: "Medium",
+    activityLevel: "Medium",
+    goodWithKids: false,
+    goodWithPets: false,
+    description: "",
+    pictureUrl: "",
   });
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  /**
-   * Handle input changes
-   * - Handles both text fields and file upload
-   */
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  // ---------- Handlers ----------
+
+  // For text, number, textarea
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
-    if (name === "picture" && files)
-      setFormData((prev) => ({ ...prev, picture: files[0] }));
-    else setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name } = e.target;
+    const value =
+      e.target.type === "number" ? Number(e.target.value) : e.target.value;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  /**
-   * Handle form submission
-   * - Validates shelter auth
-   * - Sends POST request to backend
-   * - Displays success/error messages
-   * - Resets form
-   */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // For MUI Select
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-    // Ensure user is a logged-in shelter
-    if (!authState.token || authState.userType !== "Shelter") {
-      setError("You must be logged in as a shelter to add animals.");
-      return;
-    }
+  // For checkboxes
+  const handleCheckboxChange =
+    (name: keyof AnimalCreationAttributes) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setForm((prev) => ({ ...prev, [name]: e.target.checked }));
+    };
+
+  // ---------- Submit ----------
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
     setLoading(true);
-    setError(null);
-    setSuccess(null);
+    setMessage(null);
 
     try {
-      await createAnimal(formData, authState.token);
-      setSuccess("Animal added successfully!");
-      // Reset form
-      setFormData({
-        animal: "",
-        animalName: "",
-        animalAge: "",
-        animalHealth: "",
-        animalDescription: "",
-        picture: null,
+      if (!authState.token) throw new Error("No shelter token found");
+      await createAnimal(form, authState.token);
+      setMessage("Animal added successfully!");
+      setForm({
+        species: "Dog",
+        name: "",
+        age: 0,
+        ageUnit: "Years",
+        health: "Good",
+        size: "Medium",
+        activityLevel: "Medium",
+        goodWithKids: false,
+        goodWithPets: false,
+        description: "",
+        pictureUrl: "",
       });
-      // Optional callback to refresh AnimalList
-      onAnimalCreated?.();
+      onSuccess?.();
     } catch (err: any) {
-      setError(err?.response?.data?.error || "Failed to add animal");
+      console.error(err);
+      setMessage(err.response?.data?.error || "Failed to add animal");
     } finally {
       setLoading(false);
     }
   };
-  // -----------------------------
-  // Render
-  // -----------------------------
+
+  // ---------- JSX ----------
   return (
-    <Box sx={{ mb: 4 }}>
-      {/* ------------------- Heading ------------------- */}
-      <Typography variant="h6" mb={2}>
-        Add a New Animal
-      </Typography>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        maxWidth: 500,
+        mx: "auto",
+      }}
+    >
+      {/* Species */}
+      <FormControl fullWidth>
+        <InputLabel>Species</InputLabel>
+        <Select
+          name="species"
+          value={form.species}
+          onChange={handleSelectChange}
+          label="Species"
+        >
+          <MenuItem value="Dog">Dog</MenuItem>
+          <MenuItem value="Cat">Cat</MenuItem>
+          <MenuItem value="Rabbit">Rabbit</MenuItem>
+          <MenuItem value="Other">Other</MenuItem>
+        </Select>
+      </FormControl>
 
-      {/* ------------------- Feedback ------------------- */}
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      {success && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          {success}
-        </Alert>
-      )}
+      {/* Name */}
+      <TextField
+        label="Name"
+        name="name"
+        value={form.name}
+        onChange={handleInputChange}
+        required
+        fullWidth
+      />
 
-      {/* ------------------- Form ------------------- */}
-      <Box component="form" onSubmit={handleSubmit}>
-        <Stack spacing={2}>
-          {/* Animal Type */}
-          <TextField
-            label="Animal Type"
-            name="animal"
-            value={formData.animal}
-            onChange={handleChange}
-            required
-          />
+      {/* Age */}
+      <TextField
+        label="Age"
+        name="age"
+        type="number"
+        value={form.age}
+        onChange={handleInputChange}
+        inputProps={{ min: 0 }}
+        required
+        fullWidth
+      />
 
-          {/* Name */}
-          <TextField
-            label="Name"
-            name="animalName"
-            value={formData.animalName}
-            onChange={handleChange}
-            required
-          />
+      {/* Age Unit */}
+      <FormControl fullWidth>
+        <InputLabel>Age Unit</InputLabel>
+        <Select
+          name="ageUnit"
+          value={form.ageUnit}
+          onChange={handleSelectChange}
+          label="Age Unit"
+        >
+          <MenuItem value="Years">Years</MenuItem>
+          <MenuItem value="Months">Months</MenuItem>
+        </Select>
+      </FormControl>
 
-          {/* Age */}
-          <TextField
-            label="Age"
-            name="animalAge"
-            value={formData.animalAge}
-            onChange={handleChange}
-            required
-          />
+      {/* Health */}
+      <FormControl fullWidth>
+        <InputLabel>Health</InputLabel>
+        <Select
+          name="health"
+          value={form.health}
+          onChange={handleSelectChange}
+          label="Health"
+        >
+          <MenuItem value="Good">Good</MenuItem>
+          <MenuItem value="Needs Medication">Needs Medication</MenuItem>
+          <MenuItem value="Critical">Critical</MenuItem>
+        </Select>
+      </FormControl>
 
-          {/* Health Status */}
-          <TextField
-            label="Health Status"
-            name="animalHealth"
-            value={formData.animalHealth}
-            onChange={handleChange}
-            required
-          />
+      {/* Size */}
+      <FormControl fullWidth>
+        <InputLabel>Size</InputLabel>
+        <Select
+          name="size"
+          value={form.size}
+          onChange={handleSelectChange}
+          label="Size"
+        >
+          <MenuItem value="Small">Small</MenuItem>
+          <MenuItem value="Medium">Medium</MenuItem>
+          <MenuItem value="Large">Large</MenuItem>
+        </Select>
+      </FormControl>
 
-          {/* Optional Description */}
-          <TextField
-            label="Description"
-            name="animalDescription"
-            value={formData.animalDescription}
-            onChange={handleChange}
-            multiline
-            rows={3}
-          />
+      {/* Activity Level */}
+      <FormControl fullWidth>
+        <InputLabel>Activity Level</InputLabel>
+        <Select
+          name="activityLevel"
+          value={form.activityLevel}
+          onChange={handleSelectChange}
+          label="Activity Level"
+        >
+          <MenuItem value="Low">Low</MenuItem>
+          <MenuItem value="Medium">Medium</MenuItem>
+          <MenuItem value="High">High</MenuItem>
+        </Select>
+      </FormControl>
 
-          {/* Picture Upload */}
-          <Button variant="contained" component="label">
-            Upload Picture
-            <input
-              type="file"
-              name="picture"
-              hidden
-              accept="image/*"
-              onChange={handleChange}
+      {/* Checkboxes */}
+      <FormGroup>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={form.goodWithKids}
+              onChange={handleCheckboxChange("goodWithKids")}
             />
-          </Button>
+          }
+          label="Good with Kids"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={form.goodWithPets}
+              onChange={handleCheckboxChange("goodWithPets")}
+            />
+          }
+          label="Good with Pets"
+        />
+      </FormGroup>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading}
-          >
-            {loading ? "Adding..." : "Add Animal"}
-          </Button>
-        </Stack>
-      </Box>
+      {/* Description */}
+      <TextField
+        label="Description"
+        name="description"
+        value={form.description || ""}
+        onChange={handleInputChange}
+        multiline
+        minRows={3}
+        fullWidth
+      />
+
+      {/* Picture URL */}
+      <TextField
+        label="Picture URL"
+        name="pictureUrl"
+        value={form.pictureUrl || ""}
+        onChange={handleInputChange}
+        fullWidth
+      />
+
+      {/* Submit */}
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        disabled={loading}
+      >
+        {loading ? "Adding..." : "Add Animal"}
+      </Button>
+
+      {message && (
+        <Typography color={message.includes("success") ? "green" : "error"}>
+          {message}
+        </Typography>
+      )}
     </Box>
   );
 };

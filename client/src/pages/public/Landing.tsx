@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+import HeroImage from "../../assets/LandingPageHeroPicture2.jpg";
+
 import LoginUser from "../auth/User.Login";
 import LoginShelter from "../auth/Shelter.Login";
 
@@ -15,80 +17,207 @@ import {
   CardActions,
   Modal,
   Divider,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 
-import { useModalContext } from "../../context/ModalContext"; // ✅ use global modal context
+import { useModalContext } from "../../context/ModalContext";
 
-/**
- * LandingPage Component
- */
+const NAVBAR_HEIGHT = 64; // your fixed navbar height
+
 const LandingPage: React.FC = () => {
   const { isLoginOpen, loginType, closeLogin, openLogin } = useModalContext();
 
+  // Placeholder data
   const randomDogs = [
     { id: 1, name: "Buddy", shelter: "Happy Tails" },
     { id: 2, name: "Lucy", shelter: "Paws & Co." },
     { id: 3, name: "Max", shelter: "Furry Friends" },
     { id: 4, name: "Bella", shelter: "Safe Paws" },
-    { id: 5, name: "Charlie", shelter: "Kind Hearts" },
-    { id: 6, name: "Daisy", shelter: "Good Dogs Shelter" },
+  ];
+
+  const randomShelters = [
+    { id: 1, name: "Happy Tails", location: "New York" },
+    { id: 2, name: "Safe Paws", location: "California" },
+    { id: 3, name: "Furry Friends", location: "Texas" },
+    { id: 4, name: "Kind Hearts", location: "Florida" },
   ];
 
   return (
     <>
-      {/* ================= DOGS SECTION ================= */}
-      <Box
-        sx={{
-          width: "100%",
-          py: { xs: 4, md: 6 },
-          bgcolor: "background.default",
-        }}
-      >
-        <Container
-          maxWidth={false}
+      {/* ================= PAGE WRAPPER ================= */}
+      <Box sx={{ pt: `${NAVBAR_HEIGHT}px` }}>
+        {/* offset for fixed navbar */}
+
+        {/* ================= HERO SECTION ================= */}
+        <Box
           sx={{
-            mx: "auto",
+            height: { xs: "40vh", md: "60vh" },
+            position: "relative",
+            backgroundImage: `url(${HeroImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            display: "flex",
+            alignItems: "center", // vertical centering
+            justifyContent: "center", // horizontal centering of the Stack
+            color: "white",
+            textAlign: "center",
             px: 2,
-            maxWidth: { xs: 600, sm: 900, md: 1200, lg: 1536 },
           }}
         >
-          <Typography variant="h4" textAlign="center" gutterBottom>
-            Meet Some Dogs Looking for a Home
-          </Typography>
+          <Stack spacing={2} maxWidth={700} alignItems="center">
+            {/* Main Heading */}
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: "bold",
+                lineHeight: 1.2,
+                letterSpacing: "0.02em",
+                color: "rgb(31, 2, 247)",
+                textShadow: "0 0 8px rgba(0,0,0,0.5)",
+                fontSize: { xs: "2rem", md: "3rem" },
+              }}
+            >
+              Helping You Find Your <br />
+              New Best Friend!
+            </Typography>
 
-          <Box
+            {/* Subtitle */}
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 400,
+                lineHeight: 1.5,
+                textShadow: "0 0 6px rgba(0,0,0,0.3)",
+                fontSize: { xs: "1rem", md: "1.25rem" },
+              }}
+            >
+              Discover loving animals and connect with local shelters <br />
+              to find your perfect pet today.
+            </Typography>
+
+            {/* Optional tagline / call-to-action */}
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 500,
+                fontStyle: "italic",
+                textShadow: "0 0 4px rgba(0,0,0,0.2)",
+                fontSize: { xs: "0.9rem", md: "1rem" },
+              }}
+            >
+              Join our community of pet lovers!
+            </Typography>
+          </Stack>
+        </Box>
+
+        {/* ================= SEARCH BAR SECTION ================= */}
+        <Box
+          sx={{
+            py: 3,
+            px: 2,
+            bgcolor: "background.paper",
+            boxShadow: 1,
+          }}
+        >
+          <Container
+            maxWidth="lg"
             sx={{
               display: "flex",
+              gap: 3,
               flexWrap: "wrap",
-              gap: 2,
               justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            {randomDogs.map((dog) => (
-              <Card
-                key={dog.id}
-                sx={{
-                  width: { xs: "100%", sm: 260, md: 280, lg: 300 },
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h6">{dog.name}</Typography>
-                  <Typography variant="body2">
-                    Shelter: {dog.shelter}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" variant="outlined">
-                    View More
-                  </Button>
-                </CardActions>
-              </Card>
-            ))}
-          </Box>
-        </Container>
+            <FormControl sx={{ minWidth: 150 }}>
+              <InputLabel>County</InputLabel>
+              <Select defaultValue="">
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="Kildare">Kildare</MenuItem>
+                <MenuItem value="Dublin">Dublin</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 120 }}>
+              <InputLabel>Radius</InputLabel>
+              <Select defaultValue="">
+                <MenuItem value={5}>5 km</MenuItem>
+                <MenuItem value={10}>10 km</MenuItem>
+                <MenuItem value={25}>25 km</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 150 }}>
+              <InputLabel>Animal Type</InputLabel>
+              <Select defaultValue="">
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="Dog">Dog</MenuItem>
+                <MenuItem value="Cat">Cat</MenuItem>
+                <MenuItem value="Cat">Other</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Button variant="contained" sx={{ minWidth: 120 }}>
+              Search
+            </Button>
+          </Container>
+        </Box>
+
+        {/* ================= FEATURED SHELTERS ================= */}
+        <Box sx={{ py: 6 }}>
+          <Container maxWidth="lg">
+            <Typography variant="h4" gutterBottom>
+              Find a Loving Shelter Near You
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              {randomShelters.map((shelter) => (
+                <Card key={shelter.id} sx={{ width: { xs: "100%", sm: 260 } }}>
+                  <CardContent>
+                    <Typography variant="h6">{shelter.name}</Typography>
+                    <Typography variant="body2">{shelter.location}</Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small" variant="outlined">
+                      View Shelter
+                    </Button>
+                  </CardActions>
+                </Card>
+              ))}
+            </Box>
+          </Container>
+        </Box>
+
+        {/* ================= FEATURED ANIMALS ================= */}
+        <Box sx={{ py: 6, bgcolor: "background.default" }}>
+          <Container maxWidth="lg">
+            <Typography variant="h4" gutterBottom>
+              Meet Some Pets
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              {randomDogs.map((dog) => (
+                <Card key={dog.id} sx={{ width: { xs: "100%", sm: 260 } }}>
+                  <CardContent>
+                    <Typography variant="h6">{dog.name}</Typography>
+                    <Typography variant="body2">
+                      Shelter: {dog.shelter}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small" variant="outlined">
+                      View More
+                    </Button>
+                  </CardActions>
+                </Card>
+              ))}
+            </Box>
+          </Container>
+        </Box>
       </Box>
 
-      {/* ================= SIGN IN MODAL ================= */}
+      {/* ================= LOGIN MODAL ================= */}
       <Modal open={isLoginOpen} onClose={closeLogin}>
         <Box
           sx={{

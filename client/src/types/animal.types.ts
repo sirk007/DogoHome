@@ -2,58 +2,60 @@
  * ------------------------------------------
  * Animal Types
  * ------------------------------------------
- * Defines all TypeScript types related to animals in the system.
- *
- * Used by:
- * - Shelter dashboard (CRUD)
- * - Public animal listings
- * - Future ML matching models
+ * Standardized types for animals to use in frontend:
+ * - forms
+ * - API calls
+ * - state management
  */
 
 /**
- * Controlled vocabularies
+ * Backend-controlled fields
  */
-export type AnimalSpecies = "Dog" | "Cat" | "Rabbit" | "Other";
-export type AnimalAgeUnit = "Months" | "Years";
-export type AnimalHealth = "Good" | "Needs Medication" | "Critical";
-export type AnimalSize = "Small" | "Medium" | "Large";
-export type AnimalActivityLevel = "Low" | "Medium" | "High";
+export type Species = "Dog" | "Cat" | "Rabbit" | "Other";
+export type AgeUnit = "Months" | "Years";
+export type HealthState = "Good" | "Needs Medication" | "Critical";
+export type Size = "Small" | "Medium" | "Large";
+export type ActivityLevel = "Low" | "Medium" | "High";
 
 /**
- * Base Animal type
- * Matches DB record + API responses
+ * Shape of an Animal record returned from backend
  */
 export interface Animal {
   id: number;
-  species: AnimalSpecies;
+  species: Species;
   name: string;
   age: number;
-  ageUnit: AnimalAgeUnit;
-  health: AnimalHealth;
-  size: AnimalSize;
-  activityLevel: AnimalActivityLevel;
+  ageUnit: AgeUnit;
+  health: HealthState;
+  size: Size;
+  activityLevel: ActivityLevel;
   goodWithKids: boolean;
   goodWithPets: boolean;
   description?: string | null;
   pictureUrl?: string | null;
   shelterId: number;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string; // timestamps from Sequelize
+  updatedAt: string;
 }
 
 /**
- * Payload for creating a new animal
- * (Shelter only)
+ * Shape of data needed to CREATE a new animal
  */
-export interface AnimalCreationAttributes extends Omit<
-  Animal,
-  "id" | "createdAt" | "updatedAt"
-> {}
+export interface AnimalCreationAttributes {
+  species: Species;
+  name: string;
+  age: number;
+  ageUnit: AgeUnit;
+  health: HealthState;
+  size: Size;
+  activityLevel: ActivityLevel;
+  goodWithKids: boolean;
+  goodWithPets: boolean;
+  description?: string | null;
+  pictureUrl?: string | null;
+}
 
 /**
- * Payload for updating an animal
- * Partial updates supported
+ * Shape of data for updating an animal (partial updates allowed)
  */
-export type AnimalUpdateAttributes = Partial<
-  Omit<Animal, "id" | "shelterId" | "createdAt" | "updatedAt">
->;
+export type AnimalUpdateAttributes = Partial<AnimalCreationAttributes>;
