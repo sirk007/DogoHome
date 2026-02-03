@@ -1,43 +1,38 @@
-import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
 import React, { createContext, useContext, useMemo, useState } from "react";
+import {
+  createTheme,
+  ThemeProvider,
+  CssBaseline,
+  GlobalStyles,
+} from "@mui/material";
 
-/**
- * --------------------------------------------
- * Mode Type
- * --------------------------------------------
- * Defines the two possible theme modes: light or dark.
- */
+import DayBackground from "../assets/DayBackground.png";
+import NightBackground from "../assets/NightBackground.png";
+
+/** -----------------------------
+ * Define allowed theme modes
+ * ----------------------------- */
 type Mode = "light" | "dark";
 
-/**
- * --------------------------------------------
- * ThemeContextValue
- * --------------------------------------------
- * Defines what the Theme Context provides to consumers:
- * - mode: current theme mode (light/dark)
- * - toggleTheme: function to switch between light and dark
- */
+/** -----------------------------
+ * Define the shape of the Theme Context
+ * Provides current mode + toggle function
+ * ----------------------------- */
 interface ThemeContextValue {
   mode: Mode;
   toggleTheme: () => void;
 }
 
-/**
- * --------------------------------------------
- * ThemeModeContext
- * --------------------------------------------
- * React context that holds current theme mode and toggle function.
- * Initialized with null to enforce using a custom hook for safe consumption.
- */
+/** -----------------------------
+ * Create Theme Context
+ * Start as null to force use via hook
+ * ----------------------------- */
 const ThemeModeContext = createContext<ThemeContextValue | null>(null);
 
-/**
- * --------------------------------------------
- * useThemeMode Hook
- * --------------------------------------------
- * Custom hook for consuming ThemeModeContext safely.
- * Throws an error if used outside the AppThemeProvider.
- */
+/** -----------------------------
+ * Hook to consume ThemeModeContext
+ * Throws error if used outside provider
+ * ----------------------------- */
 export const useThemeMode = () => {
   const ctx = useContext(ThemeModeContext);
   if (!ctx)
@@ -45,112 +40,102 @@ export const useThemeMode = () => {
   return ctx;
 };
 
-/**
- * --------------------------------------------
- * getInitialMode
- * --------------------------------------------
- * Determines the initial theme mode based on localStorage.
- * If a value exists ('light' or 'dark'), use it; otherwise default to 'light'.
- */
+/** -----------------------------
+ * Get initial mode from localStorage
+ * Defaults to "light"
+ * ----------------------------- */
 const getInitialMode = (): Mode => {
   const stored = localStorage.getItem("theme");
   return stored === "dark" || stored === "light" ? stored : "light";
 };
 
-/**
- * --------------------------------------------
+/** -----------------------------
  * AppThemeProvider
- * --------------------------------------------
- * Wraps the app to provide theme context and Material UI theming.
- *
- * Responsibilities:
- * 1. Stores current theme mode in state
- * 2. Provides toggleTheme function to switch modes
- * 3. Persists theme choice in localStorage
- * 4. Generates MUI theme using createTheme with custom palette for light/dark
- * 5. Wraps children with MUI ThemeProvider and CssBaseline for global styles
- */
-export const AppThemeProvider = ({
+ * Wrap your app with this to provide:
+ * - Theme context (mode + toggle)
+ * - MUI ThemeProvider
+ * - Global body styles with background images
+ * ----------------------------- */
+export const AppThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
-}: {
-  children: React.ReactNode;
 }) => {
   // -----------------------------
-  // State: current theme mode
+  // Theme mode state
   // -----------------------------
   const [mode, setMode] = useState<Mode>(getInitialMode);
 
   // -----------------------------
-  // toggleTheme function
+  // Toggle function for switching theme
   // -----------------------------
   const toggleTheme = () => {
     const next = mode === "light" ? "dark" : "light";
     setMode(next);
     localStorage.setItem("theme", next);
   };
+
   // -----------------------------
-  // MUI theme memoization
+  // Create MUI theme
+  // Use a minimal neutral palette
+  // Include semi-transparent overlays for readability
   // -----------------------------
-  // Memoize the theme object to avoid unnecessary recalculation on every render
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
           mode,
-
-          // -----------------------------
-          // Custom light palette
-          // -----------------------------
-          ...(mode === "light"
-            ? {
-                background: {
-                  default: "#f5f7fa",
-                  paper: "#ffffff",
-                },
-                text: {
-                  primary: "#1f2933",
-                  secondary: "#4b5563",
-                },
-                primary: {
-                  main: "#2563eb",
-                },
-                secondary: {
-                  main: "#64748b",
-                },
-                divider: "#e5e7eb",
-              }
-            : // -----------------------------
-              // Custom dark palette
-              // -----------------------------
-              {
-                background: {
-                  default: "#0f172a",
-                  paper: "#111827",
-                },
-                text: {
-                  primary: "#f9fafb",
-                  secondary: "#9ca3af",
-                },
-                primary: {
-                  main: "#60a5fa",
-                },
-                secondary: {
-                  main: "#94a3b8",
-                },
-                divider: "#1f2937",
-              }),
+          background: {
+            default: mode === "light" ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.5)",
+            paper: mode === "light" ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.5)",
+          },
+          text: {
+            primary: mode === "light" ? "#000" : "#f9fafb",
+            secondary: mode === "light" ? "#333" : "#ccc",
+          },
+          primary: { main: mode === "light" ? "#000" : "#fff" },
+          secondary: { main: mode === "light" ? "#000" : "#fff" },
+          divider:
+            mode === "light" ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
+        },
+        typography: {
+          fontFamily: "'Roboto', sans-serif",
         },
       }),
-    [mode]
+    [mode],
   );
 
+  // -----------------------------
+  // Set Day/Night background image
+  // -----------------------------
+  const backgroundImage = `url(${mode === "light" ? DayBackground : NightBackground})`;
+
+  // -----------------------------
+  // Return the provider with:
+  // - Theme context
+  // - MUI ThemeProvider
+  // - CssBaseline for default styles
+  // - GlobalStyles for background
+  // -----------------------------
   return (
-    // -----------------------------
-    // Provide theme context
-    // -----------------------------
     <ThemeModeContext.Provider value={{ mode, toggleTheme }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <GlobalStyles
+          styles={{
+            body: {
+              backgroundImage,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              minHeight: "100vh",
+              transition: "background 0.5s ease-in-out, color 0.3s ease",
+            },
+            "#root": {
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+            },
+          }}
+        />
         {children}
       </ThemeProvider>
     </ThemeModeContext.Provider>
