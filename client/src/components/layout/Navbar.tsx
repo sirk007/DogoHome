@@ -53,9 +53,14 @@ const Navbar: React.FC = () => {
   switch (authState.userType) {
     case "User":
       navLinks = [
-        { label: "Dashboard", path: "/user" },
+        { label: "Home", path: "/user" },
         { label: "My Posts", path: "/user/posts" },
-        { label: "Profile", path: "/user/profile" },
+        { label: "Find Animal", path: "/user/profile" },
+        { label: "Shelters", path: "/user/profile" },
+        { label: "Saved", path: "/user/profile" },
+        { label: "Posts", path: "/user/profile" },
+        { label: "Inpsect Posts", path: "/user/inspect" },
+        { label: "Donate", path: "/user/profile" },
       ];
       break;
     case "Shelter":

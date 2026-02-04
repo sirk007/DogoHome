@@ -9,8 +9,11 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 import LandingPage from "./pages/public/Landing";
 import UserRegistrationPage from "./pages/auth/User.Registration";
+import UserHome from "./pages/user/UserHome";
+import InspectPosts from "./pages/user/InspectPosts";
+import UserPost from "./pages/user/UserPost";
+
 import ShelterRegistrationPage from "./pages/auth/Shelter.Registration";
-import UserLandingPage from "./pages/user/userLandingPage/UserLandingPage";
 import ShelterAnimalPage from "./pages/shelter/ShelterAnimalPage";
 import ShelterProfile from "./pages/shelter/ShelterProfile";
 import ShelterDashboard from "./pages/shelter/ShelterDashboard";
@@ -70,7 +73,25 @@ const AppContent: React.FC = () => {
               path="/user"
               element={
                 <ProtectedRoute allowedRoles={["User"]}>
-                  <UserLandingPage />
+                  <UserHome />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/user/posts"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <UserPost />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/user/inspect"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <InspectPosts />
                 </ProtectedRoute>
               }
             />
