@@ -1,6 +1,17 @@
 import React from "react";
-import { Box, Typography, Card, CardContent, Chip, Stack } from "@mui/material";
+import MapView from "../../components/maps/MapView";
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Chip,
+  Stack,
+  Tabs,
+  Tab,
+} from "@mui/material";
 
+// Dummy posts
 const mockPosts = [
   {
     id: 1,
@@ -31,33 +42,52 @@ const InspectPosts: React.FC = () => {
       sx={{
         display: "flex",
         width: "100%",
-        height: "100vh",
-        overflow: "hidden",
+        height: "100vh", // Full viewport
       }}
     >
-      {/* ================= LEFT: POSTS ================= */}
+      {/* LEFT PANEL */}
       <Box
         sx={{
           width: "50%",
-          borderRight: "1px solid",
+          borderRight: 1,
           borderColor: "divider",
           p: 2,
+          display: "flex",
+          flexDirection: "column",
           overflowY: "auto",
+          flexShrink: 0, // prevent collapsing
         }}
       >
         <Typography variant="h5" gutterBottom>
           Recent Sightings
         </Typography>
 
+        <Box sx={{ mb: 2 }}>
+          <Tabs
+            value={0}
+            sx={{
+              minHeight: 36,
+              "& .MuiTab-root": { minHeight: 36, textTransform: "none" },
+            }}
+          >
+            <Tab label="Found" />
+            <Tab label="Lost" />
+            <Tab label="Reported" />
+          </Tabs>
+        </Box>
+
         <Stack spacing={2}>
           {mockPosts.map((post) => (
             <Card key={post.id} variant="outlined">
               <CardContent>
                 <Typography variant="h6">{post.title}</Typography>
-                <Typography variant="body2" color="text.secondary" mb={1}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   {post.description}
                 </Typography>
-
                 <Stack direction="row" spacing={1}>
                   <Chip label={post.location} size="small" />
                   <Chip label={post.time} size="small" variant="outlined" />
@@ -68,69 +98,23 @@ const InspectPosts: React.FC = () => {
         </Stack>
       </Box>
 
-      {/* ================= RIGHT: MAP ================= */}
+      {/* RIGHT PANEL */}
       <Box
         sx={{
           width: "50%",
           p: 2,
           display: "flex",
           flexDirection: "column",
+          height: "100%", // take full height
         }}
       >
         <Typography variant="h5" gutterBottom>
           Map View
         </Typography>
 
-        {/* Map placeholder */}
-        <Box
-          sx={{
-            flexGrow: 1,
-            borderRadius: 2,
-            bgcolor: "grey.200",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-          }}
-        >
-          <Typography color="text.secondary">
-            GPS based map with pins (mock)
-          </Typography>
-
-          {/* Mock pins */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: "30%",
-              left: "40%",
-              width: 12,
-              height: 12,
-              bgcolor: "error.main",
-              borderRadius: "50%",
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              top: "55%",
-              left: "60%",
-              width: 12,
-              height: 12,
-              bgcolor: "error.main",
-              borderRadius: "50%",
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              top: "45%",
-              left: "25%",
-              width: 12,
-              height: 12,
-              bgcolor: "error.main",
-              borderRadius: "50%",
-            }}
-          />
+        {/* Map fills remaining space */}
+        <Box sx={{ flexGrow: 1, minHeight: 0 }}>
+          <MapView />
         </Box>
       </Box>
     </Box>

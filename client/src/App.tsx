@@ -12,6 +12,9 @@ import UserRegistrationPage from "./pages/auth/User.Registration";
 import UserHome from "./pages/user/UserHome";
 import InspectPosts from "./pages/user/InspectPosts";
 import UserPost from "./pages/user/UserPost";
+import UserFindDog from "./pages/user/UserFindDog";
+import UserExplore from "./pages/user/UserExplore";
+import UserActivity from "./pages/user/UserActivity";
 
 import ShelterRegistrationPage from "./pages/auth/Shelter.Registration";
 import ShelterAnimalPage from "./pages/shelter/ShelterAnimalPage";
@@ -77,6 +80,23 @@ const AppContent: React.FC = () => {
                 </ProtectedRoute>
               }
             />
+            {/* USER PROTECTED */}
+            <Route
+              path="/user/explore"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <UserExplore />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/user/activity"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <UserActivity />
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="/user/posts"
@@ -92,6 +112,14 @@ const AppContent: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={["User"]}>
                   <InspectPosts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/user/searchDogs"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <UserFindDog />
                 </ProtectedRoute>
               }
             />

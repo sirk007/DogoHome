@@ -42,6 +42,7 @@ import likeRoutes from "./routes/likes.route";
 import commentRoutes from "./routes/comments.route";
 import animalRoutes from "./routes/animals.routes";
 import countyRoutes from "./routes/county.routes";
+import sightingRoutes from "./routes/sightings.routes";
 
 // ----------------------------------------------
 // CONFIGURATION
@@ -80,6 +81,7 @@ app.use("/api/likes", likeRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/animals", animalRoutes);
 app.use("/api/counties", countyRoutes);
+app.use("/api/sightings", sightingRoutes);
 
 // ----------------------------------------------
 // HEALTH CHECK

@@ -54,12 +54,11 @@ const Navbar: React.FC = () => {
     case "User":
       navLinks = [
         { label: "Home", path: "/user" },
-        { label: "My Posts", path: "/user/posts" },
-        { label: "Find Animal", path: "/user/profile" },
-        { label: "Shelters", path: "/user/profile" },
-        { label: "Saved", path: "/user/profile" },
-        { label: "Posts", path: "/user/profile" },
-        { label: "Inpsect Posts", path: "/user/inspect" },
+        { label: "Explore", path: "/user/explore" },
+        { label: "Find Animal", path: "/user/searchDogs" },
+        { label: "Community Map", path: "/user/inspect" },
+        { label: "Create Post", path: "/user/posts" },
+        { label: "My Activity", path: "/user/activity" },
         { label: "Donate", path: "/user/profile" },
       ];
       break;
