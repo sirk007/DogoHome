@@ -1,3 +1,17 @@
+/**
+ * UserHome.tsx
+ *
+ * Purpose:
+ * - Quick overview / dashboard for logged-in users
+ * - Preview nearby animals and shelters
+ * - Provide clear entry points into deeper features (Explore, Posts)
+ *
+ * NOTE:
+ * - This page intentionally uses mock data
+ * - Filters here are visual-only previews
+ * - Full search & filtering lives in /user/explore
+ */
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
