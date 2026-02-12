@@ -65,6 +65,9 @@ export const registerShelter = (
 ): Promise<ShelterLoginResponse> =>
   API.post("/register", shelterData).then((res) => res.data);
 
+export const fetchPublicShelterById = (id: number): Promise<ShelterProfile> =>
+  API.get(`/public/${id}`).then((res) => res.data);
+
 /**
  * --------------------------------------------
  * fetchShelterAuth

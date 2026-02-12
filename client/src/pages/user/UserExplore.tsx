@@ -8,11 +8,13 @@ import {
   MenuItem,
   Button,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import type { ShelterProfile } from "../../types/shelter.types";
 import { fetchPublicShelters } from "../../api/shelter.api";
 import { IrishCounties, type IrishCounty } from "../../types/counties.types";
 
 const UserExplore: React.FC = () => {
+  const navigate = useNavigate();
   const [county, setCounty] = useState<IrishCounty | "">("");
   const [shelters, setShelters] = useState<ShelterProfile[]>([]);
 
@@ -76,7 +78,7 @@ const UserExplore: React.FC = () => {
               <Button
                 variant="contained"
                 sx={{ mt: 1 }}
-                onClick={() => alert(`Go to ${s.shelterName} page`)}
+                onClick={() => navigate(`/user/shelter/${s.id}`)}
               >
                 Access
               </Button>

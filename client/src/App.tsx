@@ -20,7 +20,10 @@ import ShelterRegistrationPage from "./pages/auth/Shelter.Registration";
 import ShelterAnimalPage from "./pages/shelter/ShelterAnimalPage";
 import ShelterProfile from "./pages/shelter/ShelterProfile";
 import ShelterDashboard from "./pages/shelter/ShelterDashboard";
+
+import "leaflet/dist/leaflet.css";
 import { ModalProvider } from "./context/ModalContext";
+import UserShelterView from "./pages/user/UserShelterView";
 
 const App: React.FC = () => {
   return (
@@ -86,6 +89,15 @@ const AppContent: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={["User"]}>
                   <UserExplore />
+                </ProtectedRoute>
+              }
+            />
+            {/* USER PROTECTED */}
+            <Route
+              path="/user/shelter/:shelterId"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <UserShelterView />
                 </ProtectedRoute>
               }
             />

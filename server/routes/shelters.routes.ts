@@ -186,6 +186,40 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // ---------------------------
+// GET PUBLIC SHELTER BY ID
+// ---------------------------
+// Route: GET /public/:id
+// Access: Public
+// Description:
+//   - Returns a single shelter for public viewing
+//   - Used for UserShelterView page
+router.get("/public/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const shelter = await Shelter.findByPk(id, {
+      attributes: [
+        "id",
+        "shelterName",
+        "countyId",
+        "address",
+        "email",
+        "phoneNumber",
+      ],
+    });
+
+    if (!shelter) {
+      return res.status(404).json({ error: "Shelter not found" });
+    }
+
+    res.json(shelter);
+  } catch (err) {
+    console.error("Error fetching shelter:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ---------------------------
 // GET AUTHENTICATED SHELTER INFO
 // ---------------------------
 // Route: GET /authShelter
