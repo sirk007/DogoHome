@@ -44,35 +44,53 @@ const { Posts, Likes } = db;
 //   - Returns the created post object
 router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
   try {
-    // Validation / Hygiene
+    const { title, postText, picture, type, latitude, longitude } = req.body;
 
-    // Destructure post fields from request body
-    // `title` and `postText` are required, `picture` is optional
-    const { title, postText, picture } = req.body;
-    if (!title || typeof title !== "string" || title.length > 150) {
+    // ---- Title Validation ----
+    if (!title || typeof title !== "string" || title.trim().length > 150) {
       return res.status(400).json({ error: "Invalid title" });
     }
 
+    // ---- Content Validation ----
     if (!postText || typeof postText !== "string") {
       return res.status(400).json({ error: "Invalid post content" });
     }
 
-    // Create a new post in the database
-    // - title: the post title
-    // - postText: main content
-    // - picture: optional, defaults to null if not provided
-    // - userId: associated with the authenticated user from JWT
+    // ---- Type Validation ----
+    const allowedTypes = ["LOST", "FOUND", "SIGHTING"];
+    if (!type || !allowedTypes.includes(type)) {
+      return res.status(400).json({ error: "Invalid post type" });
+    }
+
+    // ---- Coordinate Validation ----
+    if (latitude !== undefined && latitude !== null) {
+      if (typeof latitude !== "number" || latitude < -90 || latitude > 90) {
+        return res.status(400).json({ error: "Invalid latitude" });
+      }
+    }
+
+    if (longitude !== undefined && longitude !== null) {
+      if (
+        typeof longitude !== "number" ||
+        longitude < -180 ||
+        longitude > 180
+      ) {
+        return res.status(400).json({ error: "Invalid longitude" });
+      }
+    }
+
     const newPost = await Posts.create({
-      title,
+      title: title.trim(),
       postText,
-      picture: picture || null,
+      picture: picture ?? null,
       userId: req.user!.id,
+      type,
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
     });
 
-    // Respond with 201 Created and return the new post object
     res.status(201).json(newPost);
   } catch (error) {
-    // Log any error and respond with generic 500
     console.error("Error creating post:", error);
     res.status(500).json({ error: "Failed to create post" });
   }
@@ -89,9 +107,20 @@ router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
 //   - Also returns which posts are liked by the authenticated user
 router.get("/", validateUserToken, async (req: AuthRequest, res: Response) => {
   try {
+    const { type } = req.query;
+    const allowedTypes = ["LOST", "FOUND", "SIGHTING"];
+    const whereClause: any = {};
+
+    if (type && allowedTypes.includes(type as string)) {
+      whereClause.type = type;
+    }
     // Fetch all posts from the database
     // Include associated Likes for each post
-    const listOfPosts = await Posts.findAll({ include: [Likes] });
+    const listOfPosts = await Posts.findAll({
+      where: whereClause,
+      include: [Likes],
+      order: [["createdAt", "DESC"]],
+    });
 
     // Fetch likes specifically for the authenticated user
     // This allows the frontend to know which posts the current user has liked
@@ -181,40 +210,50 @@ router.put(
   validateUserToken,
   async (req: AuthRequest, res: Response) => {
     try {
-      // Extract updated fields from request body
-      const { title, postText } = req.body;
+      const { title, postText, type, latitude, longitude } = req.body;
+      const allowedTypes = ["LOST", "FOUND", "SIGHTING"];
 
-      // Get post ID from URL parameter
-      const postId = req.params.id;
-
-      // Find the post by primary key
-      const post = await Posts.findByPk(postId);
-
-      // Return 404 if post does not exist
+      const post = await Posts.findByPk(req.params.id);
       if (!post) return res.status(404).json({ error: "Post not found" });
 
-      // ---------------------------
-      // Ownership / Admin Check
-      // ---------------------------
-      // Ensure only the post owner or an Admin can update the post
       if (post.userId !== req.user!.id && req.user!.userType !== "Admin") {
-        return res
-          .status(403)
-          .json({ error: "You do not have permission to update this post" });
+        return res.status(403).json({
+          error: "You do not have permission to update this post",
+        });
       }
 
-      // Update the post
-      // - Only update fields provided in the request body
-      // - Retain existing values if no new data is provided
+      // Validate type if provided
+      if (type !== undefined && !allowedTypes.includes(type)) {
+        return res.status(400).json({ error: "Invalid post type" });
+      }
+
+      // Validate coordinates if provided
+      if (latitude !== undefined && latitude !== null) {
+        if (typeof latitude !== "number" || latitude < -90 || latitude > 90) {
+          return res.status(400).json({ error: "Invalid latitude" });
+        }
+      }
+
+      if (longitude !== undefined && longitude !== null) {
+        if (
+          typeof longitude !== "number" ||
+          longitude < -180 ||
+          longitude > 180
+        ) {
+          return res.status(400).json({ error: "Invalid longitude" });
+        }
+      }
+
       await post.update({
-        title: title || post.title,
-        postText: postText || post.postText,
+        title: title ?? post.title,
+        postText: postText ?? post.postText,
+        type: type ?? post.type,
+        latitude: latitude ?? post.latitude,
+        longitude: longitude ?? post.longitude,
       });
 
-      // Respond with the updated post
       res.json(post);
     } catch (error) {
-      // Log any error and respond with generic 500
       console.error("Error updating post:", error);
       res.status(500).json({ error: "Failed to update post" });
     }

@@ -22,7 +22,19 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* --- ADD PATH ALIASES --- */
+    /* --- ADD PATH ALIASES --- */
+    "baseUrl": "src",
+    "paths": {
+      "@api/*": ["api/*"],
+      "@models/*": ["types/*"],
+      "@components/*": ["components/*"],
+      "@pages/*": ["pages/*"],
+      "@context/*": ["context/*"],
+      "@theme/*": ["theme/*"]
+    }
   },
   "include": ["src"]
 }

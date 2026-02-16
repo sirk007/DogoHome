@@ -11,6 +11,10 @@ interface PostAttributes {
   postText: string; // Main post content
   picture?: string | null; // Optional picture (URL or base64 string)
   userId: number; // Foreign key -> Users table
+
+  type: "LOST" | "FOUND" | "SIGHTING"; // Post category
+  latitude?: number | null; // Optional geolocation data
+  longitude?: number | null;
 }
 
 // ----------------------------------------------
@@ -18,8 +22,10 @@ interface PostAttributes {
 // ----------------------------------------------
 // Optional fields during creation
 // ----------------------------------------------
-interface PostCreationAttributes
-  extends Optional<PostAttributes, "id" | "picture"> {}
+interface PostCreationAttributes extends Optional<
+  PostAttributes,
+  "id" | "picture" | "latitude" | "longitude"
+> {}
 
 // ----------------------------------------------
 // Posts Model Class
@@ -31,8 +37,12 @@ class Posts
   public id!: number;
   public title!: string;
   public postText!: string;
-  public picture!: string | null;
+  public picture?: string | null;
   public userId!: number;
+
+  public type!: "LOST" | "FOUND" | "SIGHTING";
+  public latitude?: number | null;
+  public longitude?: number | null;
 
   // --------------------------------------------
   // Timestamps (automatically managed)
@@ -77,15 +87,27 @@ export default (sequelize: Sequelize) => {
         onDelete: "CASCADE",
       },
       picture: {
-        type: DataTypes.STRING, // could store URL or base64 string
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      type: {
+        type: DataTypes.ENUM("LOST", "FOUND", "SIGHTING"),
+        allowNull: false,
+      },
+      latitude: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+      },
+      longitude: {
+        type: DataTypes.FLOAT,
         allowNull: true,
       },
     },
     {
       sequelize,
-      modelName: "Posts", // Internal Sequelize name
-      tableName: "Posts", // DB table name
-    }
+      modelName: "Posts",
+      tableName: "Posts",
+    },
   );
 
   return Posts;

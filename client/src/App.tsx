@@ -24,6 +24,7 @@ import ShelterDashboard from "./pages/shelter/ShelterDashboard";
 import "leaflet/dist/leaflet.css";
 import { ModalProvider } from "./context/ModalContext";
 import UserShelterView from "./pages/user/UserShelterView";
+import LostPost from "@pages/user/create/LostPost";
 
 const App: React.FC = () => {
   return (
@@ -115,6 +116,15 @@ const AppContent: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={["User"]}>
                   <UserPost />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/user/create/lost"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <LostPost />
                 </ProtectedRoute>
               }
             />

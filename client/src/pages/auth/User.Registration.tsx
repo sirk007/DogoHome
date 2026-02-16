@@ -111,124 +111,122 @@ const UserRegistrationPage: React.FC = () => {
   // Render
   // -----------------------------
   return (
-    <Navbar>
-      <Container maxWidth="sm" sx={{ mt: 6 }}>
-        <Paper elevation={4} sx={{ p: 4 }}>
-          {/* Form title */}
-          <Typography variant="h5" textAlign="center" mb={3}>
-            User Registration
+    <Container maxWidth="sm" sx={{ mt: 6 }}>
+      <Paper elevation={4} sx={{ p: 4 }}>
+        {/* Form title */}
+        <Typography variant="h5" textAlign="center" mb={3}>
+          User Registration
+        </Typography>
+
+        {/* Error / Success Alerts */}
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
+
+        {/* Registration Form */}
+        <Box component="form" onSubmit={handleSubmit} mt={2}>
+          <Stack spacing={2}>
+            <TextField
+              label="Username"
+              name="username"
+              required
+              onChange={handleTextChange}
+            />
+            <TextField
+              label="Password"
+              type="password"
+              name="password"
+              required
+              onChange={handleTextChange}
+            />
+            <TextField
+              label="Confirm Password"
+              type="password"
+              required
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <TextField
+              label="Email"
+              name="email"
+              type="email"
+              required
+              onChange={handleTextChange}
+            />
+            <TextField
+              label="Age"
+              name="age"
+              type="number"
+              required
+              onChange={handleTextChange}
+            />
+
+            <TextField
+              select
+              label="Activity Level"
+              name="activityLevel"
+              value={formData.activityLevel}
+              onChange={handleTextChange}
+            >
+              {["Low", "Medium", "High"].map((v) => (
+                <MenuItem key={v} value={v}>
+                  {v}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
+              label="Pet Experience"
+              name="petExperienceLevel"
+              value={formData.petExperienceLevel}
+              onChange={handleTextChange}
+            >
+              {["None", "Beginner", "Experience"].map((v) => (
+                <MenuItem key={v} value={v}>
+                  {v}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              select
+              label="Max Dog Size"
+              name="maxDogSize"
+              value={formData.maxDogSize}
+              onChange={handleTextChange}
+            >
+              {["Small", "Medium", "Large"].map((v) => (
+                <MenuItem key={v} value={v}>
+                  {v}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <FormControlLabel
+              control={<Checkbox onChange={handleCheckbox("hasGarden")} />}
+              label="Has Garden"
+            />
+            <FormControlLabel
+              control={<Checkbox onChange={handleCheckbox("hasOtherPets")} />}
+              label="Has Other Pets"
+            />
+            <FormControlLabel
+              control={<Checkbox onChange={handleCheckbox("hasKids")} />}
+              label="Has Kids"
+            />
+
+            <Button type="submit" variant="contained">
+              Register
+            </Button>
+          </Stack>
+        </Box>
+
+        <Box mt={3} textAlign="center">
+          <Typography variant="body2">
+            Already have an account? <Link to="/login/user">Login</Link>
           </Typography>
-
-          {/* Error / Success Alerts */}
-          {error && <Alert severity="error">{error}</Alert>}
-          {success && <Alert severity="success">{success}</Alert>}
-
-          {/* Registration Form */}
-          <Box component="form" onSubmit={handleSubmit} mt={2}>
-            <Stack spacing={2}>
-              <TextField
-                label="Username"
-                name="username"
-                required
-                onChange={handleTextChange}
-              />
-              <TextField
-                label="Password"
-                type="password"
-                name="password"
-                required
-                onChange={handleTextChange}
-              />
-              <TextField
-                label="Confirm Password"
-                type="password"
-                required
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              <TextField
-                label="Email"
-                name="email"
-                type="email"
-                required
-                onChange={handleTextChange}
-              />
-              <TextField
-                label="Age"
-                name="age"
-                type="number"
-                required
-                onChange={handleTextChange}
-              />
-
-              <TextField
-                select
-                label="Activity Level"
-                name="activityLevel"
-                value={formData.activityLevel}
-                onChange={handleTextChange}
-              >
-                {["Low", "Medium", "High"].map((v) => (
-                  <MenuItem key={v} value={v}>
-                    {v}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <TextField
-                select
-                label="Pet Experience"
-                name="petExperienceLevel"
-                value={formData.petExperienceLevel}
-                onChange={handleTextChange}
-              >
-                {["None", "Beginner", "Experience"].map((v) => (
-                  <MenuItem key={v} value={v}>
-                    {v}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <TextField
-                select
-                label="Max Dog Size"
-                name="maxDogSize"
-                value={formData.maxDogSize}
-                onChange={handleTextChange}
-              >
-                {["Small", "Medium", "Large"].map((v) => (
-                  <MenuItem key={v} value={v}>
-                    {v}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <FormControlLabel
-                control={<Checkbox onChange={handleCheckbox("hasGarden")} />}
-                label="Has Garden"
-              />
-              <FormControlLabel
-                control={<Checkbox onChange={handleCheckbox("hasOtherPets")} />}
-                label="Has Other Pets"
-              />
-              <FormControlLabel
-                control={<Checkbox onChange={handleCheckbox("hasKids")} />}
-                label="Has Kids"
-              />
-
-              <Button type="submit" variant="contained">
-                Register
-              </Button>
-            </Stack>
-          </Box>
-
-          <Box mt={3} textAlign="center">
-            <Typography variant="body2">
-              Already have an account? <Link to="/login/user">Login</Link>
-            </Typography>
-          </Box>
-        </Paper>
-      </Container>
-    </Navbar>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 

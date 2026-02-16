@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // <-- added
 import ReportLostPetImg from "../../assets/ReportLostPet.png";
 import ReportFoundPetImg from "../../assets/ReportFoundPet.png";
 import ReportAnimalSightingImg from "../../assets/ReportAnimalSighting.png";
@@ -12,6 +13,8 @@ import {
 } from "@mui/material";
 
 const UserPost: React.FC = () => {
+  const navigate = useNavigate(); // <-- added
+
   return (
     <Box
       sx={{
@@ -80,7 +83,11 @@ const UserPost: React.FC = () => {
               </Typography>
             </CardContent>
             <Box sx={{ p: 2 }}>
-              <Button fullWidth variant="contained">
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => navigate("/user/create/lost")}
+              >
                 Create Lost Pet Post
               </Button>
             </Box>

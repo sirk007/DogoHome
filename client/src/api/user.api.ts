@@ -60,8 +60,10 @@ export const loginUser = (
  * - Handles front-end registration forms
  * - Any server validation errors will be thrown as Axios errors
  */
-export const registerUser = (userData: UserCreationAttributes) =>
-  API.post("/register", userData);
+export const registerUser = (
+  userData: UserCreationAttributes,
+): Promise<UserLoginResponse> =>
+  API.post("/register", userData).then((res) => res.data);
 
 /**
  * --------------------------------------------

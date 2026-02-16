@@ -1,9 +1,20 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import path from "path"; // <-- needed for resolving paths
 
 // Force IPv4 instead of IPv6 - Firewall blocking it
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      "@api": path.resolve(__dirname, "src/api"),
+      "@models": path.resolve(__dirname, "src/types"),
+      "@components": path.resolve(__dirname, "src/components"),
+      "@pages": path.resolve(__dirname, "src/pages"),
+      "@context": path.resolve(__dirname, "src/context"),
+      "@theme": path.resolve(__dirname, "src/theme"),
+    },
+  },
   server: {
     host: "127.0.0.1",
     port: 5173, // frontend port
