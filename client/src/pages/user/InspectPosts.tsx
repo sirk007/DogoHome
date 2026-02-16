@@ -10,40 +10,41 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { fetchPosts } from "@api/post.api"; // use your API
+import { fetchPosts } from "@api/post.api";
 import type { Post } from "@models/post.types";
 
 const InspectPosts: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [posts, setPosts] = useState<Post[]>([]);
 
-  const tabLabels = ["FOUND", "LOST", "SIGHTING"];
+  const tabLabels = ["ALL", "FOUND", "LOST", "SIGHTING"];
 
-  // Fetch posts for all types on mount
+  // Fetch posts once on mount
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const foundData = await fetchPosts("FOUND");
         const lostData = await fetchPosts("LOST");
+        const foundData = await fetchPosts("FOUND");
         const sightingData = await fetchPosts("SIGHTING");
 
-        // merge all posts
         setPosts([
-          ...foundData.listOfPosts,
           ...lostData.listOfPosts,
+          ...foundData.listOfPosts,
           ...sightingData.listOfPosts,
         ]);
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     };
+
     loadPosts();
   }, []);
 
   // Filter posts based on selected tab
-  const filteredPosts = posts.filter(
-    (post) => post.type === tabLabels[tabIndex],
-  );
+  const displayedPosts =
+    tabLabels[tabIndex] === "ALL"
+      ? posts
+      : posts.filter((p) => p.type === tabLabels[tabIndex]);
 
   return (
     <Box sx={{ display: "flex", width: "100%", height: "100vh" }}>
@@ -57,7 +58,6 @@ const InspectPosts: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           overflowY: "auto",
-          flexShrink: 0,
         }}
       >
         <Typography variant="h5" gutterBottom>
@@ -73,13 +73,14 @@ const InspectPosts: React.FC = () => {
             mb: 2,
           }}
         >
+          <Tab label="All" />
           <Tab label="Found" />
           <Tab label="Lost" />
           <Tab label="Reported" />
         </Tabs>
 
         <Stack spacing={2}>
-          {filteredPosts.map((post) => (
+          {displayedPosts.map((post) => (
             <Card key={post.id} variant="outlined">
               <CardContent>
                 <Typography variant="h6">{post.title}</Typography>
@@ -121,7 +122,12 @@ const InspectPosts: React.FC = () => {
         </Typography>
 
         <Box sx={{ flexGrow: 1, minHeight: 0 }}>
-          <MapView />
+          {/* Pass the current tab to MapView */}
+          <MapView
+            filterType={
+              tabLabels[tabIndex] as "ALL" | "LOST" | "FOUND" | "SIGHTING"
+            }
+          />
         </Box>
       </Box>
     </Box>

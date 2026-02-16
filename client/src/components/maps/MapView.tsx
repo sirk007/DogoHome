@@ -42,7 +42,11 @@ const iconMap: Record<string, L.Icon> = {
   SIGHTING: blueIcon,
 };
 
-const MapView: React.FC = () => {
+interface MapViewProps {
+  filterType?: "ALL" | "LOST" | "FOUND" | "SIGHTING"; // <-- new prop
+}
+
+const MapView: React.FC<MapViewProps> = ({ filterType = "ALL" }) => {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
@@ -66,6 +70,9 @@ const MapView: React.FC = () => {
     loadPosts();
   }, []);
 
+  // Filter posts based on filterType prop
+  const displayedPosts =
+    filterType === "ALL" ? posts : posts.filter((p) => p.type === filterType);
   return (
     <Box
       sx={{
@@ -85,13 +92,13 @@ const MapView: React.FC = () => {
           attribution="&copy; OpenStreetMap contributors"
         />
 
-        {posts
+        {displayedPosts
           .filter((post) => post.latitude != null && post.longitude != null)
           .map((post) => (
             <Marker
               key={post.id}
               position={[post.latitude!, post.longitude!]}
-              icon={iconMap[post.type]} // ← clean lookup
+              icon={iconMap[post.type]}
             >
               <Popup>
                 <strong>{post.title}</strong>
