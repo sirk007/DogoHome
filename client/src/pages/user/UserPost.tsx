@@ -162,7 +162,11 @@ const UserPost: React.FC = () => {
               </Typography>
             </CardContent>
             <Box sx={{ p: 2 }}>
-              <Button fullWidth variant="contained">
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => navigate("/user/create/sighting")}
+              >
                 Create Sighting Post
               </Button>
             </Box>

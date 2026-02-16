@@ -26,6 +26,7 @@ import { ModalProvider } from "./context/ModalContext";
 import UserShelterView from "./pages/user/UserShelterView";
 import LostPost from "@pages/user/create/LostPost";
 import FoundPost from "@pages/user/create/FoundPost";
+import SightingPost from "@pages/user/create/SightingPost";
 
 const App: React.FC = () => {
   return (
@@ -75,7 +76,6 @@ const AppContent: React.FC = () => {
               path="/shelter/registration"
               element={<ShelterRegistrationPage />}
             />
-
             {/* USER PROTECTED */}
             <Route
               path="/user"
@@ -111,7 +111,6 @@ const AppContent: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/user/posts"
               element={
@@ -120,7 +119,6 @@ const AppContent: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/user/create/lost"
               element={
@@ -129,7 +127,6 @@ const AppContent: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/user/create/found"
               element={
@@ -138,7 +135,14 @@ const AppContent: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-
+            <Route
+              path="/user/create/sighting"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <SightingPost />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/user/inspect"
               element={
@@ -155,7 +159,6 @@ const AppContent: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-
             {/* SHELTER PROTECTED */}
             <Route
               path="/shelter"
@@ -181,7 +184,6 @@ const AppContent: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-
             {/* FALLBACK */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -6,6 +6,7 @@ import { fetchPosts } from "@api/post.api";
 import type { Post } from "@models/post.types";
 import CheckGreen from "@assets/CheckGreen.png";
 import CheckRed from "@assets/CheckRed.png";
+import CheckBlue from "@assets/CheckBlue.png";
 
 interface PostsResponse {
   listOfPosts: Post[];
@@ -27,6 +28,20 @@ const greenIcon = new L.Icon({
   popupAnchor: [0, -50],
 });
 
+const blueIcon = new L.Icon({
+  iconUrl: CheckBlue,
+  iconSize: [30, 50],
+  iconAnchor: [15, 50],
+  popupAnchor: [0, -50],
+});
+
+// --- Lookup table for post types ---
+const iconMap: Record<string, L.Icon> = {
+  LOST: redIcon,
+  FOUND: greenIcon,
+  SIGHTING: blueIcon,
+};
+
 const MapView: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
 
@@ -35,12 +50,19 @@ const MapView: React.FC = () => {
       try {
         const lostData: PostsResponse = await fetchPosts("LOST");
         const foundData: PostsResponse = await fetchPosts("FOUND");
-        // Merge LOST + FOUND
-        setPosts([...lostData.listOfPosts, ...foundData.listOfPosts]);
+        const sightingData: PostsResponse = await fetchPosts("SIGHTING");
+
+        // Merge all post types
+        setPosts([
+          ...lostData.listOfPosts,
+          ...foundData.listOfPosts,
+          ...sightingData.listOfPosts,
+        ]);
       } catch (error) {
         console.error("Error fetching posts:", error);
       }
     };
+
     loadPosts();
   }, []);
 
@@ -64,18 +86,12 @@ const MapView: React.FC = () => {
         />
 
         {posts
-          .filter(
-            (post) =>
-              post.latitude !== undefined &&
-              post.latitude !== null &&
-              post.longitude !== undefined &&
-              post.longitude !== null,
-          )
+          .filter((post) => post.latitude != null && post.longitude != null)
           .map((post) => (
             <Marker
               key={post.id}
               position={[post.latitude!, post.longitude!]}
-              icon={post.type === "LOST" ? redIcon : greenIcon}
+              icon={iconMap[post.type]} // ← clean lookup
             >
               <Popup>
                 <strong>{post.title}</strong>
