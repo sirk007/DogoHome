@@ -25,7 +25,6 @@
     "noUncheckedSideEffectImports": true,
 
     /* --- ADD PATH ALIASES --- */
-    /* --- ADD PATH ALIASES --- */
     "baseUrl": "src",
     "paths": {
       "@api/*": ["api/*"],
@@ -33,7 +32,8 @@
       "@components/*": ["components/*"],
       "@pages/*": ["pages/*"],
       "@context/*": ["context/*"],
-      "@theme/*": ["theme/*"]
+      "@theme/*": ["theme/*"],
+      "@assets/*": ["assets/*"]
     }
   },
   "include": ["src"]

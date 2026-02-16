@@ -122,7 +122,11 @@ const UserPost: React.FC = () => {
               </Typography>
             </CardContent>
             <Box sx={{ p: 2 }}>
-              <Button fullWidth variant="contained">
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => navigate("/user/create/found")}
+              >
                 Create Found Pet Post
               </Button>
             </Box>

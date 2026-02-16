@@ -15,13 +15,15 @@ export const createPost = async (data: any): Promise<Post> => {
   return res.data;
 };
 
-export const fetchPosts = async (type?: string): Promise<Post[]> => {
+export const fetchPosts = async (type?: string) => {
   const token = sessionStorage.getItem("accessToken");
+
   const res = await API.get("/", {
     params: type ? { type } : {},
     headers: { accessToken: token || "" },
   });
-  return res.data;
+
+  return res.data; // returns { listOfPosts, likedPosts }
 };
 
 export const fetchPostById = async (id: number): Promise<Post> => {

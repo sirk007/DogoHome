@@ -25,6 +25,7 @@ import "leaflet/dist/leaflet.css";
 import { ModalProvider } from "./context/ModalContext";
 import UserShelterView from "./pages/user/UserShelterView";
 import LostPost from "@pages/user/create/LostPost";
+import FoundPost from "@pages/user/create/FoundPost";
 
 const App: React.FC = () => {
   return (
@@ -125,6 +126,15 @@ const AppContent: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={["User"]}>
                   <LostPost />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/user/create/found"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <FoundPost />
                 </ProtectedRoute>
               }
             />
