@@ -1,13 +1,19 @@
 /**
- * --------------------------------------------
- * Axios instance for User API
- * --------------------------------------------
- * Pre-configured Axios instance with the base URL pointing
- * to the user API endpoint.
+ * ==============================
+ * user.api.ts
+ * ------------------------------
+ * API layer for all user-related backend interactions.
+ *
+ * Responsibilities:
+ * 1. Login users
+ * 2. Register new users
+ * 3. Verify JWT & fetch authenticated user
  *
  * Benefits:
- * - Centralizes the API base URL for all user requests
- * - Makes it easy to switch between development and production URLs
+ * - Centralizes API calls for user management
+ * - Provides consistent error handling
+ * - Simplifies integration with front-end forms/hooks
+ * ==============================
  */
 
 import axios from "axios";
@@ -16,26 +22,33 @@ import type {
   UserLoginResponse,
 } from "../types/user.types";
 
+/**
+ * ============================================
+ * AXIOS INSTANCE
+ * --------------------------------------------
+ * Pre-configured Axios instance pointing to the user API.
+ * Adjust `baseURL` for dev vs production environments.
+ * ============================================
+ */
 const API = axios.create({ baseURL: "http://localhost:3002/api/users" });
 
 /**
- * --------------------------------------------
+ * ============================================
  * loginUser
  * --------------------------------------------
- * Authenticates a user with the backend.
+ * Authenticate a user with username & password.
  *
  * Parameters:
- * - username: string -> the user's login username
- * - password: string -> the user's password
+ * - username: string -> user's login username
+ * - password: string -> user's password
  *
  * Returns:
- * - Promise<UserLoginResponse> -> object containing:
- *   - token (JWT)
- *   - user info (username, id, role)
+ * - Promise<UserLoginResponse> -> JWT token + user info
  *
  * Notes:
- * - Throws an error if login fails (invalid credentials)
- * - Centralized for use in login forms
+ * - Throws Axios error if credentials are invalid
+ * - Centralized for use in login forms or auth hooks
+ * ============================================
  */
 
 export const loginUser = (
@@ -45,20 +58,21 @@ export const loginUser = (
   API.post("/login", { username, password }).then((res) => res.data);
 
 /**
- * --------------------------------------------
+ * ============================================
  * registerUser
  * --------------------------------------------
- * Creates a new user account.
+ * Register a new user account.
  *
  * Parameters:
- * - userData: UserCreationAttributes -> object containing all user registration info
+ * - userData: UserCreationAttributes -> full registration info
  *
  * Returns:
- * - Axios promise -> response containing the newly created user info
+ * - Promise<UserLoginResponse> -> token + newly created user info
  *
  * Notes:
  * - Handles front-end registration forms
- * - Any server validation errors will be thrown as Axios errors
+ * - Any server validation errors will propagate as Axios errors
+ * ============================================
  */
 export const registerUser = (
   userData: UserCreationAttributes,
@@ -66,21 +80,21 @@ export const registerUser = (
   API.post("/register", userData).then((res) => res.data);
 
 /**
- * --------------------------------------------
+ * ============================================
  * fetchUserAuth
  * --------------------------------------------
- * Verifies the user's JWT token and fetches current user info.
+ * Verify a JWT token and retrieve current user info.
  *
  * Parameters:
- * - token: string -> JWT stored in sessionStorage
+ * - token: string -> JWT stored in front-end (local/session storage)
  *
  * Returns:
- * - Promise<UserLoginResponse> -> user data if token is valid
- * - Throws error if token is invalid/expired
+ * - Promise<UserLoginResponse> -> user info if token is valid
  *
  * Notes:
  * - Used in auth hooks to maintain persistent login
- * - Front-end should never trust token without verification
+ * - Always validate token server-side before trusting user data
+ * ============================================
  */
 export const fetchUserAuth = (token: string) =>
   API.get<UserLoginResponse>("/auth", {
