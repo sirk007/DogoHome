@@ -1,15 +1,20 @@
 /**
- * --------------------------------------------
- * Axios instance for Shelter API
- * --------------------------------------------
- * Pre-configured Axios instance with the base URL pointing
- * to the user API endpoint.
+ * ==============================
+ * shelter.api.ts
+ * ------------------------------
+ * API layer for all shelter-related backend interactions.
+ *
+ * Responsibilities:
+ * 1. Login shelters
+ * 2. Register new shelters
+ * 3. Fetch shelter profiles (public & authenticated)
  *
  * Benefits:
- * - Centralizes the API base URL for all shelter requests
- * - Makes it easy to switch between development and production URLs
+ * - Centralizes API calls for shelter management
+ * - Simplifies integration with front-end forms/hooks
+ * - Provides consistent error handling
+ * ==============================
  */
-
 import axios from "axios";
 import type {
   ShelterProfile,
@@ -17,26 +22,33 @@ import type {
   ShelterLoginResponse,
 } from "../types/shelter.types";
 
+/**
+ * ============================================
+ * AXIOS INSTANCE
+ * --------------------------------------------
+ * Pre-configured Axios instance pointing to the shelter API.
+ * Adjust `baseURL` for dev vs production environments.
+ * ============================================
+ */
 const API = axios.create({ baseURL: "http://localhost:3002/api/shelters" });
 
 /**
- * --------------------------------------------
+ * ============================================
  * loginShelter
  * --------------------------------------------
- * Authenticates a shelter with the backend.
+ * Authenticate a shelter with username & password.
  *
  * Parameters:
- * - username: string -> the shelter's login username
- * - password: string -> the shelter's password
+ * - username: string
+ * - password: string
  *
  * Returns:
- * - Promise<ShelterLoginResponse> -> object containing:
- *   - token (JWT)
- *   - shelter info (username, id, role)
+ * - Promise<ShelterLoginResponse> -> JWT + shelter info
  *
  * Notes:
- * - Throws an error if login fails (invalid credentials)
- * - Centralized for use in login forms
+ * - Throws Axios error if credentials are invalid
+ * - Centralized for login forms/hooks
+ * ============================================
  */
 export const loginShelter = (
   username: string,
@@ -45,45 +57,62 @@ export const loginShelter = (
   API.post("/login", { username, password }).then((res) => res.data);
 
 /**
- * --------------------------------------------
+ * ============================================
  * registerShelter
  * --------------------------------------------
- * Creates a new shelter account.
+ * Register a new shelter account.
  *
  * Parameters:
- * - shelterData: ShelterCreationAttributes -> object containing all shelter registration info
+ * - shelterData: ShelterCreationAttributes
  *
  * Returns:
- * - Axios promise -> response containing the newly created shelter info
+ * - Promise<ShelterLoginResponse> -> token + newly created shelter
  *
  * Notes:
  * - Handles front-end registration forms
- * - Any server validation errors will be thrown as Axios errors
+ * - Validation errors propagate as Axios errors
+ * ============================================
  */
 export const registerShelter = (
   shelterData: ShelterCreationAttributes,
 ): Promise<ShelterLoginResponse> =>
   API.post("/register", shelterData).then((res) => res.data);
 
+/**
+ * ============================================
+ * fetchPublicShelterById
+ * --------------------------------------------
+ * Fetches public profile of a shelter by ID.
+ *
+ * Parameters:
+ * - id: number
+ *
+ * Returns:
+ * - Promise<ShelterProfile>
+ *
+ * Notes:
+ * - Publicly accessible info (does not require auth token)
+ * ============================================
+ */
 export const fetchPublicShelterById = (id: number): Promise<ShelterProfile> =>
   API.get(`/public/${id}`).then((res) => res.data);
 
 /**
+ * ============================================
+ * fetchShelterProfile
  * --------------------------------------------
- * fetchShelterAuth
- * --------------------------------------------
- * Verifies the shelter's JWT token and fetches current shelter info.
+ * Verify JWT and fetch authenticated shelter info.
  *
  * Parameters:
- * - token: string -> JWT stored in sessionStorage
+ * - token: string -> JWT stored in front-end
  *
  * Returns:
- * - Promise<ShelterLoginResponse> -> shelter data if token is valid
- * - Throws error if token is invalid/expired
+ * - Promise<ShelterProfile>
  *
  * Notes:
- * - Used in auth hooks to maintain persistent login
- * - Front-end should never trust token without verification
+ * - Used in auth hooks for persistent login
+ * - Always validate token server-side
+ * ============================================
  */
 
 export const fetchShelterProfile = (token: string): Promise<ShelterProfile> =>
@@ -91,10 +120,23 @@ export const fetchShelterProfile = (token: string): Promise<ShelterProfile> =>
     headers: { accessShelterToken: token },
   }).then((res) => res.data);
 
-// --------------------------------------------
-// fetchPublicShelters (PUBLIC)
-// --------------------------------------------
-// Fetches all shelters, optionally filtered by county
+/**
+ * ============================================
+ * fetchPublicShelters
+ * --------------------------------------------
+ * Fetch all public shelters, optionally filtered by county.
+ *
+ * Parameters:
+ * - countyId?: number -> optional county filter
+ *
+ * Returns:
+ * - Promise<ShelterProfile[]>
+ *
+ * Notes:
+ * - Public endpoint; no auth required
+ * - Useful for lists/maps in front-end
+ * ============================================
+ */
 export const fetchPublicShelters = (
   countyId?: number,
 ): Promise<ShelterProfile[]> =>
