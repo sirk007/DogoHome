@@ -9,17 +9,85 @@ import {
   Card,
   CardContent,
   CardMedia,
+  TextField,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import type { ShelterProfile } from "../../types/shelter.types";
 import type { Animal } from "../../types/animal.types";
 import { fetchPublicShelterById } from "../../api/shelter.api";
 import { fetchAnimalsByShelterId } from "../../api/animal.api";
+import { sendMessageUser } from "../../api/message.api";
 
 const ANIMALS_PER_PAGE = 6;
-
 const categories = ["All", "Dog", "Cat", "Rabbit", "Other"];
 
+// ---------------------------
+// MessageForm Component
+// ---------------------------
+const MessageForm: React.FC<{ shelterId: number; animalId?: number }> = ({
+  shelterId,
+  animalId,
+}) => {
+  const [message, setMessage] = useState("");
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    success: boolean;
+    msg: string;
+  }>({ open: false, success: true, msg: "" });
+
+  const handleSend = async () => {
+    if (!message.trim()) return;
+    try {
+      await sendMessageUser({
+        receiverId: shelterId,
+        content: message,
+        animalId,
+      });
+      setSnackbar({ open: true, success: true, msg: "Message sent!" });
+      setMessage("");
+    } catch (err: any) {
+      console.error(err);
+      setSnackbar({
+        open: true,
+        success: false,
+        msg: err.message || "Failed to send message",
+      });
+    }
+  };
+
+  return (
+    <Box mt={4}>
+      <Typography variant="h6">Send a message to this shelter</Typography>
+      <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+        <TextField
+          fullWidth
+          placeholder="Type your message..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <Button variant="contained" onClick={handleSend}>
+          Send
+        </Button>
+      </Box>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+      >
+        <Alert severity={snackbar.success ? "success" : "error"}>
+          {snackbar.msg}
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
+};
+
+// ---------------------------
+// UserShelterView Component
+// ---------------------------
 const UserShelterView: React.FC = () => {
   const { shelterId } = useParams<{ shelterId: string }>();
   const navigate = useNavigate();
@@ -37,7 +105,6 @@ const UserShelterView: React.FC = () => {
     fetchAnimalsByShelterId(id).then(setAnimals);
   }, [shelterId]);
 
-  // Filter animals by category
   const filteredAnimals = useMemo(() => {
     if (selectedCategory === "All") return animals;
     return animals.filter(
@@ -45,9 +112,7 @@ const UserShelterView: React.FC = () => {
     );
   }, [animals, selectedCategory]);
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredAnimals.length / ANIMALS_PER_PAGE);
-
   const paginatedAnimals = filteredAnimals.slice(
     (page - 1) * ANIMALS_PER_PAGE,
     page * ANIMALS_PER_PAGE,
@@ -79,6 +144,9 @@ const UserShelterView: React.FC = () => {
         )}
       </Box>
 
+      {/* Message Form */}
+      <MessageForm shelterId={shelter.id} />
+
       <Divider sx={{ my: 4 }} />
 
       {/* Filter Tabs */}
@@ -104,25 +172,15 @@ const UserShelterView: React.FC = () => {
         {paginatedAnimals.map((animal) => (
           <Card
             key={animal.id}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              borderRadius: 2,
-            }}
+            sx={{ display: "flex", alignItems: "center", borderRadius: 2 }}
           >
-            {/* Image Placeholder */}
             <CardMedia
               component="img"
               image={animal.pictureUrl || "/placeholder.jpg"}
               alt={animal.name}
-              sx={{
-                width: 140,
-                height: 120,
-                objectFit: "cover",
-              }}
+              sx={{ width: 140, height: 120, objectFit: "cover" }}
             />
 
-            {/* Animal Info */}
             <CardContent sx={{ flex: 1 }}>
               <Typography variant="h6">{animal.name}</Typography>
               <Typography color="text.secondary">
@@ -151,11 +209,9 @@ const UserShelterView: React.FC = () => {
           <Button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
             Prev
           </Button>
-
           <Typography>
             Page {page} of {totalPages}
           </Typography>
-
           <Button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
