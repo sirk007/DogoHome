@@ -10,6 +10,7 @@ import Comments from "./Comment.model";
 import Animals from "./Animal.model";
 import Admin from "./Admin.model";
 import Shelter from "./Shelter.model";
+import Message from "./Messages.model";
 
 const db: any = {};
 
@@ -24,6 +25,7 @@ db.Comments = Comments(sequelize);
 db.Animals = Animals(sequelize);
 db.Admin = Admin(sequelize);
 db.Shelter = Shelter(sequelize);
+db.Message = Message(sequelize);
 
 // ----------------------------------------------
 // Set up associations
