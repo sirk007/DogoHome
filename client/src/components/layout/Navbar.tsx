@@ -60,6 +60,7 @@ const Navbar: React.FC = () => {
         { label: "Create Post", path: "/user/posts" },
         { label: "My Activity", path: "/user/activity" },
         { label: "Donate", path: "/user/profile" },
+        { label: "Messages", path: "/user/messages" },
       ];
       break;
     case "Shelter":
@@ -72,6 +73,7 @@ const Navbar: React.FC = () => {
         { label: "Donations", path: "/shelter/profile" },
         { label: "Reports", path: "/shelter/profile" },
         { label: "Settings", path: "/shelter/profile" },
+        { label: "Messages", path: "/shelter/messages" },
       ];
       break;
     case "Admin":

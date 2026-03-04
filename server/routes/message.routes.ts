@@ -129,4 +129,50 @@ router.get(
   },
 );
 
+// ---------------------------
+// SHELTER FETCH CONVERSATIONS LIST
+// ---------------------------
+router.get(
+  "/shelter/conversations",
+  validateShelterToken,
+  async (req: any, res) => {
+    const shelterId = req.shelter.id;
+
+    try {
+      // Get all messages where shelter is sender OR receiver
+      const messages = await Message.findAll({
+        where: {
+          [Op.or]: [{ senderId: shelterId }, { receiverId: shelterId }],
+        },
+        order: [["createdAt", "DESC"]],
+      });
+
+      // Extract unique userIds (excluding shelterId)
+      const conversationsMap = new Map<number, string>();
+
+      for (const msg of messages) {
+        const otherId =
+          msg.senderId === shelterId ? msg.receiverId : msg.senderId;
+
+        // Only add first (latest) message per user
+        if (!conversationsMap.has(otherId)) {
+          conversationsMap.set(otherId, msg.content);
+        }
+      }
+
+      const conversationsList = Array.from(conversationsMap.entries()).map(
+        ([userId, lastMessage]) => ({
+          userId,
+          lastMessage,
+        }),
+      );
+
+      res.json(conversationsList);
+    } catch (err: any) {
+      console.error("Shelter conversations list error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  },
+);
+
 export default router;

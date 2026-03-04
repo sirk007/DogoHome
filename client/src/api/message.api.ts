@@ -6,10 +6,11 @@
  *
  * Responsibilities:
  * - Send a message from User to Shelter
+ * - Send a message from Shelter to User
  * - Fetch conversations between User and Shelter
  *
  * Notes:
- * - Requires JWT stored in sessionStorage under "userToken"
+ * - Requires JWT stored in sessionStorage under "accessToken"
  * ==============================
  */
 import axios from "axios";
@@ -31,30 +32,52 @@ const API = axios.create({
 
 /**
  * ============================================
- * sendMessageUser
- * --------------------------------------------
- * Send a message from User to a Shelter
- *
- * Parameters:
- * - data: { receiverId: number; content: string; animalId?: number }
- *
- * Returns:
- * - Promise<Message> -> the newly created message
- *
- * Notes:
- * - Requires JWT stored in sessionStorage under "userToken"
- * - Throws error if user not authenticated or request fails
+ * USER API
  * ============================================
+ */
+
+/**
+ * Send a message from User to a Shelter
  */
 export const sendMessageUser = async (
   data: MessageCreationAttributes,
 ): Promise<Message> => {
-  // Use sessionStorage (not localStorage) and match your server middleware
   const token = sessionStorage.getItem("accessToken");
   if (!token) throw new Error("User not authenticated");
 
   const res = await API.post("/user/send", data, {
-    headers: { accessToken: token }, // matches your validateUserToken middleware
+    headers: { accessToken: token },
+  });
+
+  return res.data;
+};
+
+/**
+ * Fetch conversation for the User
+ */
+export const fetchUserConversation = async (
+  otherId: number,
+  animalId?: number,
+): Promise<Message[]> => {
+  const token = sessionStorage.getItem("accessToken");
+  if (!token) throw new Error("User not authenticated");
+
+  const res = await API.get("/user/conversation", {
+    params: { otherId, animalId },
+    headers: { accessToken: token },
+  });
+
+  return res.data;
+};
+
+export const fetchUserConversationsList = async (): Promise<
+  { userId: number; lastMessage: string }[]
+> => {
+  const token = sessionStorage.getItem("accessToken");
+  if (!token) throw new Error("User not authenticated");
+
+  const res = await API.get("/user/conversations", {
+    headers: { accessToken: token },
   });
 
   return res.data;
@@ -62,31 +85,52 @@ export const sendMessageUser = async (
 
 /**
  * ============================================
- * fetchUserConversation
- * --------------------------------------------
- * Fetch conversation between current user and another user/shelter
- *
- * Parameters:
- * - otherId: number -> ID of other participant
- * - animalId?: number -> optional filter by animal
- *
- * Returns:
- * - Promise<Message[]> -> array of messages sorted by createdAt
- *
- * Notes:
- * - Requires JWT stored in sessionStorage
+ * SHELTER API
  * ============================================
  */
-export const fetchUserConversation = async (
+
+/**
+ * Send a message from Shelter to a User
+ */
+export const sendMessageShelter = async (
+  data: MessageCreationAttributes,
+): Promise<Message> => {
+  const token = sessionStorage.getItem("accessShelterToken");
+  if (!token) throw new Error("Shelter not authenticated");
+
+  const res = await API.post("/shelter/send", data, {
+    headers: { accessShelterToken: token },
+  });
+
+  return res.data;
+};
+
+export const fetchShelterConversationsList = async (): Promise<
+  { userId: number; lastMessage: string }[]
+> => {
+  const token = sessionStorage.getItem("accessShelterToken");
+  if (!token) throw new Error("Shelter not authenticated");
+
+  const res = await API.get("/shelter/conversations", {
+    headers: { accessShelterToken: token },
+  });
+
+  return res.data;
+};
+
+/**
+ * Fetch conversation for the Shelter
+ */
+export const fetchShelterConversation = async (
   otherId: number,
   animalId?: number,
 ): Promise<Message[]> => {
-  const token = sessionStorage.getItem("userToken");
-  if (!token) throw new Error("User not authenticated");
+  const token = sessionStorage.getItem("accessShelterToken");
+  if (!token) throw new Error("Shelter not authenticated");
 
-  const res = await API.get("/user/conversation", {
+  const res = await API.get("/shelter/conversation", {
     params: { otherId, animalId },
-    headers: { accessToken: token },
+    headers: { accessShelterToken: token },
   });
 
   return res.data;

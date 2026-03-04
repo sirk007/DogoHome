@@ -368,4 +368,47 @@ router.delete(
   },
 );
 
+// ---------------------------
+// GET ANIMAL STATS FOR SHELTER (Dashboard)
+// ---------------------------
+// Route: GET /stats
+// Access: Protected (Shelter only)
+// Middleware: validateShelterToken
+router.get(
+  "/stats",
+  validateShelterToken,
+  async (req: ShelterAuthRequest, res: Response) => {
+    try {
+      if (!req.shelter) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      // Count total animals for this shelter
+      const total = await Animals.count({
+        where: { shelterId: req.shelter.id },
+      });
+
+      // Count by species
+      const dogs = await Animals.count({
+        where: { shelterId: req.shelter.id, species: "Dog" },
+      });
+      const cats = await Animals.count({
+        where: { shelterId: req.shelter.id, species: "Cat" },
+      });
+      const others = await Animals.count({
+        where: {
+          shelterId: req.shelter.id,
+          species: ["Rabbit", "Other"],
+        },
+      });
+
+      // Return stats
+      res.json({ total, dogs, cats, others });
+    } catch (error) {
+      console.error("Error fetching animal stats:", error);
+      res.status(500).json({ error: "Failed to fetch animal stats" });
+    }
+  },
+);
+
 export default router;

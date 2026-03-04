@@ -27,6 +27,8 @@ import UserShelterView from "./pages/user/UserShelterView";
 import LostPost from "@pages/user/create/LostPost";
 import FoundPost from "@pages/user/create/FoundPost";
 import SightingPost from "@pages/user/create/SightingPost";
+import ShelterMessagesPage from "@pages/shelter/ShelterMessagesPage";
+import UserMessagesPage from "@pages/user/UserMessagesPage";
 
 const App: React.FC = () => {
   return (
@@ -159,6 +161,14 @@ const AppContent: React.FC = () => {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/user/messages"
+              element={
+                <ProtectedRoute allowedRoles={["User"]}>
+                  <UserMessagesPage />
+                </ProtectedRoute>
+              }
+            />
             {/* SHELTER PROTECTED */}
             <Route
               path="/shelter"
@@ -181,6 +191,14 @@ const AppContent: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={["Shelter"]}>
                   <ShelterAnimalPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/shelter/messages"
+              element={
+                <ProtectedRoute allowedRoles={["Shelter"]}>
+                  <ShelterMessagesPage />
                 </ProtectedRoute>
               }
             />
