@@ -42,6 +42,18 @@ export interface AdminProfile extends AdminBase {
  * Response returned by the backend on successful login.
  * Includes a JWT token for authentication.
  */
+
+/**
+ * Attributes required for shelter registration.
+ * Excludes 'id' and 'userType', which are set by the backend.
+ */
+export interface AdminCreationAttributes extends Omit<
+  AdminProfile,
+  "id" | "userType"
+> {
+  password: string;
+}
+
 export interface AdminLoginResponse extends AdminBase {
   token: string;
 }

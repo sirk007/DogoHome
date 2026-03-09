@@ -22,6 +22,9 @@ import {
 } from "@mui/material";
 
 import { useModalContext } from "../../context/ModalContext";
+import HeroSection from "@components/landing/HeroSection";
+import SearchBar from "@components/landing/SearchBar";
+import FeatureBox from "@components/landing/FeatureBox";
 
 const LandingPage: React.FC = () => {
   const { isLoginOpen, loginType, closeLogin, openLogin } = useModalContext();
@@ -43,148 +46,43 @@ const LandingPage: React.FC = () => {
   return (
     <>
       {/* ================= HERO SECTION ================= */}
-      <Box
-        sx={{
-          height: { xs: "50vh", md: "60vh" },
-          position: "relative",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          color: "white",
-          px: 2,
-        }}
-      >
-        {/* Top-right buttons */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: 16,
-            right: 16,
-            display: "flex",
-            gap: 1,
-            flexWrap: "wrap",
-            justifyContent: { xs: "flex-end", sm: "flex-start" },
-          }}
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => openLogin("User")}
-            size="small"
-            sx={{ flex: { xs: "1 1 48%", sm: "auto" } }}
-          >
-            Sign In
-          </Button>
-          <Button
-            variant="contained"
-            color="success"
-            component={Link}
-            to="/registration"
-            size="small"
-            sx={{ flex: { xs: "1 1 48%", sm: "auto" } }}
-          >
-            Register
-          </Button>
-        </Box>
+      <HeroSection openLogin={openLogin} />
+      <Box>{/* Main hero text */}</Box>
 
-        {/* Main hero text */}
-        <Stack
-          spacing={2}
-          maxWidth={700}
-          alignItems="center"
-          justifyContent="center"
-          height="100%"
-          textAlign="center"
-          mx="auto"
-        >
-          <Typography
-            variant="h3"
+      <Box sx={{ py: 6 }}>
+        <Container maxWidth="lg">
+          <Box
             sx={{
-              fontWeight: "bold",
-              lineHeight: 1.2,
-              letterSpacing: "0.02em",
-              color: "rgb(31, 2, 247)",
-              textShadow: "0 0 8px rgba(0,0,0,0.5)",
-              fontSize: { xs: "1.8rem", sm: "2.2rem", md: "3rem" },
+              display: "flex",
+              gap: 2,
+              flexWrap: "wrap",
             }}
           >
-            Helping You Find Your <br />
-            New Best Friend!
-          </Typography>
+            <FeatureBox
+              title="Find Pets & Shelters"
+              description="Browse shelters across Ireland and discover animals looking for a new home."
+            />
 
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 400,
-              lineHeight: 1.5,
-              textShadow: "0 0 6px rgba(0,0,0,0.3)",
-              fontSize: { xs: "0.9rem", sm: "1rem", md: "1.25rem" },
-            }}
-          >
-            Discover loving animals and connect with local shelters <br />
-            to find your perfect pet today.
-          </Typography>
+            <FeatureBox
+              title="Community Pet Alerts"
+              description="Report lost pets, found animals, or unusual sightings on the shared community map."
+            />
 
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 500,
-              fontStyle: "italic",
-              textShadow: "0 0 4px rgba(0,0,0,0.2)",
-              fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-            }}
-          >
-            Join our community of pet lovers!
-          </Typography>
-        </Stack>
+            <FeatureBox
+              title="Connect With Shelters"
+              description="Message shelters directly and start the adoption process from one platform."
+            />
+          </Box>
+        </Container>
       </Box>
 
       {/* ================= SEARCH BAR SECTION ================= */}
-      <Box sx={{ py: 3, px: 2, bgcolor: "background.paper", boxShadow: 1 }}>
-        <Container
-          maxWidth="lg"
-          sx={{
-            display: "flex",
-            gap: 2,
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          <FormControl sx={{ minWidth: { xs: "100%", sm: 150 } }}>
-            <InputLabel>County</InputLabel>
-            <Select defaultValue="">
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="Kildare">Kildare</MenuItem>
-              <MenuItem value="Dublin">Dublin</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl sx={{ minWidth: { xs: "100%", sm: 120 } }}>
-            <InputLabel>Radius</InputLabel>
-            <Select defaultValue="">
-              <MenuItem value={5}>5 km</MenuItem>
-              <MenuItem value={10}>10 km</MenuItem>
-              <MenuItem value={25}>25 km</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl sx={{ minWidth: { xs: "100%", sm: 150 } }}>
-            <InputLabel>Animal Type</InputLabel>
-            <Select defaultValue="">
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="Dog">Dog</MenuItem>
-              <MenuItem value="Cat">Cat</MenuItem>
-              <MenuItem value="Other">Other</MenuItem>
-            </Select>
-          </FormControl>
-
-          <Button
-            variant="contained"
-            sx={{ minWidth: { xs: "100%", sm: 120 } }}
-          >
-            Search
-          </Button>
-        </Container>
-      </Box>
+      <SearchBar
+        onSearch={(filters) => {
+          console.log("Search with filters:", filters);
+          // Implement search functionality here
+        }}
+      />
 
       {/* ================= FEATURED SHELTERS ================= */}
       <Box sx={{ py: 6 }}>

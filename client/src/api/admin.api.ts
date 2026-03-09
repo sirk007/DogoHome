@@ -15,6 +15,8 @@
  * ==============================
  */
 
+import type { AdminCreationAttributes } from "@models/admin.types";
+import type { AdminLoginResponse } from "@models/admin.types";
 import axios from "axios";
 
 /**
@@ -47,6 +49,28 @@ const API = axios.create({ baseURL: "http://localhost:3002/api/admins" });
  */
 export const loginAdmin = (username: string, password: string) =>
   API.post("/login", { username, password });
+
+/**
+ * ============================================
+ * registerAdmin
+ * --------------------------------------------
+ * Register a new admin account.
+ *
+ * Parameters:
+ * - adminData: AdminCreationAttributes
+ *
+ * Returns:
+ * - Promise<AdminLoginResponse> -> token + newly created admin
+ *
+ * Notes:
+ * - Handles front-end registration forms
+ * - Validation errors propagate as Axios errors
+ * ============================================
+ */
+export const registerAdmin = (
+  adminData: AdminCreationAttributes,
+): Promise<AdminLoginResponse> =>
+  API.post("/register", adminData).then((res) => res.data);
 
 /**
  * ============================================
