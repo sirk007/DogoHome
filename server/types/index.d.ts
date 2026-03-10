@@ -51,6 +51,16 @@ declare global {
         username: string;
         userType: string;
       };
+      /**
+       * Populated when a SuperAdmin account is authenticated.
+       * Used for elevated privileges and protected super admin routes.
+       */
+      superAdmin?: {
+        id: number;
+        username: string;
+        email: string;
+        userType: string;
+      };
     }
   }
 }
