@@ -11,6 +11,7 @@ import Animals from "./Animal.model";
 import Admin from "./Admin.model";
 import Shelter from "./Shelter.model";
 import Message from "./Messages.model";
+import SuperAdmin from "./Super.Admin.model";
 
 const db: any = {};
 
@@ -26,6 +27,7 @@ db.Animals = Animals(sequelize);
 db.Admin = Admin(sequelize);
 db.Shelter = Shelter(sequelize);
 db.Message = Message(sequelize);
+db.SuperAdmin = SuperAdmin(sequelize);
 
 // ----------------------------------------------
 // Set up associations
