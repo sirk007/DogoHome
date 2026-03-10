@@ -54,7 +54,7 @@ const nearbyShelters = [
 
 const UserFindDog: React.FC = () => {
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth={false} sx={{ py: 4 }}>
       {/* ================= HEADER ================= */}
       <Box mb={4}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>

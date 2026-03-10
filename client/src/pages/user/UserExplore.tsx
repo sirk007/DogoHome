@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Button,
+  Card,
+  CardContent,
+  Stack,
+  Autocomplete,
+  TextField,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import type { ShelterProfile } from "../../types/shelter.types";
@@ -21,86 +22,91 @@ const UserExplore: React.FC = () => {
   // Fetch shelters whenever county changes
   useEffect(() => {
     if (!county) return;
-    // We assume your backend uses numeric IDs; adjust if necessary
     const countyIndex = IrishCounties.indexOf(county) + 1;
     fetchPublicShelters(countyIndex).then(setShelters);
   }, [county]);
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", width: "100%" }}>
-      {/* Left: Filters + Shelters List */}
+    <Box sx={{ width: "100%", minHeight: "100vh", p: { xs: 2, md: 4 } }}>
+      <Typography variant="h4" mb={3} textAlign="center">
+        Explore Shelters
+      </Typography>
+
       <Box
         sx={{
-          width: "50%",
-          p: 3,
-          overflowY: "auto",
-          bgcolor: "rgba(0,0,0,0.05)",
-        }}
-      >
-        <Typography variant="h5" gutterBottom>
-          Filter Shelters
-        </Typography>
-
-        {/* County Filter */}
-        <FormControl fullWidth margin="normal">
-          <InputLabel>County</InputLabel>
-          <Select
-            value={county}
-            onChange={(e) => setCounty(e.target.value as IrishCounty)}
-            label="County"
-          >
-            {IrishCounties.map((c) => (
-              <MenuItem key={c} value={c}>
-                {c}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Shelter List */}
-        <Box sx={{ mt: 3 }}>
-          {shelters.length === 0 && county && (
-            <Typography>No shelters found in this county.</Typography>
-          )}
-
-          {shelters.map((s) => (
-            <Box
-              key={s.id}
-              sx={{
-                p: 2,
-                mb: 2,
-                border: "1px solid gray",
-                borderRadius: 1,
-              }}
-            >
-              <Typography fontWeight="bold">{s.shelterName}</Typography>
-              {s.phoneNumber && <Typography>📞 {s.phoneNumber}</Typography>}
-              <Button
-                variant="contained"
-                sx={{ mt: 1 }}
-                onClick={() => navigate(`/user/shelter/${s.id}`)}
-              >
-                Access
-              </Button>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-      {/* Right: Map placeholder */}
-      <Box
-        sx={{
-          width: "50%",
-          borderRight: 1,
-          borderColor: "divider",
-          bgcolor: "rgba(0,0,0,0.05)",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 3,
         }}
       >
-        <Typography variant="h6" color="textSecondary">
-          Map Placeholder
-        </Typography>
+        {/* LEFT: Filters + Shelter List */}
+        <Box
+          sx={{
+            flex: { xs: "1 1 100%", md: "0 0 45%" },
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            maxHeight: { md: "80vh" },
+            overflowY: "auto",
+          }}
+        >
+          {/* COUNTY FILTER (searchable) */}
+          <Autocomplete<IrishCounty>
+            value={county || null}
+            onChange={(event, newValue) => setCounty(newValue || "")}
+            options={IrishCounties}
+            fullWidth
+            clearOnEscape
+            autoHighlight
+            renderInput={(params) => <TextField {...params} label="County" />}
+          />
+
+          {/* SHELTER LIST */}
+          <Stack spacing={2}>
+            {shelters.length === 0 && county && (
+              <Typography>No shelters found in this county.</Typography>
+            )}
+
+            {shelters.map((s) => (
+              <Card key={s.id} variant="outlined" sx={{ borderRadius: 2 }}>
+                <CardContent>
+                  <Typography variant="h6">{s.shelterName}</Typography>
+                  {s.phoneNumber && (
+                    <Typography variant="body2" color="text.secondary">
+                      📞 {s.phoneNumber}
+                    </Typography>
+                  )}
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ mt: 1 }}
+                    onClick={() => navigate(`/user/shelter/${s.id}`)}
+                  >
+                    Access
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </Stack>
+        </Box>
+
+        {/* RIGHT: Map */}
+        <Box
+          sx={{
+            flex: { xs: "1 1 100%", md: "1 1 55%" },
+            minHeight: 300,
+            bgcolor: "rgba(0,0,0,0.05)",
+            borderRadius: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: 1,
+          }}
+        >
+          <Typography variant="h6" color="text.secondary">
+            Map Placeholder
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );

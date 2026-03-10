@@ -44,7 +44,7 @@ export interface AdminProfile extends AdminBase {
  */
 
 /**
- * Attributes required for shelter registration.
+ * Attributes required for admin registration.
  * Excludes 'id' and 'userType', which are set by the backend.
  */
 export interface AdminCreationAttributes extends Omit<
