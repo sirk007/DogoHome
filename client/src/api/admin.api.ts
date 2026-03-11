@@ -33,10 +33,10 @@ const API = axios.create({ baseURL: "http://localhost:3002/api/admins" });
  * ============================================
  * loginAdmin
  * --------------------------------------------
- * Authenticate an admin with username & password.
+ * Authenticate an admin with email & password.
  *
  * Parameters:
- * - username: string
+ * - email: string
  * - password: string
  *
  * Returns:
@@ -47,8 +47,8 @@ const API = axios.create({ baseURL: "http://localhost:3002/api/admins" });
  * - Centralized for admin login forms/hooks
  * ============================================
  */
-export const loginAdmin = (username: string, password: string) =>
-  API.post("/login", { username, password });
+export const loginAdmin = (email: string, password: string) =>
+  API.post("/login", { email, password });
 
 /**
  * ============================================
