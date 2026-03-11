@@ -21,6 +21,7 @@
 export interface AdminBase {
   id: number;
   username: string;
+  email: string;
   userType: "Admin";
 }
 
@@ -28,20 +29,8 @@ export interface AdminBase {
  * Full Admin profile with extended fields
  */
 export interface AdminProfile extends AdminBase {
-  email: string;
   age?: number;
 }
-
-/**
- * TODO: Define AdminCreationAttributes for registration.
- * Should extend AdminProfile and include password,
- * omitting fields handled by the backend (id, userType).
- */
-
-/**
- * Response returned by the backend on successful login.
- * Includes a JWT token for authentication.
- */
 
 /**
  * Attributes required for admin registration.
@@ -54,6 +43,10 @@ export interface AdminCreationAttributes extends Omit<
   password: string;
 }
 
+/**
+ * Response returned by the backend on successful login.
+ * Includes a JWT token for authentication.
+ */
 export interface AdminLoginResponse extends AdminBase {
   token: string;
 }

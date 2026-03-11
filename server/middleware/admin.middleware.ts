@@ -9,6 +9,7 @@ export interface AdminAuthRequest extends Request {
   admin?: {
     id: number; // Admin ID from JWT
     username: string; // Admin username
+    email: string; // Admin email
     userType: string; // Admin type/role (e.g., "Admin")
   };
 }
@@ -31,7 +32,7 @@ const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || "defaultAdminSecret";
 export const validateAdminToken = (
   req: AdminAuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // Get JWT from request headers
   const accessToken = req.header("adminAccessToken");
@@ -49,6 +50,7 @@ export const validateAdminToken = (
     const validToken = verify(accessToken, ADMIN_JWT_SECRET) as {
       id: number;
       username: string;
+      email: string;
       userType: string;
     };
 

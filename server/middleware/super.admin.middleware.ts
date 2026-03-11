@@ -9,6 +9,7 @@ export interface SuperAdminAuthRequest extends Request {
   superAdmin?: {
     id: number; // Super Admin ID from JWT
     username: string; // Super Admin username
+    email: string; // Super Admin email
     userType: string; // Super Admin type/role (e.g., "SuperAdmin")
   };
 }
@@ -50,6 +51,7 @@ export const validateSuperAdminToken = (
     const validToken = verify(accessToken, SUPER_ADMIN_JWT_SECRET) as {
       id: number;
       username: string;
+      email: string;
       userType: string;
     };
 

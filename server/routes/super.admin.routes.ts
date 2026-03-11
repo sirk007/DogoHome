@@ -73,6 +73,11 @@ router.post("/", async (req: Request, res: Response) => {
     if (typeof age !== "number" || age < 18 || age > 120) {
       return res.status(400).json({ error: "Invalid age" });
     }
+
+    const existingSuperAdmin = await SuperAdmin.findOne({ where: { email } });
+    if (existingSuperAdmin) {
+      return res.status(409).json({ error: "Email already in use" });
+    }
     // Hash the password with bcrypt before saving
     // Salt rounds = 10 (moderate security, reasonable speed)
     const hash = await bcrypt.hash(password, 10);

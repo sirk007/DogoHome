@@ -42,6 +42,7 @@ const JWT_SECRET = process.env.ADMIN_JWT_SECRET || "fallbackSecret";
 interface AdminLoginResponse {
   id: number;
   username: string;
+  email: string;
   userType: "Admin";
   token: string; // JWT
 }
@@ -75,6 +76,13 @@ router.post("/", async (req: Request, res: Response) => {
     if (typeof age !== "number" || age < 18 || age > 120) {
       return res.status(400).json({ error: "Invalid age" });
     }
+
+    // Check if email already exists
+    const existingAdmin = await Admin.findOne({ where: { email } });
+    if (existingAdmin) {
+      return res.status(409).json({ error: "Email already in use" });
+    }
+
     // Hash the password with bcrypt before saving
     // Salt rounds = 10 (moderate security, reasonable speed)
     const hash = await bcrypt.hash(password, 10);
@@ -105,10 +113,10 @@ router.post("/", async (req: Request, res: Response) => {
 // Middleware: None
 // Description: Authenticates an admin and returns a JWT token
 router.post("/login", async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
-    // Search for Admin by username in the database
-    const admin = await Admin.findOne({ where: { username } });
+    // Search for Admin by email in the database
+    const admin = await Admin.findOne({ where: { email } });
     if (!admin) return res.status(404).json({ error: "Admin not found" });
 
     // Compare submitted password with stored hashed password
@@ -116,11 +124,11 @@ router.post("/login", async (req: Request, res: Response) => {
     if (!match) return res.status(401).json({ error: "Incorrect password" });
 
     // Destructure Admin info for JWT payload
-    const { id, userType } = admin;
+    const { id, username, userType } = admin;
 
-    // Sign a JWT token that encodes id, username, and userType
+    // Sign a JWT token that encodes id, email, and userType
     // Token expires in 1 hour
-    const accessAdminToken = sign({ id, username, userType }, JWT_SECRET, {
+    const accessAdminToken = sign({ id, email, userType }, JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -128,6 +136,7 @@ router.post("/login", async (req: Request, res: Response) => {
     const loginResponse: AdminLoginResponse = {
       id,
       username,
+      email,
       userType,
       token: accessAdminToken,
     };
