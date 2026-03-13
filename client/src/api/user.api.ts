@@ -52,10 +52,10 @@ const API = axios.create({ baseURL: "http://localhost:3002/api/users" });
  */
 
 export const loginUser = (
-  username: string,
+  email: string,
   password: string,
 ): Promise<UserLoginResponse> =>
-  API.post("/login", { username, password }).then((res) => res.data);
+  API.post("/login", { email, password }).then((res) => res.data);
 
 /**
  * ============================================

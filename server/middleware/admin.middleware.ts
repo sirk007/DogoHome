@@ -8,7 +8,6 @@ import { verify } from "jsonwebtoken";
 export interface AdminAuthRequest extends Request {
   admin?: {
     id: number; // Admin ID from JWT
-    username: string; // Admin username
     email: string; // Admin email
     userType: string; // Admin type/role (e.g., "Admin")
   };
@@ -49,7 +48,6 @@ export const validateAdminToken = (
     // If valid, decode payload and attach to req.admin
     const validToken = verify(accessToken, ADMIN_JWT_SECRET) as {
       id: number;
-      username: string;
       email: string;
       userType: string;
     };

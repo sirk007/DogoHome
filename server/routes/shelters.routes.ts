@@ -47,7 +47,7 @@ const PHONE_REGEX = /^[0-9+\-\s()]{7,20}$/;
 // Backend type for login response
 interface ShelterLoginResponse {
   id: number;
-  username: string;
+  email: string;
   userType: "Shelter";
   token: string; // JWT
 }
@@ -111,6 +111,11 @@ router.post("/register", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid phone number" });
     }
 
+    const existingShelter = await Shelter.findOne({ where: { email } });
+    if (existingShelter) {
+      return res.status(409).json({ error: "Email already in use" });
+    }
+
     // Hash the password with bcrypt before saving
     // Salt rounds = 10 (moderate security, reasonable speed)
     const hash = await bcrypt.hash(password, 10);
@@ -144,10 +149,10 @@ router.post("/register", async (req: Request, res: Response) => {
 // Middleware: None
 // Description: Authenticates a shelter and returns JWT
 router.post("/login", async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
     // Search for Shelter by username in the database
-    const shelter = await Shelter.findOne({ where: { username } });
+    const shelter = await Shelter.findOne({ where: { email } });
     if (!shelter) return res.status(404).json({ error: "Shelter not found" });
 
     // Compare submitted password with stored hashed password
@@ -155,22 +160,18 @@ router.post("/login", async (req: Request, res: Response) => {
     if (!match) return res.status(401).json({ error: "Incorrect password" });
 
     // Destructure shelter info for JWT payload
-    const { id, username: uname, userType } = shelter.get();
+    const { id, userType } = shelter.get();
 
     // Sign a JWT token that encodes id, username, and userType
     // Token expires in 1 hour
-    const accessShelterToken = sign(
-      { id, username: uname, userType },
-      JWT_SECRET,
-      {
-        expiresIn: "1h",
-      },
-    );
+    const accessShelterToken = sign({ id, email, userType }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     //Build response object
     const loginResponse: ShelterLoginResponse = {
       id,
-      username,
+      email,
       userType,
       token: accessShelterToken,
     };

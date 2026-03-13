@@ -76,6 +76,7 @@ export const useAuth = () => {
   // -----------------------------
   const [authState, setAuthState] = useState<AuthState>({
     username: "", // username of authenticated user
+    email: "",
     id: 0, // database ID of user
     userType: "", // role: User, Admin, Shelter
     status: false, // whether user is logged in
@@ -117,7 +118,13 @@ export const useAuth = () => {
       // 2. No valid token found
       // -----------------------------
       if (!tokenEntry) {
-        setAuthState({ username: "", id: 0, userType: "", status: false });
+        setAuthState({
+          username: "",
+          email: "",
+          id: 0,
+          userType: "",
+          status: false,
+        });
         setLoading(false);
         return;
       }
@@ -138,9 +145,10 @@ export const useAuth = () => {
         // -----------------------------
         // 4. Update auth state with verified data
         // -----------------------------
-        const { id, username, userType } = response.data;
+        const { id, username, email, userType } = response.data;
         setAuthState({
           username,
+          email,
           id,
           userType: isValidUserRole(userType) ? userType : "",
           status: true,
@@ -149,7 +157,13 @@ export const useAuth = () => {
       } catch {
         // Network or unexpected error -> treat as unauthenticated
         sessionStorage.removeItem(key);
-        setAuthState({ username: "", id: 0, userType: "", status: false });
+        setAuthState({
+          username: "",
+          email: "",
+          id: 0,
+          userType: "",
+          status: false,
+        });
       } finally {
         setLoading(false); // auth check complete
       }
@@ -164,7 +178,13 @@ export const useAuth = () => {
   // Clears all stored tokens and resets auth state
   const logout = () => {
     Object.values(TOKEN_KEYS).forEach((key) => sessionStorage.removeItem(key));
-    setAuthState({ username: "", id: 0, userType: "", status: false });
+    setAuthState({
+      username: "",
+      email: "",
+      id: 0,
+      userType: "",
+      status: false,
+    });
   };
 
   // -----------------------------

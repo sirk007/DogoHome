@@ -46,8 +46,8 @@ const API = axios.create({
  * - Use in login forms/hooks for users
  * ============================================
  */
-export const loginUser = (username: string, password: string) =>
-  API.post("/users/login", { username, password });
+export const loginUser = (email: string, password: string) =>
+  API.post("/users/login", { email, password });
 
 /**
  * ============================================
@@ -67,8 +67,8 @@ export const loginUser = (username: string, password: string) =>
  * - Use in shelter login forms/hooks
  * ============================================
  */
-export const loginShelter = (username: string, password: string) =>
-  API.post("/shelters/login", { username, password });
+export const loginShelter = (email: string, password: string) =>
+  API.post("/shelters/login", { email, password });
 
 /**
  * ============================================

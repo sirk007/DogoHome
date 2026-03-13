@@ -21,6 +21,7 @@
 export interface ShelterBase {
   id: number;
   username: string;
+  email: string;
   userType: "Shelter";
 }
 
@@ -28,7 +29,6 @@ export interface ShelterBase {
  * Full Shelter profile with extended fields
  */
 export interface ShelterProfile extends ShelterBase {
-  email: string;
   shelterName: string;
   countyId: number;
   address: string;

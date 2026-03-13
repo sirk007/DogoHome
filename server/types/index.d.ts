@@ -30,7 +30,7 @@ declare global {
        */
       user?: {
         id: number;
-        username: string;
+        email: string;
         userType: string;
       };
       /**
@@ -39,7 +39,7 @@ declare global {
        */
       shelter?: {
         id: number;
-        username: string;
+        email: string;
         userType: string;
       };
       /**
@@ -48,7 +48,6 @@ declare global {
        */
       admin?: {
         id: number;
-        username: string;
         email: string;
         userType: string;
       };
@@ -58,7 +57,6 @@ declare global {
        */
       superAdmin?: {
         id: number;
-        username: string;
         email: string;
         userType: string;
       };

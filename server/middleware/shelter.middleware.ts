@@ -8,7 +8,7 @@ import { verify } from "jsonwebtoken";
 export interface ShelterAuthRequest extends Request {
   shelter?: {
     id: number; // Shelter ID from JWT
-    username: string; // Shelter username
+    email: string;
     userType: string; // Shelter type/role (e.g., "Admin", "ShelterUser")
   };
 }
@@ -32,7 +32,7 @@ const SHELTER_JWT_SECRET =
 export const validateShelterToken = (
   req: ShelterAuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // Get JWT from request headers
   const accessToken = req.header("accessShelterToken");
@@ -49,7 +49,7 @@ export const validateShelterToken = (
     // If valid, decode payload and attach to req.shelter
     const validToken = verify(accessToken, SHELTER_JWT_SECRET) as {
       id: number;
-      username: string;
+      email: string;
       userType: string;
     };
 

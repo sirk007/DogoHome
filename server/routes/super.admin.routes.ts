@@ -41,7 +41,6 @@ const JWT_SECRET = process.env.SUPER_ADMIN_JWT_SECRET || "fallbackSecret";
 // Backend type for login response
 interface SuperAdminLoginResponse {
   id: number;
-  username: string;
   email: string;
   userType: "SuperAdmin";
   token: string; // JWT
@@ -120,7 +119,7 @@ router.post("/login", async (req: Request, res: Response) => {
     if (!match) return res.status(401).json({ error: "Incorrect password" });
 
     // Destructure SuperAdmin info for JWT payload
-    const { id, username, userType } = superAdmin;
+    const { id, userType } = superAdmin;
 
     // Sign a JWT token that encodes id, email, and userType
     // Token expires in 1 hour
@@ -131,7 +130,6 @@ router.post("/login", async (req: Request, res: Response) => {
     //Build response object
     const loginResponse: SuperAdminLoginResponse = {
       id,
-      username,
       email,
       userType,
       token: accessSuperAdminToken,

@@ -51,10 +51,10 @@ const API = axios.create({ baseURL: "http://localhost:3002/api/shelters" });
  * ============================================
  */
 export const loginShelter = (
-  username: string,
+  email: string,
   password: string,
 ): Promise<ShelterLoginResponse> =>
-  API.post("/login", { username, password }).then((res) => res.data);
+  API.post("/login", { email, password }).then((res) => res.data);
 
 /**
  * ============================================

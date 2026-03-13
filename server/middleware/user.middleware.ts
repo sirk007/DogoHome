@@ -8,7 +8,7 @@ import { verify } from "jsonwebtoken";
 export interface AuthRequest extends Request {
   user?: {
     id: number; // User ID from JWT
-    username: string; // Username from JWT
+    email: string;
     userType: string; // User type/role (e.g., "Admin", "User")
   };
 }
@@ -31,7 +31,7 @@ const USER_JWT_SECRET = process.env.USER_JWT_SECRET || "defaultSecret";
 export const validateUserToken = (
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // Get JWT from request headers
   const accessToken = req.header("accessToken");
@@ -48,7 +48,7 @@ export const validateUserToken = (
     // If valid, decode payload and attach to req.user
     const validToken = verify(accessToken, USER_JWT_SECRET) as {
       id: number;
-      username: string;
+      email: string;
       userType: string;
     };
 

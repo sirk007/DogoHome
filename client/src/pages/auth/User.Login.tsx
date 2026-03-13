@@ -23,7 +23,7 @@ const LoginUser: React.FC = () => {
   // -----------------------------
   // Local state
   // -----------------------------
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -32,10 +32,9 @@ const LoginUser: React.FC = () => {
   // -----------------------------
   const handleLogin = async () => {
     try {
-      const loginResponse: UserLoginResponse = await loginUser(
-        username,
-        password,
-      );
+      console.log("Login attempt with:", { email, password });
+
+      const loginResponse: UserLoginResponse = await loginUser(email, password);
 
       // -----------------------------
       // Store token safely
@@ -49,12 +48,13 @@ const LoginUser: React.FC = () => {
       setAuthState({
         id: loginResponse.id,
         username: loginResponse.username,
+        email: loginResponse.email,
         userType: loginResponse.userType,
         status: true,
       });
 
       setError(""); // clear previous errors
-      setUsername("");
+      setEmail("");
       setPassword("");
 
       navigate("/user"); // redirect to user dashboard
@@ -69,7 +69,13 @@ const LoginUser: React.FC = () => {
   // -----------------------------
   const handleLogout = () => {
     sessionStorage.removeItem("accessToken");
-    setAuthState({ username: "", id: 0, userType: "", status: false });
+    setAuthState({
+      username: "",
+      email: "",
+      id: 0,
+      userType: "",
+      status: false,
+    });
   };
 
   // -----------------------------
@@ -82,9 +88,9 @@ const LoginUser: React.FC = () => {
       </Typography>
 
       <TextField
-        label="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        label="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         fullWidth
         sx={{ mb: 2 }}
       />

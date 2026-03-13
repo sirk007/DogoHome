@@ -48,7 +48,7 @@ const dogSizes = ["Small", "Medium", "Large"] as const;
 // Backend type for login response
 interface UserLoginResponse {
   id: number;
-  username: string;
+  email: string;
   userType: "User";
   token: string;
 }
@@ -110,6 +110,11 @@ router.post("/register", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid preferred energy level" });
     }
 
+    const existingUser = await Users.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(409).json({ error: "Email already in use" });
+    }
+
     // Hash the password with bcrypt before saving
     // Salt rounds = 10 (moderate security, reasonable speed)
     const hash = await bcrypt.hash(password, 10);
@@ -148,10 +153,10 @@ router.post("/register", async (req: Request, res: Response) => {
 // Middleware: None
 // Description: Authenticates user and returns JWT token
 router.post("/login", async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
-    // Search for user by username in the database
-    const user = await Users.findOne({ where: { username } });
+    // Search for user by email in the database
+    const user = await Users.findOne({ where: { email } });
     if (!user) return res.status(404).json({ error: "User not found" });
 
     // Compare submitted password with stored hashed password
@@ -163,14 +168,14 @@ router.post("/login", async (req: Request, res: Response) => {
 
     // Sign a JWT token that encodes id, username, and userType
     // Token expires in 1 hour
-    const accessToken = sign({ id, username, userType }, JWT_SECRET, {
+    const accessToken = sign({ id, email, userType }, JWT_SECRET, {
       expiresIn: "1h",
     });
 
     // Response with backend type
     const loginResponse: UserLoginResponse = {
       id,
-      username,
+      email,
       userType, // TS will ensure this is "User"
       token: accessToken,
     };

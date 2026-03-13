@@ -21,6 +21,7 @@
 export interface UserBase {
   id: number;
   username: string;
+  email: string;
   userType: "User";
 }
 
@@ -28,7 +29,6 @@ export interface UserBase {
  * Full User profile with extended fields
  */
 export interface UserProfile extends UserBase {
-  email: string;
   age: number;
   activityLevel: "Low" | "Medium" | "High";
   hasGarden: boolean;
