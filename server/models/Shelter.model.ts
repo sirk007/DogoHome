@@ -15,6 +15,8 @@ interface ShelterAttributes {
   address: string; // Physical address
   phoneNumber: string; // Contact phone
   userType: "Shelter"; // Role identifier, default: "Shelter"
+  status: "Unverified" | "Verified" | "Suspended";
+  verified_by_admin_id: number;
 }
 
 // ----------------------------------------------
@@ -25,7 +27,7 @@ interface ShelterAttributes {
 // ----------------------------------------------
 interface ShelterCreationAttributes extends Optional<
   ShelterAttributes,
-  "id" | "userType"
+  "id" | "userType" | "verified_by_admin_id"
 > {}
 
 // ----------------------------------------------
@@ -47,6 +49,8 @@ class Shelter
   public address!: string;
   public phoneNumber!: string;
   public userType!: "Shelter";
+  public status!: "Unverified" | "Verified" | "Suspended";
+  public verified_by_admin_id!: number;
 
   // --------------------------------------------
   // Timestamps (automatically managed)
@@ -77,7 +81,14 @@ class Shelter
       foreignKey: "shelterId",
       onDelete: "cascade",
     });
-    Shelter.belongsTo(models.County, { foreignKey: "countyId" });
+    Shelter.belongsTo(models.County, {
+      foreignKey: "countyId",
+      onDelete: "cascade",
+    });
+    Shelter.belongsTo(models.Admins, {
+      foreignKey: "verified_by_admin_id",
+      onDelete: "SET NULL",
+    });
   }
 }
 
@@ -124,6 +135,16 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.ENUM("Shelter"),
         defaultValue: "Shelter",
         allowNull: false,
+      },
+      status: {
+        type: DataTypes.ENUM("Unverified", "Verified", "Suspended"),
+        defaultValue: "Unverified",
+        allowNull: false,
+      },
+      verified_by_admin_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: "Admins", key: "id" },
       },
     },
     {

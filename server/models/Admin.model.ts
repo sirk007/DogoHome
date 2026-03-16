@@ -73,6 +73,14 @@ class Admins
   static associate(models: any) {
     Admins.hasMany(models.Posts, { onDelete: "cascade" });
     Admins.hasMany(models.County, { onDelete: "cascade" });
+    Admins.hasMany(models.Shelters, {
+      foreignKey: "verified_by_admin_id",
+      onDelete: "SET NULL",
+    });
+    Admins.belongsTo(models.SuperAdmins, {
+      foreignKey: "created_by_super_admin_id",
+      onDelete: "SET NULL",
+    });
   }
 }
 
@@ -112,7 +120,7 @@ export default (sequelize: Sequelize) => {
       },
       created_by_super_admin_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: { model: "SuperAdmins", key: "id" },
         onDelete: "CASCADE",
       },
