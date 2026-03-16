@@ -13,6 +13,7 @@ interface AdminAttributes {
   email: string; // Contact email
   age: number; // Admin age
   userType: "Admin"; // Role identifier (Admin)
+  created_by_super_admin_id: number;
 }
 
 // ----------------------------------------------
@@ -26,7 +27,7 @@ interface AdminAttributes {
 // ----------------------------------------------
 interface AdminCreationAttributes extends Optional<
   AdminAttributes,
-  "id" | "userType"
+  "id" | "userType" | "created_by_super_admin_id"
 > {}
 
 // ----------------------------------------------
@@ -48,6 +49,7 @@ class Admins
   public email!: string;
   public age!: number;
   public userType!: "Admin";
+  public created_by_super_admin_id!: number;
 
   // --------------------------------------------
   // Timestamps (managed automatically by Sequelize)
@@ -107,6 +109,12 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.ENUM("Admin"),
         allowNull: false,
         defaultValue: "Admin",
+      },
+      created_by_super_admin_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: "SuperAdmins", key: "id" },
+        onDelete: "CASCADE",
       },
     },
     {
