@@ -81,6 +81,10 @@ class Shelter
       foreignKey: "shelterId",
       onDelete: "cascade",
     });
+    Shelter.hasMany(models.ShelterStaff, {
+      foreignKey: "shelter_id",
+      onDelete: "SET NULL",
+    });
     Shelter.belongsTo(models.County, {
       foreignKey: "countyId",
       onDelete: "cascade",
