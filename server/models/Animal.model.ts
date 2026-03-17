@@ -64,8 +64,12 @@ class Animals
   // Each animal belongs to a single shelter
   // Cascade delete ensures animals are removed if shelter is deleted
   static associate(models: any) {
+    Animals.hasMany(models.AdoptionRequests, {
+      foreignKey: "animal_id",
+      onDelete: "CASCADE",
+    });
     Animals.belongsTo(models.Shelter, {
-      foreignKey: "shelterId",
+      foreignKey: "shelter_id",
       onDelete: "cascade",
     });
   }
@@ -134,7 +138,7 @@ export default (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      modelName: "Animals", // Sequelize internal model name
+      modelName: "Animal", // Sequelize internal model name
       tableName: "Animals", // Actual database table
     },
   );

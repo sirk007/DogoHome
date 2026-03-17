@@ -95,13 +95,24 @@ class Users
   // User is removed.
   // --------------------------------------------
   static associate(models: any) {
-    Users.hasMany(models.Posts, { foreignKey: "userId", onDelete: "CASCADE" });
+    Users.hasMany(models.Posts, {
+      foreignKey: "userId",
+      onDelete: "CASCADE",
+    });
     Users.hasMany(models.Comments, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-    Users.hasMany(models.Likes, { foreignKey: "userId", onDelete: "CASCADE" });
-    Users.belongsTo(models.County, { foreignKey: "countyId" });
+    Users.hasMany(models.Likes, {
+      foreignKey: "userId",
+      onDelete: "CASCADE",
+    });
+    Users.hasMany(models.AdoptionRequests, {
+      foreignKey: "user_id",
+    });
+    Users.belongsTo(models.County, {
+      foreignKey: "countyId",
+    });
   }
 }
 

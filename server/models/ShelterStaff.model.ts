@@ -74,8 +74,11 @@ class ShelterStaff
 
   static associate(models: any) {
     ShelterStaff.hasMany(models.Posts, { onDelete: "cascade" });
-    ShelterStaff.hasMany(models.County, { onDelete: "cascade" });
-    ShelterStaff.hasMany(models.Animals, {});
+    ShelterStaff.hasMany(models.Animals);
+    ShelterStaff.hasMany(models.AdoptionRequests, {
+      foreignKey: "reviewed_by_staff_id",
+      onDelete: "SET NULL",
+    });
     ShelterStaff.belongsTo(models.Shelters, {
       foreignKey: "shelter_id",
       onDelete: "SET NULL",
