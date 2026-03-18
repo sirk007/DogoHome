@@ -76,7 +76,7 @@ export default (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      modelName: "Likes", // Internal Sequelize name
+      modelName: "Like", // Internal Sequelize name
       tableName: "Likes", // DB table name
       indexes: [
         {
@@ -88,7 +88,7 @@ export default (sequelize: Sequelize) => {
           fields: ["userId", "commentId"], // prevent multiple likes by same user on same comment
         },
       ],
-    }
+    },
   );
 
   return Likes;

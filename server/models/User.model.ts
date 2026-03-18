@@ -53,7 +53,7 @@ interface UserCreationAttributes extends Optional<
 // - Provides strongly-typed access to user data
 // - Enables Sequelize ORM functionality
 // ----------------------------------------------
-class Users
+class User
   extends Model<UserAttributes, UserCreationAttributes>
   implements UserAttributes
 {
@@ -95,22 +95,22 @@ class Users
   // User is removed.
   // --------------------------------------------
   static associate(models: any) {
-    Users.hasMany(models.Posts, {
+    User.hasMany(models.Posts, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-    Users.hasMany(models.Comments, {
+    User.hasMany(models.Comments, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-    Users.hasMany(models.Likes, {
+    User.hasMany(models.Likes, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-    Users.hasMany(models.AdoptionRequests, {
-      foreignKey: "user_id",
+    User.hasMany(models.AdoptionRequests, {
+      foreignKey: "userId",
     });
-    Users.belongsTo(models.County, {
+    User.belongsTo(models.County, {
       foreignKey: "countyId",
     });
   }
@@ -123,77 +123,90 @@ class Users
 // relationships, and default values.
 // ----------------------------------------------
 export default (sequelize: Sequelize) => {
-  Users.init(
+  User.init(
     {
       username: { type: DataTypes.STRING, allowNull: false },
       password: { type: DataTypes.STRING, allowNull: false },
       email: { type: DataTypes.STRING, allowNull: false },
-
       age: { type: DataTypes.INTEGER, allowNull: false },
 
       countyId: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: { model: "Counties", key: "id" },
+        field: "county_id", // Mapping to DB == Column name
+        references: {
+          model: "Counties",
+          key: "id",
+        },
       },
 
       userType: {
         type: DataTypes.ENUM("User"),
         defaultValue: "User",
         allowNull: false,
+        field: "user_type",
       },
 
       activityLevel: {
         type: DataTypes.ENUM("Low", "Medium", "High"),
         allowNull: false,
+        field: "activity_level",
       },
 
       hasGarden: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+        field: "has_garden",
       },
 
       hasOtherPets: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+        field: "has_other_pets",
       },
 
       hasKids: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+        field: "has_kids",
       },
 
       petExperienceLevel: {
         type: DataTypes.ENUM("None", "Beginner", "Experience"),
         allowNull: false,
+        field: "pet_experience_level",
       },
 
       maxDogSize: {
         type: DataTypes.ENUM("Small", "Medium", "Large"),
         allowNull: false,
+        field: "max_dog_size",
       },
 
       preferredEnergyLevel: {
         type: DataTypes.ENUM("Low", "Medium", "High"),
         allowNull: true,
+        field: "preferred_energy_level",
       },
 
       preferredAgeRangeMin: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        field: "preferred_age_range_min",
       },
 
       preferredAgeRangeMax: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        field: "preferred_age_range_max",
       },
     },
     {
       sequelize,
-      modelName: "Users",
+      modelName: "User",
       tableName: "Users",
     },
   );
 
-  return Users;
+  return User;
 };

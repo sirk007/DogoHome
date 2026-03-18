@@ -60,7 +60,7 @@ export default (sequelize: Sequelize) => {
       sequelize,
       modelName: "County", // internal Sequelize model name
       tableName: "Counties", // table name in DB
-    }
+    },
   );
   return County;
 };

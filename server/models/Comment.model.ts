@@ -79,7 +79,7 @@ export default (sequelize: Sequelize) => {
       sequelize,
       modelName: "Comments", // Internal Sequelize name
       tableName: "Comments", // DB table name
-    }
+    },
   );
 
   return Comments;
