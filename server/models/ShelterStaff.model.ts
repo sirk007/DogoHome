@@ -51,7 +51,7 @@ class ShelterStaff
   public role!: "Manager" | "Staff";
   public userType!: "ShelterStaff";
   public status!: "Invited" | "Active" | "Disabled";
-  public inviteExpiresAt?: Date | undefined;
+  public inviteExpiresAt?: Date;
 
   // --------------------------------------------
   // Timestamps (managed automatically by Sequelize)
@@ -69,7 +69,7 @@ class ShelterStaff
   // -
   //
   // Cascade delete ensures related records
-  // are removed if an Admin is deleted.
+  //
   // --------------------------------------------
 
   static associate(models: any) {
@@ -85,9 +85,9 @@ class ShelterStaff
       foreignKey: "reviewedByStaffId",
       onDelete: "SET NULL",
     });
-    ShelterStaff.belongsTo(models.Shelters, {
+    ShelterStaff.belongsTo(models.Shelter, {
       foreignKey: "shelterId",
-      onDelete: "SET NULL",
+      onDelete: "CASCADE",
     });
   }
 }
@@ -148,7 +148,7 @@ export default (sequelize: Sequelize) => {
     {
       sequelize,
       modelName: "ShelterStaff",
-      tableName: "shelter_Staff",
+      tableName: "shelter_staff",
     },
   );
   return ShelterStaff;

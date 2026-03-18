@@ -7,13 +7,13 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // on an Admin record in the database.
 // ----------------------------------------------
 interface AdminAttributes {
-  id?: number; // Primary key (auto-generated)
+  id: number; // Primary key (auto-generated)
   username: string; // Admin login username
   password: string; // Hashed password
   email: string; // Contact email
   age: number; // Admin age
   userType: "Admin"; // Role identifier (Admin)
-  created_by_super_admin_id: number;
+  createdBySuperAdminId: number;
 }
 
 // ----------------------------------------------
@@ -27,7 +27,7 @@ interface AdminAttributes {
 // ----------------------------------------------
 interface AdminCreationAttributes extends Optional<
   AdminAttributes,
-  "id" | "userType" | "created_by_super_admin_id"
+  "id" | "userType" | "createdBySuperAdminId"
 > {}
 
 // ----------------------------------------------
@@ -39,7 +39,7 @@ interface AdminCreationAttributes extends Optional<
 // - Enables Sequelize ORM features
 // ----------------------------------------------
 
-class Admins
+class Admin
   extends Model<AdminAttributes, AdminCreationAttributes>
   implements AdminAttributes
 {
@@ -49,7 +49,7 @@ class Admins
   public email!: string;
   public age!: number;
   public userType!: "Admin";
-  public created_by_super_admin_id!: number;
+  public createdBySuperAdminId!: number;
 
   // --------------------------------------------
   // Timestamps (managed automatically by Sequelize)
@@ -71,14 +71,14 @@ class Admins
   // --------------------------------------------
 
   static associate(models: any) {
-    Admins.hasMany(models.Posts, { onDelete: "cascade" });
-    Admins.hasMany(models.County, { onDelete: "cascade" });
-    Admins.hasMany(models.Shelters, {
-      foreignKey: "verified_by_admin_id",
+    Admin.hasMany(models.Posts, { onDelete: "cascade" });
+    Admin.hasMany(models.County, { onDelete: "cascade" });
+    Admin.hasMany(models.Shelters, {
+      foreignKey: "verifiedByAdminId",
       onDelete: "SET NULL",
     });
-    Admins.belongsTo(models.SuperAdmins, {
-      foreignKey: "created_by_super_admin_id",
+    Admin.belongsTo(models.SuperAdmins, {
+      foreignKey: "createdBySuperAdminId",
       onDelete: "SET NULL",
     });
   }
@@ -93,8 +93,13 @@ class Admins
 // - Registers the model with Sequelize
 // ----------------------------------------------
 export default (sequelize: Sequelize) => {
-  Admins.init(
+  Admin.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -117,10 +122,12 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.ENUM("Admin"),
         allowNull: false,
         defaultValue: "Admin",
+        field: "user_type",
       },
-      created_by_super_admin_id: {
+      createdBySuperAdminId: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        field: "created_by_super_admin_id",
         references: { model: "SuperAdmins", key: "id" },
         onDelete: "CASCADE",
       },
@@ -128,8 +135,8 @@ export default (sequelize: Sequelize) => {
     {
       sequelize,
       modelName: "Admin", // Sequelize internal model name
-      tableName: "Admins", // Actual database table name
+      tableName: "admins", // Actual database table name
     },
   );
-  return Admins;
+  return Admin;
 };
