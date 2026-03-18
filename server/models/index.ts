@@ -11,7 +11,7 @@ import Animals from "./Animal.model";
 import Admin from "./Admin.model";
 import Shelter from "./Shelter.model";
 import Message from "./Messages.model";
-import SuperAdmin from "./Super.Admin.model";
+import SuperAdmin from "./SuperAdmin.model";
 
 const db: any = {};
 
