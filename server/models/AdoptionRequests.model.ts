@@ -8,12 +8,12 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // ----------------------------------------------
 
 interface AdoptionRequestAttributes {
-  id?: number; // Primary key (auto-generated)
-  user_id: number; //
-  animal_id: number; //
+  id: number; // Primary key (auto-generated)
+  userId: number; //
+  animalId: number; //
   status: "Pending" | "Approved" | "Rejected" | "Cancelled";
   reviewedByStaffId?: number;
-  reviewed_at?: Date;
+  reviewedAt?: Date;
 }
 
 // ----------------------------------------------
@@ -27,7 +27,7 @@ interface AdoptionRequestAttributes {
 
 interface AdoptionRequestCreationAttributes extends Optional<
   AdoptionRequestAttributes,
-  "id" | "status" | "reviewedByStaffId" | "reviewed_at"
+  "id" | "status" | "reviewedByStaffId" | "reviewedAt"
 > {}
 
 // ----------------------------------------------
@@ -44,11 +44,11 @@ class AdoptionRequest
   implements AdoptionRequestAttributes
 {
   public id!: number;
-  public user_id!: number;
-  public animal_id!: number;
+  public userId!: number;
+  public animalId!: number;
   public status!: "Pending" | "Approved" | "Rejected" | "Cancelled";
   public reviewedByStaffId?: number;
-  public reviewed_at?: Date | undefined;
+  public reviewedAt?: Date;
 
   // --------------------------------------------
   // Timestamps (managed automatically by Sequelize)
@@ -71,14 +71,14 @@ class AdoptionRequest
 
   static associate(models: any) {
     // Each adoption request belongs to ONE user
-    AdoptionRequest.belongsTo(models.Users, {
+    AdoptionRequest.belongsTo(models.User, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
 
     // Each adoption request belongs to ONE animal
-    AdoptionRequest.belongsTo(models.Animals, {
-      foreignKey: "animal_id",
+    AdoptionRequest.belongsTo(models.Animal, {
+      foreignKey: "animalId",
       onDelete: "CASCADE",
     });
 
@@ -100,17 +100,26 @@ class AdoptionRequest
 export default (sequelize: Sequelize) => {
   AdoptionRequest.init(
     {
-      user_id: {
+      id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        references: { model: "Users", key: "id" },
-        onDelete: "CASCADE",
+        autoIncrement: true,
+        primaryKey: true,
       },
-      animal_id: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: "Animals", key: "id" },
+        field: "user_id",
+        references: { model: "User", key: "id" },
         onDelete: "CASCADE",
+        onUpdate: "CASCADE",
+      },
+      animalId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: "animal_id",
+        references: { model: "Animal", key: "id" },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       status: {
         type: DataTypes.ENUM("Pending", "Approved", "Rejected", "Cancelled"),
@@ -120,18 +129,20 @@ export default (sequelize: Sequelize) => {
       reviewedByStaffId: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: { model: "Shelter_Staff", key: "id" },
+        field: "reviewed_by_staff_id",
+        references: { model: "ShelterStaff", key: "id" },
         onDelete: "SET NULL",
       },
-      reviewed_at: {
+      reviewedAt: {
         type: DataTypes.DATE,
         allowNull: true,
+        field: "reviewed_at",
       },
     },
     {
       sequelize,
       modelName: "AdoptionRequest", // Sequelize internal model name
-      tableName: "Adoption_Request", // Actual database table name
+      tableName: "adoption_requests", // Actual database table name
     },
   );
   return AdoptionRequest;
