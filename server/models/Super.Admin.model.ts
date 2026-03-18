@@ -7,7 +7,7 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // on a Super Admin record in the database.
 // ----------------------------------------------
 interface SuperAdminAttributes {
-  id?: number; // Primary key (auto-generated)
+  id: number; // Primary key (auto-generated)
   username: string; // Super Admin login username
   password: string; // Hashed password
   email: string; // Contact email
@@ -38,7 +38,7 @@ interface SuperAdminCreationAttributes extends Optional<
 // - Enables Sequelize ORM features
 // ----------------------------------------------
 
-class SuperAdmins
+class SuperAdmin
   extends Model<SuperAdminAttributes, SuperAdminCreationAttributes>
   implements SuperAdminAttributes
 {
@@ -69,9 +69,9 @@ class SuperAdmins
   // --------------------------------------------
 
   static associate(models: any) {
-    SuperAdmins.hasMany(models.Posts, { onDelete: "cascade" });
-    SuperAdmins.hasMany(models.County, { onDelete: "cascade" });
-    SuperAdmins.hasMany(models.Admins, { onDelete: "SET NULL" });
+    SuperAdmin.hasMany(models.Posts, { onDelete: "cascade" });
+    SuperAdmin.hasMany(models.County, { onDelete: "cascade" });
+    SuperAdmin.hasMany(models.Admins, { onDelete: "SET NULL" });
   }
 }
 
@@ -84,8 +84,13 @@ class SuperAdmins
 // - Registers the model with Sequelize
 // ----------------------------------------------
 export default (sequelize: Sequelize) => {
-  SuperAdmins.init(
+  SuperAdmin.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -107,14 +112,15 @@ export default (sequelize: Sequelize) => {
       userType: {
         type: DataTypes.ENUM("SuperAdmin"),
         allowNull: false,
+        field: "user_type",
         defaultValue: "SuperAdmin",
       },
     },
     {
       sequelize,
       modelName: "SuperAdmin", // Sequelize internal model name
-      tableName: "SuperAdmins", // Actual database table name
+      tableName: "super_admins", // Actual database table name
     },
   );
-  return SuperAdmins;
+  return SuperAdmin;
 };
