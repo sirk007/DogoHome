@@ -7,14 +7,14 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // on a ShelterStaff record in the database.
 // ----------------------------------------------
 interface ShelterStaffAttributes {
-  id?: number; // Primary key (auto-generated)
-  shelter_id: number; // FK to Shelters table
+  id: number; // Primary key (auto-generated)
+  shelterId: number; // FK to Shelters table
   email: string; // Login/email
   password: string; // Hashed password
   role: "Manager" | "Staff"; // Staff role
   userType: "ShelterStaff"; // Role identifier (Shelter Staff)
   status: "Invited" | "Active" | "Disabled"; // Account status
-  invite_expires_at?: Date; //Expiration of invitation
+  inviteExpiresAt?: Date; //Expiration of invitation
 }
 
 // ----------------------------------------------
@@ -45,13 +45,13 @@ class ShelterStaff
   implements ShelterStaffAttributes
 {
   public id!: number;
-  public shelter_id!: number;
+  public shelterId!: number;
   public email!: string;
   public password!: string;
   public role!: "Manager" | "Staff";
   public userType!: "ShelterStaff";
   public status!: "Invited" | "Active" | "Disabled";
-  public invite_expires_at?: Date | undefined;
+  public inviteExpiresAt?: Date | undefined;
 
   // --------------------------------------------
   // Timestamps (managed automatically by Sequelize)
@@ -73,14 +73,20 @@ class ShelterStaff
   // --------------------------------------------
 
   static associate(models: any) {
-    ShelterStaff.hasMany(models.Posts, { onDelete: "cascade" });
-    ShelterStaff.hasMany(models.Animals);
+    ShelterStaff.hasMany(models.Posts, {
+      foreignKey: "shelterStaffId",
+      onDelete: "CASCADE",
+    });
+    ShelterStaff.hasMany(models.Animals, {
+      foreignKey: "shelterStaffId",
+      onDelete: "CASCADE",
+    });
     ShelterStaff.hasMany(models.AdoptionRequests, {
-      foreignKey: "reviewed_by_staff_id",
+      foreignKey: "reviewedByStaffId",
       onDelete: "SET NULL",
     });
     ShelterStaff.belongsTo(models.Shelters, {
-      foreignKey: "shelter_id",
+      foreignKey: "shelterId",
       onDelete: "SET NULL",
     });
   }
@@ -97,10 +103,16 @@ class ShelterStaff
 export default (sequelize: Sequelize) => {
   ShelterStaff.init(
     {
-      shelter_id: {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      shelterId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: { model: "Shelters", key: "id" },
+        field: "shelter_id",
       },
       email: {
         type: DataTypes.STRING,
@@ -119,22 +131,24 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.ENUM("ShelterStaff"),
         allowNull: false,
         defaultValue: "ShelterStaff",
+        field: "user_type",
       },
       status: {
         type: DataTypes.ENUM("Invited", "Active", "Disabled"),
         allowNull: false,
         defaultValue: "Invited",
       },
-      invite_expires_at: {
+      inviteExpiresAt: {
         type: DataTypes.DATE,
         allowNull: true,
+        field: "invite_expires_at",
         defaultValue: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       },
     },
     {
       sequelize,
       modelName: "ShelterStaff",
-      tableName: "Shelter_Staff",
+      tableName: "shelter_Staff",
     },
   );
   return ShelterStaff;
