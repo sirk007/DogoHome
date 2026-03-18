@@ -6,7 +6,7 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // Represents a user post in the system (text + optional image)
 // ----------------------------------------------
 interface PostAttributes {
-  id?: number; // Primary key (auto-generated)
+  id: number; // Primary key (auto-generated)
   title: string; // Post title
   postText: string; // Main post content
   picture?: string | null; // Optional picture (URL or base64 string)
@@ -30,7 +30,7 @@ interface PostCreationAttributes extends Optional<
 // ----------------------------------------------
 // Posts Model Class
 // ----------------------------------------------
-class Posts
+class Post
   extends Model<PostAttributes, PostCreationAttributes>
   implements PostAttributes
 {
@@ -57,12 +57,12 @@ class Posts
   // Each post can have many comments and likes
   // Cascade deletes remove related comments & likes when post is deleted
   static associate(models: any) {
-    Posts.belongsTo(models.Users, { foreignKey: "userId" });
-    Posts.hasMany(models.Comments, {
+    Post.belongsTo(models.User, { foreignKey: "userId" });
+    Post.hasMany(models.Comments, {
       foreignKey: "postId",
       onDelete: "CASCADE",
     });
-    Posts.hasMany(models.Likes, { foreignKey: "postId", onDelete: "CASCADE" });
+    Post.hasMany(models.Likes, { foreignKey: "postId", onDelete: "CASCADE" });
   }
 }
 
@@ -70,8 +70,13 @@ class Posts
 // Model Initializer
 // ----------------------------------------------
 export default (sequelize: Sequelize) => {
-  Posts.init(
+  Post.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       title: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -79,12 +84,15 @@ export default (sequelize: Sequelize) => {
       postText: {
         type: DataTypes.STRING,
         allowNull: false,
+        field: "post_text",
       },
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "user_id",
         references: { model: "Users", key: "id" },
         onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
       picture: {
         type: DataTypes.STRING,
@@ -105,10 +113,10 @@ export default (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      modelName: "Posts",
-      tableName: "Posts",
+      modelName: "Post",
+      tableName: "posts",
     },
   );
 
-  return Posts;
+  return Post;
 };

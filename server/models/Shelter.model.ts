@@ -77,7 +77,7 @@ class Shelter
       foreignKey: "shelterId",
       onDelete: "CASCADE",
     });
-    Shelter.hasMany(models.Animals, {
+    Shelter.hasMany(models.Animal, {
       foreignKey: "shelterId",
       onDelete: "CASCADE",
     });
@@ -89,7 +89,7 @@ class Shelter
       foreignKey: "countyId",
       onDelete: "CASCADE",
     });
-    Shelter.belongsTo(models.Admins, {
+    Shelter.belongsTo(models.Admin, {
       foreignKey: "verifiedByAdminId",
       onDelete: "SET NULL",
     });

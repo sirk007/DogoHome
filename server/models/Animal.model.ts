@@ -64,7 +64,7 @@ class Animal
   // Each animal belongs to a single shelter
   // Cascade delete ensures animals are removed if shelter is deleted
   static associate(models: any) {
-    Animal.hasMany(models.AdoptionRequests, {
+    Animal.hasMany(models.AdoptionRequest, {
       foreignKey: "animalId",
       onDelete: "CASCADE",
     });

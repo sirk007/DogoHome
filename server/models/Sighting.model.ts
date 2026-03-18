@@ -48,7 +48,7 @@ class Sighting
   // --------------------------------------------
   static associate(models: any) {
     // A sighting belongs to a user
-    Sighting.belongsTo(models.Users, { foreignKey: "userId" });
+    Sighting.belongsTo(models.User, { foreignKey: "userId" });
 
     // Optional: link to county for filtering
     Sighting.belongsTo(models.County, { foreignKey: "countyId" });

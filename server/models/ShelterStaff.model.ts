@@ -73,15 +73,15 @@ class ShelterStaff
   // --------------------------------------------
 
   static associate(models: any) {
-    ShelterStaff.hasMany(models.Posts, {
+    ShelterStaff.hasMany(models.Post, {
       foreignKey: "shelterStaffId",
       onDelete: "CASCADE",
     });
-    ShelterStaff.hasMany(models.Animals, {
+    ShelterStaff.hasMany(models.Animal, {
       foreignKey: "shelterStaffId",
       onDelete: "CASCADE",
     });
-    ShelterStaff.hasMany(models.AdoptionRequests, {
+    ShelterStaff.hasMany(models.AdoptionRequest, {
       foreignKey: "reviewedByStaffId",
       onDelete: "SET NULL",
     });
@@ -111,7 +111,7 @@ export default (sequelize: Sequelize) => {
       shelterId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: "Shelters", key: "id" },
+        references: { model: "Shelter", key: "id" },
         field: "shelter_id",
       },
       email: {

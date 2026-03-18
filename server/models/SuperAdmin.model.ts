@@ -69,9 +69,9 @@ class SuperAdmin
   // --------------------------------------------
 
   static associate(models: any) {
-    SuperAdmin.hasMany(models.Posts, { onDelete: "cascade" });
+    SuperAdmin.hasMany(models.Post, { onDelete: "cascade" });
     SuperAdmin.hasMany(models.County, { onDelete: "cascade" });
-    SuperAdmin.hasMany(models.Admins, { onDelete: "SET NULL" });
+    SuperAdmin.hasMany(models.Admin, { onDelete: "SET NULL" });
   }
 }
 

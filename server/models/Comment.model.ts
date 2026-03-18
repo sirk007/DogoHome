@@ -45,8 +45,8 @@ class Comments
   // - Each comment can have many likes
   // - Cascade deletion ensures likes are removed if a comment is deleted
   static associate(models: any) {
-    Comments.belongsTo(models.Users, { foreignKey: "userId" });
-    Comments.belongsTo(models.Posts, { foreignKey: "postId" });
+    Comments.belongsTo(models.User, { foreignKey: "userId" });
+    Comments.belongsTo(models.Post, { foreignKey: "postId" });
     Comments.hasMany(models.Likes, {
       foreignKey: "commentId",
       onDelete: "CASCADE",

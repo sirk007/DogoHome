@@ -95,7 +95,7 @@ class User
   // User is removed.
   // --------------------------------------------
   static associate(models: any) {
-    User.hasMany(models.Posts, {
+    User.hasMany(models.Post, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
@@ -107,7 +107,7 @@ class User
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-    User.hasMany(models.AdoptionRequests, {
+    User.hasMany(models.AdoptionRequest, {
       foreignKey: "userId",
     });
     User.belongsTo(models.County, {
@@ -140,7 +140,7 @@ export default (sequelize: Sequelize) => {
         allowNull: true,
         field: "county_id", // Mapping to DB == Column name
         references: {
-          model: "Counties",
+          model: "County",
           key: "id",
         },
       },
