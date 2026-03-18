@@ -12,7 +12,7 @@ interface AdoptionRequestAttributes {
   user_id: number; //
   animal_id: number; //
   status: "Pending" | "Approved" | "Rejected" | "Cancelled";
-  reviewed_by_staff_id?: number;
+  reviewedByStaffId?: number;
   reviewed_at?: Date;
 }
 
@@ -27,7 +27,7 @@ interface AdoptionRequestAttributes {
 
 interface AdoptionRequestCreationAttributes extends Optional<
   AdoptionRequestAttributes,
-  "id" | "status" | "reviewed_by_staff_id" | "reviewed_at"
+  "id" | "status" | "reviewedByStaffId" | "reviewed_at"
 > {}
 
 // ----------------------------------------------
@@ -47,7 +47,7 @@ class AdoptionRequest
   public user_id!: number;
   public animal_id!: number;
   public status!: "Pending" | "Approved" | "Rejected" | "Cancelled";
-  public reviewed_by_staff_id!: number;
+  public reviewedByStaffId?: number;
   public reviewed_at?: Date | undefined;
 
   // --------------------------------------------
@@ -72,7 +72,7 @@ class AdoptionRequest
   static associate(models: any) {
     // Each adoption request belongs to ONE user
     AdoptionRequest.belongsTo(models.Users, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       onDelete: "CASCADE",
     });
 
@@ -84,7 +84,7 @@ class AdoptionRequest
 
     // Each adoption request can be reviewed by ONE staff member
     AdoptionRequest.belongsTo(models.ShelterStaff, {
-      foreignKey: "reviewed_by_staff_id",
+      foreignKey: "reviewedByStaffId",
       onDelete: "SET NULL",
     });
   }
@@ -100,40 +100,38 @@ class AdoptionRequest
 export default (sequelize: Sequelize) => {
   AdoptionRequest.init(
     {
-      username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      age: {
+      user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: { model: "Users", key: "id" },
+        onDelete: "CASCADE",
       },
-      userType: {
-        type: DataTypes.ENUM("Admin"),
+      animal_id: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: "Admin",
+        references: { model: "Animals", key: "id" },
+        onDelete: "CASCADE",
       },
-      created_by_super_admin_id: {
+      status: {
+        type: DataTypes.ENUM("Pending", "Approved", "Rejected", "Cancelled"),
+        allowNull: false,
+        defaultValue: "Pending",
+      },
+      reviewedByStaffId: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: { model: "SuperAdmins", key: "id" },
-        onDelete: "CASCADE",
+        references: { model: "Shelter_Staff", key: "id" },
+        onDelete: "SET NULL",
+      },
+      reviewed_at: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
     },
     {
       sequelize,
-      modelName: "Admin", // Sequelize internal model name
-      tableName: "Admins", // Actual database table name
+      modelName: "AdoptionRequest", // Sequelize internal model name
+      tableName: "Adoption_Request", // Actual database table name
     },
   );
   return AdoptionRequest;

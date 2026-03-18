@@ -7,7 +7,7 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // as it exists in the database.
 // ----------------------------------------------
 interface UserAttributes {
-  id?: number;
+  id: number;
   username: string;
   password: string;
   email: string;
@@ -19,7 +19,7 @@ interface UserAttributes {
   hasGarden: boolean;
   hasOtherPets: boolean;
   hasKids: boolean;
-  petExperienceLevel: "None" | "Beginner" | "Experience";
+  petExperienceLevel: "None" | "Beginner" | "Experienced";
   maxDogSize: "Small" | "Medium" | "Large";
   preferredEnergyLevel?: "Low" | "Medium" | "High";
   preferredAgeRangeMin?: number;
@@ -68,8 +68,8 @@ class User
   public hasGarden!: boolean;
   public hasOtherPets!: boolean;
   public hasKids!: boolean;
-  public petExperienceLevel!: "None" | "Beginner" | "Experience";
-  public maxDogSize!: "Medium" | "Small" | "Large";
+  public petExperienceLevel!: "None" | "Beginner" | "Experienced";
+  public maxDogSize!: "Small" | "Medium" | "Large";
   public preferredEnergyLevel?: "Low" | "Medium" | "High";
   public preferredAgeRangeMin?: number;
   public preferredAgeRangeMax?: number;
@@ -125,6 +125,11 @@ class User
 export default (sequelize: Sequelize) => {
   User.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       username: { type: DataTypes.STRING, allowNull: false },
       password: { type: DataTypes.STRING, allowNull: false },
       email: { type: DataTypes.STRING, allowNull: false },
@@ -172,7 +177,7 @@ export default (sequelize: Sequelize) => {
       },
 
       petExperienceLevel: {
-        type: DataTypes.ENUM("None", "Beginner", "Experience"),
+        type: DataTypes.ENUM("None", "Beginner", "Experienced"),
         allowNull: false,
         field: "pet_experience_level",
       },
@@ -204,7 +209,7 @@ export default (sequelize: Sequelize) => {
     {
       sequelize,
       modelName: "User",
-      tableName: "Users",
+      tableName: "users",
     },
   );
 

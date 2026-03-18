@@ -6,7 +6,7 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // Represents the full shape of a Shelter record in the DB
 // ----------------------------------------------
 interface ShelterAttributes {
-  id?: number; // Primary key (auto-generated)
+  id: number; // Primary key (auto-generated)
   username: string; // Login username
   password: string; // Hashed password
   email: string; // Contact email
@@ -16,7 +16,7 @@ interface ShelterAttributes {
   phoneNumber: string; // Contact phone
   userType: "Shelter"; // Role identifier, default: "Shelter"
   status: "Unverified" | "Verified" | "Suspended";
-  verified_by_admin_id: number;
+  verifiedByAdminId?: number; // Optional foreign key
 }
 
 // ----------------------------------------------
@@ -27,7 +27,7 @@ interface ShelterAttributes {
 // ----------------------------------------------
 interface ShelterCreationAttributes extends Optional<
   ShelterAttributes,
-  "id" | "userType" | "verified_by_admin_id"
+  "id" | "userType" | "verifiedByAdminId"
 > {}
 
 // ----------------------------------------------
@@ -50,7 +50,7 @@ class Shelter
   public phoneNumber!: string;
   public userType!: "Shelter";
   public status!: "Unverified" | "Verified" | "Suspended";
-  public verified_by_admin_id!: number;
+  public verifiedByAdminId?: number; // Optional foreign key
 
   // --------------------------------------------
   // Timestamps (automatically managed)
@@ -71,26 +71,26 @@ class Shelter
   static associate(models: any) {
     Shelter.hasMany(models.Likes, {
       foreignKey: "shelterId",
-      onDelete: "cascade",
+      onDelete: "CASCADE",
     });
     Shelter.hasMany(models.Posts, {
       foreignKey: "shelterId",
-      onDelete: "cascade",
+      onDelete: "CASCADE",
     });
     Shelter.hasMany(models.Animals, {
       foreignKey: "shelterId",
-      onDelete: "cascade",
+      onDelete: "CASCADE",
     });
     Shelter.hasMany(models.ShelterStaff, {
-      foreignKey: "shelter_id",
+      foreignKey: "shelterId",
       onDelete: "SET NULL",
     });
     Shelter.belongsTo(models.County, {
       foreignKey: "countyId",
-      onDelete: "cascade",
+      onDelete: "CASCADE",
     });
     Shelter.belongsTo(models.Admins, {
-      foreignKey: "verified_by_admin_id",
+      foreignKey: "verifiedByAdminId",
       onDelete: "SET NULL",
     });
   }
@@ -104,6 +104,11 @@ class Shelter
 export default (sequelize: Sequelize) => {
   Shelter.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -121,11 +126,13 @@ export default (sequelize: Sequelize) => {
       shelterName: {
         type: DataTypes.STRING,
         allowNull: false,
+        field: "shelter_name",
       },
       countyId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: { model: "Counties", key: "id" },
+        field: "county_id",
       },
       address: {
         type: DataTypes.STRING,
@@ -134,27 +141,30 @@ export default (sequelize: Sequelize) => {
       phoneNumber: {
         type: DataTypes.STRING(20),
         allowNull: false,
+        field: "phone_number",
       },
       userType: {
         type: DataTypes.ENUM("Shelter"),
         defaultValue: "Shelter",
         allowNull: false,
+        field: "user_type",
       },
       status: {
         type: DataTypes.ENUM("Unverified", "Verified", "Suspended"),
         defaultValue: "Unverified",
         allowNull: false,
       },
-      verified_by_admin_id: {
+      verifiedByAdminId: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: { model: "Admins", key: "id" },
+        field: "verified_by_admin_id",
       },
     },
     {
       sequelize,
       modelName: "Shelter", // Sequelize internal model name
-      tableName: "Shelters", // Actual database table name
+      tableName: "shelters", // Actual database table name
     },
   );
   return Shelter;
