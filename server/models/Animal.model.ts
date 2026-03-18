@@ -6,7 +6,7 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // Represents the structure of a pet/animal record
 // ----------------------------------------------
 interface AnimalAttributes {
-  id?: number; // Primary-Key
+  id: number; // Primary-Key
   species: "Dog" | "Cat" | "Rabbit" | "Other"; // Controlled vocabulary
   name: string; // Name of the animal
   age: number; // Age in units defined below
@@ -34,7 +34,7 @@ interface AnimalCreationAttributes extends Optional<
 // ----------------------------------------------
 // Animal Model Class
 // ----------------------------------------------
-class Animals
+class Animal
   extends Model<AnimalAttributes, AnimalCreationAttributes>
   implements AnimalAttributes
 {
@@ -64,12 +64,12 @@ class Animals
   // Each animal belongs to a single shelter
   // Cascade delete ensures animals are removed if shelter is deleted
   static associate(models: any) {
-    Animals.hasMany(models.AdoptionRequests, {
-      foreignKey: "animal_id",
+    Animal.hasMany(models.AdoptionRequests, {
+      foreignKey: "animalId",
       onDelete: "CASCADE",
     });
-    Animals.belongsTo(models.Shelter, {
-      foreignKey: "shelter_id",
+    Animal.belongsTo(models.Shelter, {
+      foreignKey: "shelterId",
       onDelete: "cascade",
     });
   }
@@ -79,8 +79,13 @@ class Animals
 // Model Initializer
 // ----------------------------------------------
 export default (sequelize: Sequelize) => {
-  Animals.init(
+  Animal.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       species: {
         type: DataTypes.ENUM("Dog", "Cat", "Rabbit", "Other"),
         allowNull: false,
@@ -97,6 +102,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.ENUM("Months", "Years"),
         defaultValue: "Years",
         allowNull: false,
+        field: "age_unit",
       },
       health: {
         type: DataTypes.ENUM("Good", "Needs Medication", "Critical"),
@@ -109,16 +115,19 @@ export default (sequelize: Sequelize) => {
       activityLevel: {
         type: DataTypes.ENUM("Low", "Medium", "High"),
         allowNull: false,
+        field: "activity_level",
       },
       goodWithKids: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
+        field: "good_with_kids",
       },
       goodWithPets: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false,
+        field: "good_with_pets",
       },
       description: {
         type: DataTypes.TEXT,
@@ -127,10 +136,12 @@ export default (sequelize: Sequelize) => {
       pictureUrl: {
         type: DataTypes.STRING,
         allowNull: true,
+        field: "picture_url",
       },
       shelterId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "shelter_id",
         references: { model: "Shelters", key: "id" },
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
@@ -139,9 +150,9 @@ export default (sequelize: Sequelize) => {
     {
       sequelize,
       modelName: "Animal", // Sequelize internal model name
-      tableName: "Animals", // Actual database table
+      tableName: "animals", // Actual database table
     },
   );
 
-  return Animals;
+  return Animal;
 };
