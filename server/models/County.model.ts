@@ -4,7 +4,7 @@ import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 // County Model Attributes
 // ----------------------------------------------
 interface CountyAttributes {
-  id?: number; // Auto-generated primary key
+  id: number; // Auto-generated primary key
   countyName: string; // Auto-generated primary key
 }
 
@@ -33,7 +33,7 @@ class County
   // Counties can have multiple Users and Shelters
   static associate(models: any) {
     // Define associations here if needed
-    County.hasMany(models.Users, {
+    County.hasMany(models.User, {
       foreignKey: "countyId",
       onDelete: "cascade", // remove users if county is deleted
     });
@@ -50,16 +50,22 @@ class County
 export default (sequelize: Sequelize) => {
   County.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       countyName: {
         type: DataTypes.STRING,
         allowNull: false,
+        field: "county_name",
         unique: true, // ensures no duplicate county names
       },
     },
     {
       sequelize,
       modelName: "County", // internal Sequelize model name
-      tableName: "Counties", // table name in DB
+      tableName: "counties", // table name in DB
     },
   );
   return County;

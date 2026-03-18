@@ -142,7 +142,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "shelter_id",
-        references: { model: "Shelters", key: "id" },
+        references: { model: "Shelter", key: "id" },
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },
