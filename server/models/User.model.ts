@@ -1,4 +1,15 @@
 import { DataTypes, Model, Sequelize, Optional } from "sequelize";
+import {
+  ACTIVITY_LEVELS,
+  PET_EXPERIENCE_LEVELS,
+  DOG_SIZES,
+} from "./enums/user.enums";
+import type {
+  ActivityLevel,
+  PetExperienceLevel,
+  DogSize,
+} from "./enums/user.enums";
+import type { Models } from "./index";
 
 // ----------------------------------------------
 // User Model Attribute Definitions
@@ -15,13 +26,13 @@ interface UserAttributes {
   countyId?: number;
   userType: "User";
   // ML / Matching traits
-  activityLevel: "Low" | "Medium" | "High";
+  activityLevel: ActivityLevel;
   hasGarden: boolean;
   hasOtherPets: boolean;
   hasKids: boolean;
-  petExperienceLevel: "None" | "Beginner" | "Experienced";
-  maxDogSize: "Small" | "Medium" | "Large";
-  preferredEnergyLevel?: "Low" | "Medium" | "High";
+  petExperienceLevel: PetExperienceLevel;
+  maxDogSize: DogSize;
+  preferredEnergyLevel?: ActivityLevel;
   preferredAgeRangeMin?: number;
   preferredAgeRangeMax?: number;
 }
@@ -63,14 +74,14 @@ class User
   public email!: string;
   public age!: number;
   public userType!: "User";
-
-  public activityLevel!: "Low" | "Medium" | "High";
+  public countyId?: number;
+  public activityLevel!: ActivityLevel;
   public hasGarden!: boolean;
   public hasOtherPets!: boolean;
   public hasKids!: boolean;
-  public petExperienceLevel!: "None" | "Beginner" | "Experienced";
-  public maxDogSize!: "Small" | "Medium" | "Large";
-  public preferredEnergyLevel?: "Low" | "Medium" | "High";
+  public petExperienceLevel!: PetExperienceLevel;
+  public maxDogSize!: DogSize;
+  public preferredEnergyLevel?: ActivityLevel;
   public preferredAgeRangeMin?: number;
   public preferredAgeRangeMax?: number;
 
@@ -94,16 +105,16 @@ class User
   // Cascade delete ensures cleanup when a
   // User is removed.
   // --------------------------------------------
-  static associate(models: any) {
+  static associate(models: Models) {
     User.hasMany(models.Post, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-    User.hasMany(models.Comments, {
+    User.hasMany(models.Comment, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-    User.hasMany(models.Likes, {
+    User.hasMany(models.Like, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
@@ -130,10 +141,33 @@ export default (sequelize: Sequelize) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      username: { type: DataTypes.STRING, allowNull: false },
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          notEmpty: true,
+          len: [3, 30],
+        },
+      },
       password: { type: DataTypes.STRING, allowNull: false },
-      email: { type: DataTypes.STRING, allowNull: false },
-      age: { type: DataTypes.INTEGER, allowNull: false },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true, // Database level check
+        validate: {
+          isEmail: true, // Sequelize validator
+          notEmpty: true,
+        },
+      },
+      age: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          min: 0,
+          max: 100,
+        },
+      },
 
       countyId: {
         type: DataTypes.INTEGER,
@@ -153,7 +187,7 @@ export default (sequelize: Sequelize) => {
       },
 
       activityLevel: {
-        type: DataTypes.ENUM("Low", "Medium", "High"),
+        type: DataTypes.ENUM(...ACTIVITY_LEVELS),
         allowNull: false,
         field: "activity_level",
       },
@@ -177,19 +211,19 @@ export default (sequelize: Sequelize) => {
       },
 
       petExperienceLevel: {
-        type: DataTypes.ENUM("None", "Beginner", "Experienced"),
+        type: DataTypes.ENUM(...PET_EXPERIENCE_LEVELS),
         allowNull: false,
         field: "pet_experience_level",
       },
 
       maxDogSize: {
-        type: DataTypes.ENUM("Small", "Medium", "Large"),
+        type: DataTypes.ENUM(...DOG_SIZES),
         allowNull: false,
         field: "max_dog_size",
       },
 
       preferredEnergyLevel: {
-        type: DataTypes.ENUM("Low", "Medium", "High"),
+        type: DataTypes.ENUM(...ACTIVITY_LEVELS),
         allowNull: true,
         field: "preferred_energy_level",
       },
@@ -215,3 +249,5 @@ export default (sequelize: Sequelize) => {
 
   return User;
 };
+
+export { User };
