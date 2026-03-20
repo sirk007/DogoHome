@@ -93,6 +93,7 @@ class User
 {
   // All fields must be declared as class properties
   // The (!) tells TypeScript this will be initialized by Sequelize - trust me bro!
+  // the (?) tells Typescript that this is optional entry
   public id!: number;
   public username!: string;
   public password!: string;
