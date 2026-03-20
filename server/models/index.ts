@@ -35,6 +35,7 @@ import initSuperAdmin, { SuperAdmin } from "./SuperAdmin.model";
 
 // Core data models
 import initAnimal, { Animal } from "./Animal.model";
+import initAdoptionRequest, { AdoptionRequest } from "./AdoptionRequests.model";
 import initCounty, { County } from "./County.model";
 
 // Social interaction models
@@ -65,6 +66,7 @@ export interface Models {
   Admin: typeof Admin;
   SuperAdmin: typeof SuperAdmin;
   Animal: typeof Animal;
+  AdoptionRequest: typeof AdoptionRequest;
   County: typeof County;
   Post: typeof Post;
   Like: typeof Like;
@@ -130,6 +132,7 @@ db.Admin = initAdmin(sequelize) as typeof Admin;
 db.SuperAdmin = initSuperAdmin(sequelize) as typeof SuperAdmin;
 
 db.Animal = initAnimal(sequelize) as typeof Animal;
+db.AdoptionRequest = initAdoptionRequest(sequelize) as typeof AdoptionRequest;
 db.County = initCounty(sequelize) as typeof County;
 
 db.Post = initPost(sequelize) as typeof Post;
