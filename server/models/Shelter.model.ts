@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------
-// Shelter MODEL
+// SHELTER MODEL
 // -----------------------------------------------------------------
 import { DataTypes, Model, Sequelize, Optional } from "sequelize";
 
