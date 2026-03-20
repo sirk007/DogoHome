@@ -149,7 +149,7 @@ class Shelter
 /**
  * This is the default export function - the Initializer or factory
  *
- * It takes a Sequelize instance and returns a configured User model class.
+ * It takes a Sequelize instance and returns a configured Shelter model class.
  *
  * @param sequelize - The Sequelize database connection
  * @returns The configured Shelter model class

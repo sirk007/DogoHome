@@ -137,6 +137,9 @@ class ShelterStaff
 export default (sequelize: Sequelize) => {
   ShelterStaff.init(
     {
+      // Define all columns with their:
+      // - Data types
+      // - Constraints (allowNull, unique, etc...)
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
