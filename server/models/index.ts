@@ -60,7 +60,7 @@ import initMessage, { Message } from "./Messages.model";
 export interface Models {
   // Each property is a Model Class (Not an instance!)
   // typeof means the class/constructor function, not an actual instance
-  Users: typeof User;
+  User: typeof User;
   Shelter: typeof Shelter;
   ShelterStaff: typeof ShelterStaff;
   Admin: typeof Admin;
@@ -125,7 +125,7 @@ const db: Partial<DB> = {};
 // 3. Returns a ready to use model class.
 // Call each initializer through sequelize instance and store the result.
 // -----------------------------------------------------------------
-db.Users = initUser(sequelize) as typeof User;
+db.User = initUser(sequelize) as typeof User;
 db.Shelter = initShelter(sequelize) as typeof Shelter;
 db.ShelterStaff = initShelterStaff(sequelize) as typeof ShelterStaff;
 db.Admin = initAdmin(sequelize) as typeof Admin;
