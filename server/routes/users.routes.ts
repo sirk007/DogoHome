@@ -20,8 +20,20 @@ import db from "../models";
 // Middleware to protect routes
 // validateUserToken checks JWT and sets req.user if valid
 // validateAdminToken ensures the user is an admin before allowing access
-import { validateUserToken } from "../middleware/user.middleware";
+import { AuthRequest, validateUserToken } from "../middleware/user.middleware";
 import { validateAdminToken } from "../middleware/admin.middleware";
+
+// Enum imports
+import {
+  ACTIVITY_LEVELS,
+  PET_EXPERIENCE_LEVELS,
+  DOG_SIZES,
+} from "../models/enums/user.enums";
+import type {
+  ActivityLevel,
+  PetExperienceLevel,
+  DogSize,
+} from "../models/enums/user.enums";
 
 // ----------------------------------------------
 // -------------  CONFIG/SETUP    ---------------
@@ -38,19 +50,74 @@ const JWT_SECRET = process.env.USER_JWT_SECRET || "fallbackSecret"; // fallback 
 
 // Destructure the Users model from the Sequelize instance
 // Users model will be used to query/create/update/delete users
-const { Users } = db;
+const { User } = db;
 
-// Allowed enum values
-const activityLevels = ["Low", "Medium", "High"] as const;
-const petExperienceLevels = ["None", "Beginner", "Experience"] as const;
-const dogSizes = ["Small", "Medium", "Large"] as const;
-
-// Backend type for login response
+/**
+ * Backend type for login response
+ */
 interface UserLoginResponse {
   id: number;
   email: string;
   userType: "User";
   token: string;
+}
+
+/**
+ * Request body type for user registration
+ */
+interface RegisterBody {
+  username: string;
+  password: string;
+  email: string;
+  age: number;
+  countyId?: number;
+  activityLevel: ActivityLevel;
+  hasGarden?: boolean;
+  hasOtherPets?: boolean;
+  hasKids?: boolean;
+  petExperienceLevel: PetExperienceLevel;
+  maxDogSize: DogSize;
+  preferredEnergyLevel?: ActivityLevel;
+  preferredAgeRangeMin?: number;
+  preferredAgeRangeMax?: number;
+}
+
+/**
+ * Request body type for user update (Partial updates allowed)
+ */
+interface UpdateBody {
+  password?: string;
+  email?: string;
+  age?: number;
+  countyId?: number;
+  activityLevel?: ActivityLevel;
+  hasGarden?: boolean;
+  hasOtherPets?: boolean;
+  hasKids?: boolean;
+  petExperienceLevel?: PetExperienceLevel;
+  maxDogSize?: DogSize;
+  preferredEnergyLevel?: ActivityLevel;
+  preferredAgeRangeMin?: number;
+  preferredAgeRangeMax?: number;
+}
+
+/**
+ * Type for update data object (Matches UpdateBody)
+ */
+interface UpdateData {
+  password?: string;
+  email?: string;
+  age?: number;
+  countyId?: number;
+  activityLevel?: ActivityLevel;
+  hasGarden?: boolean;
+  hasOtherPets?: boolean;
+  hasKids?: boolean;
+  petExperienceLevel?: PetExperienceLevel;
+  maxDogSize?: DogSize;
+  preferredEnergyLevel?: ActivityLevel;
+  preferredAgeRangeMin?: number;
+  preferredAgeRangeMax?: number;
 }
 
 // ----------------------------------------------
@@ -60,7 +127,7 @@ interface UserLoginResponse {
 // ---------------------------
 // CREATE A NEW USER (Public)
 // ---------------------------
-// Route: POST /
+// Route: POST /register
 // Access: Public
 // Middleware: None
 // Description: Creates a new user with hashed password
@@ -70,6 +137,7 @@ router.post("/register", async (req: Request, res: Response) => {
     password,
     email,
     age,
+    countyId,
     activityLevel,
     hasGarden = false,
     hasOtherPets = false,
@@ -79,7 +147,7 @@ router.post("/register", async (req: Request, res: Response) => {
     preferredEnergyLevel,
     preferredAgeRangeMin,
     preferredAgeRangeMax,
-  } = req.body;
+  } = req.body as RegisterBody;
   try {
     // Validation / Hygiene
     if (!username || typeof username !== "string" || username.length > 50) {
@@ -94,23 +162,29 @@ router.post("/register", async (req: Request, res: Response) => {
     if (typeof age !== "number" || age < 0 || age > 120) {
       return res.status(400).json({ error: "Invalid age" });
     }
-    if (!activityLevels.includes(activityLevel)) {
+    if (
+      countyId !== undefined &&
+      (typeof countyId !== "number" || countyId < 0)
+    ) {
+      return res.status(400).json({ error: "Invalid county ID" });
+    }
+    if (!ACTIVITY_LEVELS.includes(activityLevel)) {
       return res.status(400).json({ error: "Invalid activity level" });
     }
-    if (!petExperienceLevels.includes(petExperienceLevel)) {
+    if (!PET_EXPERIENCE_LEVELS.includes(petExperienceLevel)) {
       return res.status(400).json({ error: "Invalid pet experience level" });
     }
-    if (!dogSizes.includes(maxDogSize)) {
+    if (!DOG_SIZES.includes(maxDogSize)) {
       return res.status(400).json({ error: "Invalid max dog size" });
     }
     if (
       preferredEnergyLevel &&
-      !activityLevels.includes(preferredEnergyLevel)
+      !ACTIVITY_LEVELS.includes(preferredEnergyLevel)
     ) {
       return res.status(400).json({ error: "Invalid preferred energy level" });
     }
-
-    const existingUser = await Users.findOne({ where: { email } });
+    // Check for existing user
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(409).json({ error: "Email already in use" });
     }
@@ -121,20 +195,21 @@ router.post("/register", async (req: Request, res: Response) => {
 
     // Store the new user in the database
     // Password stored is hashed, never store plain text
-    await Users.create({
+    await User.create({
       username,
       password: hash,
       email,
       age,
+      countyId,
       activityLevel,
       hasGarden,
       hasOtherPets,
       hasKids,
       petExperienceLevel,
       maxDogSize,
-      preferredEnergyLevel: preferredEnergyLevel || null,
-      preferredAgeRangeMin: preferredAgeRangeMin || null,
-      preferredAgeRangeMax: preferredAgeRangeMax || null,
+      preferredEnergyLevel: preferredEnergyLevel,
+      preferredAgeRangeMin: preferredAgeRangeMin,
+      preferredAgeRangeMax: preferredAgeRangeMax,
     });
     // Respond with a success message (JSON)
     res.json({ message: "User created successfully!" });
@@ -156,7 +231,7 @@ router.post("/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   try {
     // Search for user by email in the database
-    const user = await Users.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email } });
     if (!user) return res.status(404).json({ error: "User not found" });
 
     // Compare submitted password with stored hashed password
@@ -197,10 +272,14 @@ router.post("/login", async (req: Request, res: Response) => {
 // Access: Protected (User only)
 // Middleware: validateUserToken
 // Description: Returns info for the currently authenticated user
-router.get("/auth", validateUserToken, (req: Request, res: Response) => {
+router.get("/auth", validateUserToken, (req: AuthRequest, res: Response) => {
   // validateUserToken sets req.user from decoded JWT
-  // Here we just return it
-  res.json(req.user);
+  // Return only non-sensitive user info
+  res.json({
+    id: req.user!.id,
+    email: req.user!.email,
+    userType: req.user!.userType,
+  });
 });
 
 // ---------------------------
@@ -214,7 +293,7 @@ router.get("/basicinfo/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     // Find user by primary key (id)
-    const user = await Users.findByPk(id, {
+    const user = await User.findByPk(id, {
       // Exclude password field from the returned object
       attributes: { exclude: ["password"] },
     });
@@ -240,7 +319,8 @@ router.get("/basicinfo/:id", async (req: Request, res: Response) => {
 // Description: Returns all users excluding passwords
 router.get("/", validateAdminToken, async (req: Request, res: Response) => {
   try {
-    const users = await Users.findAll({
+    const users = await User.findAll({
+      where: { userType: "User" },
       attributes: { exclude: ["password"] },
     });
 
@@ -264,14 +344,14 @@ router.get("/", validateAdminToken, async (req: Request, res: Response) => {
 router.put(
   "/me",
   validateUserToken,
-  async (req: Request | any, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
-      const userId = req.user.id; // decoded JWT sets req.user
-
+      const userId = req.user!.id; // decoded JWT sets req.user
       const {
         email,
         password,
         age,
+        countyId,
         activityLevel,
         hasGarden,
         hasOtherPets,
@@ -281,9 +361,9 @@ router.put(
         preferredEnergyLevel,
         preferredAgeRangeMin,
         preferredAgeRangeMax,
-      } = req.body;
+      } = req.body as UpdateBody;
 
-      const updateData: any = {};
+      const updateData: UpdateData = {};
 
       // ---------------------------
       // Validation (Only if provided)
@@ -309,15 +389,22 @@ router.put(
         updateData.age = age;
       }
 
+      if (countyId !== undefined) {
+        if (typeof countyId !== "number" || countyId < 0) {
+          return res.status(400).json({ error: "Invalid county ID" });
+        }
+        updateData.countyId = countyId;
+      }
+
       if (activityLevel !== undefined) {
-        if (!activityLevels.includes(activityLevel)) {
+        if (!ACTIVITY_LEVELS.includes(activityLevel)) {
           return res.status(400).json({ error: "Invalid activity level" });
         }
         updateData.activityLevel = activityLevel;
       }
 
       if (petExperienceLevel !== undefined) {
-        if (!petExperienceLevels.includes(petExperienceLevel)) {
+        if (!PET_EXPERIENCE_LEVELS.includes(petExperienceLevel)) {
           return res
             .status(400)
             .json({ error: "Invalid pet experience level" });
@@ -326,7 +413,7 @@ router.put(
       }
 
       if (maxDogSize !== undefined) {
-        if (!dogSizes.includes(maxDogSize)) {
+        if (!DOG_SIZES.includes(maxDogSize)) {
           return res.status(400).json({ error: "Invalid max dog size" });
         }
         updateData.maxDogSize = maxDogSize;
@@ -335,7 +422,7 @@ router.put(
       if (preferredEnergyLevel !== undefined) {
         if (
           preferredEnergyLevel !== null &&
-          !activityLevels.includes(preferredEnergyLevel)
+          !ACTIVITY_LEVELS.includes(preferredEnergyLevel)
         ) {
           return res
             .status(400)
@@ -356,7 +443,7 @@ router.put(
       // ---------------------------
       // Perform update
       // ---------------------------
-      await Users.update(updateData, { where: { id: userId } });
+      await User.update(updateData, { where: { id: userId } });
 
       res.json({ message: "Profile updated successfully" });
     } catch (error) {
@@ -380,7 +467,7 @@ router.delete(
     try {
       const { id } = req.params;
       // Destroy user record
-      await Users.destroy({ where: { id } });
+      await User.destroy({ where: { id } });
 
       // Confirm deletion
       res.json({ message: "User deleted successfully" });
