@@ -15,7 +15,7 @@
 // -----------------------------------------------------------------
 
 // -----------------------------------------------------------------
-// Status - Determine users status of verification
+// STATUS - Determine users status of verification
 // -----------------------------------------------------------------
 // Runtime array for Sequelize validation
 // as const ensures TypeScript treats these as literal values

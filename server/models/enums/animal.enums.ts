@@ -33,7 +33,7 @@ export type Species = (typeof SPECIES)[number];
 // Used to indicate whether the age value represents months or years
 export const AGE_UNIT = ["Months", "Years"] as const;
 // Creates: type AgeUnit = "Months" | "Years"
-export type AgeUint = (typeof AGE_UNIT)[number];
+export type AgeUnit = (typeof AGE_UNIT)[number];
 
 // -----------------------------------------------------------------
 // HEALTH - Health status of the animal
@@ -54,4 +54,4 @@ export type Size = (typeof SIZE)[number];
 // -----------------------------------------------------------------
 export const ACTIVITY_LEVEL = ["Low", "Medium", "High"] as const;
 // Creates: type Activity = "Low" | "Medium" | "High"
-export type Activity = (typeof ACTIVITY_LEVEL)[number];
+export type ActivityLevel = (typeof ACTIVITY_LEVEL)[number];

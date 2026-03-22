@@ -15,12 +15,11 @@
 // -----------------------------------------------------------------
 
 // -----------------------------------------------------------------
-// Status -
+// STATUS - Shelter Staff invitation status
 // -----------------------------------------------------------------
 // Runtime array for Sequelize validation
 // as const ensures TypeScript treats these as literal values
 // not just generic strings
-//
 export const STATUS = ["Invited", "Active", "Disabled"] as const;
 // TypeScript union type derived form the array
 // (typeof STATUS)[number] means: "Give me the type of any element in STATUS"
@@ -28,7 +27,7 @@ export const STATUS = ["Invited", "Active", "Disabled"] as const;
 export type Status = (typeof STATUS)[number];
 
 // -----------------------------------------------------------------
-// Role
+// ROLE - Shelter staff role
 // -----------------------------------------------------------------
 // Used to indicate whether the age value represents months or years
 export const ROLE = ["Manager", "Staff"] as const;
