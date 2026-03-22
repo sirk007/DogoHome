@@ -42,7 +42,7 @@ import initCounty, { County } from "./County.model";
 import initPost, { Post } from "./Post.model";
 import initLike, { Like } from "./Like.model";
 import initComment, { Comment } from "./Comment.model";
-import initMessage, { Message } from "./Messages.model";
+import initMessage, { Message } from "./Message.model";
 
 // -----------------------------------------------------------------
 // INTERFACE DEFINITIONS - The Contract
