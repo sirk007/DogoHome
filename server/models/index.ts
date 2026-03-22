@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------
-// DATABASE MODEL REGISTRY
+// DATABASE MODEL CENTRAL REGISTRY
 // -----------------------------------------------------------------
 // This file serves as the central hub for all database models.
 // 1. Initializes all Sequelize models with the database connection

@@ -54,7 +54,6 @@ interface AdminCreationAttributes extends Optional<
  *
  * Implements AdminAttributes ensure the class has all required fields
  */
-
 class Admin
   extends Model<AdminAttributes, AdminCreationAttributes>
   implements AdminAttributes
