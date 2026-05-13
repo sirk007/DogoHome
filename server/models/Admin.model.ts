@@ -151,7 +151,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: true,
         field: "created_by_super_admin_id",
-        references: { model: "SuperAdmin", key: "id" },
+        references: { model: "super_admins", key: "id" },
       },
     },
     {

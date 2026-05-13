@@ -126,7 +126,7 @@ class Shelter
     // A shelter can have many Shelter Staff
     Shelter.hasMany(models.ShelterStaff, {
       foreignKey: "shelterId",
-      onDelete: "SET NULL",
+      onDelete: "CASCADE",
     });
 
     // A shelter belongs to one County
@@ -189,7 +189,7 @@ export default (sequelize: Sequelize) => {
       countyId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: "County", key: "id" },
+        references: { model: "counties", key: "id" },
         field: "county_id",
       },
       address: {
@@ -215,7 +215,7 @@ export default (sequelize: Sequelize) => {
       verifiedByAdminId: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        references: { model: "Admins", key: "id" },
+        references: { model: "admins", key: "id" },
         field: "verified_by_admin_id",
       },
     },

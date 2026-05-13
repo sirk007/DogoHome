@@ -25,15 +25,14 @@
     "noUncheckedSideEffectImports": true,
 
     /* --- ADD PATH ALIASES --- */
-    "baseUrl": "src",
     "paths": {
-      "@api/*": ["api/*"],
-      "@models/*": ["types/*"],
-      "@components/*": ["components/*"],
-      "@pages/*": ["pages/*"],
-      "@context/*": ["context/*"],
-      "@theme/*": ["theme/*"],
-      "@assets/*": ["assets/*"]
+      "@api/*": ["./src/api/*"],
+      "@models/*": ["./src/types/*"],
+      "@components/*": ["./src/components/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@context/*": ["./src/context/*"],
+      "@theme/*": ["./src/theme/*"],
+      "@assets/*": ["./src/assets/*"]
     }
   },
   "include": ["src"]

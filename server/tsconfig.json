@@ -5,10 +5,10 @@
     "target": "ES2020",
 
     // Use CommonJS modules (required for Node.js / Express)
-    "module": "CommonJS",
+    "module": "node16",
 
     // Resolve modules the same way Node.js does
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
 
     // Allows default imports from CommonJS modules (e.g. import express from 'express')
     "esModuleInterop": true,

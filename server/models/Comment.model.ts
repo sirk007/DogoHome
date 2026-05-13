@@ -119,13 +119,13 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "user_id",
-        references: { model: "User", key: "id" },
+        references: { model: "users", key: "id" },
       },
       postId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "post_id",
-        references: { model: "Post", key: "id" },
+        references: { model: "posts", key: "id" },
       },
     },
     {

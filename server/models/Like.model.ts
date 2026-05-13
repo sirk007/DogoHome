@@ -129,7 +129,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         field: "user_id",
-        references: { model: "User", key: "id" },
+        references: { model: "users", key: "id" },
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },
@@ -137,7 +137,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: true,
         field: "post_id",
-        references: { model: "Post", key: "id" },
+        references: { model: "posts", key: "id" },
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },
@@ -145,7 +145,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: true,
         field: "comment_id",
-        references: { model: "Comment", key: "id" },
+        references: { model: "comments", key: "id" },
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },
@@ -157,11 +157,11 @@ export default (sequelize: Sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["userId", "postId"], // prevent multiple likes by same user on same post
+          fields: ["user_id", "post_id"], // prevent multiple likes by same user on same post
         },
         {
           unique: true,
-          fields: ["userId", "commentId"], // prevent multiple likes by same user on same comment
+          fields: ["user_id", "comment_id"], // prevent multiple likes by same user on same comment
         },
       ],
     },

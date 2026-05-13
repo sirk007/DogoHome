@@ -225,7 +225,7 @@ export default (sequelize: Sequelize) => {
         allowNull: true, // Optional
         field: "county_id", // Mapping to DB == Column name (snake_case)
         references: {
-          model: "County", // References County table
+          model: "counties", // References County table
           key: "id", // References County.id column
         },
       },

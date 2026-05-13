@@ -95,6 +95,7 @@ class Message
   static associate(models: Models) {
     Message.belongsTo(models.User, {
       foreignKey: "senderId",
+      as: "sender",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
@@ -103,6 +104,7 @@ class Message
     // Receiver association
     Message.belongsTo(models.User, {
       foreignKey: "receiverId",
+      as: "receiver",
       onDelete: "CASCADE",
     });
     // If animalId exists, link message to Animal
@@ -138,7 +140,7 @@ export default (sequelize: Sequelize) => {
         allowNull: false,
         field: "sender_id",
         references: {
-          model: "User",
+          model: "users",
           key: "id",
         },
       },
@@ -147,7 +149,7 @@ export default (sequelize: Sequelize) => {
         allowNull: false,
         field: "receiver_id",
         references: {
-          model: "User",
+          model: "users",
           key: "id",
         },
       },
@@ -156,7 +158,7 @@ export default (sequelize: Sequelize) => {
         allowNull: true,
         field: "animal_id",
         references: {
-          model: "Animal",
+          model: "animals",
           key: "id",
         },
       },

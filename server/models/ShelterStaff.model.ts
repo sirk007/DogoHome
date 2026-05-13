@@ -148,7 +148,7 @@ export default (sequelize: Sequelize) => {
       shelterId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: { model: "Shelter", key: "id" },
+        references: { model: "shelters", key: "id" },
         field: "shelter_id",
       },
       email: {
