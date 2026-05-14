@@ -75,9 +75,9 @@ export default (sequelize: Sequelize) => {
       lat: { type: DataTypes.DOUBLE, allowNull: false },
       lng: { type: DataTypes.DOUBLE, allowNull: false },
       location: { type: DataTypes.STRING, allowNull: true },
-      userId: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
+      userId: { type: DataTypes.INTEGER, allowNull: false },
       countyId: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: true,
         references: { model: "counties", key: "id" },
       },
@@ -92,4 +92,4 @@ export default (sequelize: Sequelize) => {
   return Sighting;
 };
 
-export {Sighting};
+export { Sighting };
