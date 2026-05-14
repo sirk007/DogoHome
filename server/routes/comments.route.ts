@@ -25,7 +25,7 @@ const router = Router();
 
 // Destructure the Comments model from the Sequelize instance
 // Comments model will be used to query/create/update/delete comments
-const { Comments } = db;
+const { Comment } = db;
 
 // ---------------------------
 // CREATE COMMENT
@@ -48,7 +48,7 @@ router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
     }
 
     // Create new comment tied to authenticated user
-    const newComment = await Comments.create({
+    const newComment = await Comment.create({
       commentBody,
       postId,
       userId: req.user!.id,
@@ -74,7 +74,7 @@ router.get("/post/:postId", async (req: AuthRequest, res: Response) => {
   try {
     const { postId } = req.params;
     // Fetch comments ordered by creation date
-    const comments = await Comments.findAll({
+    const comments = await Comment.findAll({
       where: { postId },
       order: [["createdAt", "ASC"]],
     });
@@ -104,7 +104,7 @@ router.delete(
     try {
       const { id } = req.params;
       // Find comment by primary key
-      const comment = await Comments.findByPk(id);
+      const comment = await Comment.findByPk(id);
       if (!comment) {
         return res.status(404).json({ error: "Comment not found" });
       }

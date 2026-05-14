@@ -40,6 +40,7 @@ import initCounty, { County } from "./County.model";
 
 // Social interaction models
 import initPost, { Post } from "./Post.model";
+import initSighting, { Sighting } from "./Sighting.model";
 import initLike, { Like } from "./Like.model";
 import initComment, { Comment } from "./Comment.model";
 import initMessage, { Message } from "./Message.model";
@@ -72,6 +73,7 @@ export interface Models {
   Like: typeof Like;
   Comment: typeof Comment;
   Message: typeof Message;
+  Sighting: typeof Sighting;
 }
 
 /**
@@ -136,6 +138,7 @@ db.AdoptionRequest = initAdoptionRequest(sequelize) as typeof AdoptionRequest;
 db.County = initCounty(sequelize) as typeof County;
 
 db.Post = initPost(sequelize) as typeof Post;
+db.Sighting = initSighting(sequelize) as typeof Sighting;
 db.Like = initLike(sequelize) as typeof Like;
 db.Comment = initComment(sequelize) as typeof Comment;
 db.Message = initMessage(sequelize) as typeof Message;

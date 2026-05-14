@@ -93,7 +93,6 @@ router.post("/", async (req: Request, res: Response) => {
       username,
       password: hash,
       email,
-      age,
     });
 
     // Respond with a success message (JSON)

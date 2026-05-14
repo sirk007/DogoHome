@@ -49,7 +49,7 @@ interface ShelterAttributes {
  */
 interface ShelterCreationAttributes extends Optional<
   ShelterAttributes,
-  "id" | "userType" | "verifiedByAdminId"
+  "id" | "userType" | "verifiedByAdminId" | "status"
 > {}
 
 // -----------------------------------------------------------------

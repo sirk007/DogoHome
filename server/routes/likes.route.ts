@@ -25,7 +25,7 @@ const router = Router();
 
 // Destructure the Likes model from the Sequelize instance
 // Likes model will be used to query/create/update/delete likes
-const { Likes } = db;
+const { Like } = db;
 
 // ----------------------------------------------
 // ----------------   ROUTES   -----------------
@@ -58,7 +58,7 @@ router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
 
     // Check if a like already exists for this user and post
     // This determines whether we are liking or unliking
-    const existingLike = await Likes.findOne({
+    const existingLike = await Like.findOne({
       where: {
         postId,
         userId,
@@ -67,11 +67,11 @@ router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
 
     // Inform the client that the post is now liked
     if (!existingLike) {
-      await Likes.create({ postId, userId });
+      await Like.create({ postId, userId });
       return res.json({ liked: true });
     } else {
       // If a like already exists, remove it (UNLIKE)
-      await Likes.destroy({
+      await Like.destroy({
         where: {
           postId,
           userId,

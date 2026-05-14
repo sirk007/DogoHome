@@ -79,15 +79,17 @@ export default (sequelize: Sequelize) => {
       countyId: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: true,
-        references: { model: "Counties", key: "id" },
+        references: { model: "counties", key: "id" },
       },
     },
     {
       sequelize,
       modelName: "Sighting",
-      tableName: "Sightings",
+      tableName: "sightings",
     },
   );
 
   return Sighting;
 };
+
+export {Sighting};

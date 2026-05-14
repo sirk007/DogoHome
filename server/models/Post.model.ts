@@ -60,6 +60,7 @@ interface PostCreationAttributes extends Optional<
  *
  * Implements PostAttributes ensure the class has all required fields
  */
+
 class Post
   extends Model<PostAttributes, PostCreationAttributes>
   implements PostAttributes

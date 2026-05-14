@@ -3,7 +3,7 @@ import db from "../models";
 import { validateUserToken } from "../middleware/user.middleware";
 
 const router = Router();
-const { Sighting, Users, County } = db;
+const { Sighting, User, County } = db;
 
 // ---------------------------
 // GET ALL SIGHTINGS (Public)
@@ -26,7 +26,7 @@ router.get("/", async (req: Request, res: Response) => {
     const sightings = await Sighting.findAll({
       where: whereClause,
       include: [
-        { model: Users, attributes: ["id", "username"] },
+        { model: User, attributes: ["id", "username"] },
         { model: County, attributes: ["id", "countyName"] },
       ],
       order: [["createdAt", "DESC"]],
@@ -89,7 +89,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
     const sighting = await Sighting.findByPk(id, {
       include: [
-        { model: Users, attributes: ["id", "username"] },
+        { model: User, attributes: ["id", "username"] },
         { model: County, attributes: ["id", "countyName"] },
       ],
     });

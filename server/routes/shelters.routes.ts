@@ -130,6 +130,7 @@ router.post("/register", async (req: Request, res: Response) => {
       countyId, // numeric ID linking to county
       address,
       phoneNumber,
+      status: "Unverified",
     });
 
     // Respond with a success message (JSON)

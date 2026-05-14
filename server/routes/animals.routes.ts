@@ -27,7 +27,7 @@ const router = Router();
 
 // Destructure the Animals model from the Sequelize instance
 // Animals model will be used to query/create/update/delete animals
-const { Animals } = db;
+const { Animal } = db;
 
 // ----------------------------------------------
 // ---------------- ANIMAL ROUTES ---------------
@@ -104,7 +104,7 @@ router.post(
       // Create new animal record in the database
       // Optional fields (description, picture) default to null if not provided
       // shelterId links the animal to the authenticated shelter
-      const newAnimal = await Animals.create({
+      const newAnimal = await Animal.create({
         species,
         name,
         age,
@@ -147,7 +147,7 @@ router.get(
       }
 
       // Find all animals where shelterId matches the authenticated shelter
-      const animals = await Animals.findAll({
+      const animals = await Animal.findAll({
         where: { shelterId: req.shelter.id },
       });
 
@@ -174,7 +174,7 @@ router.get("/byShelterId/:shelterId", async (req: Request, res: Response) => {
     const shelterId = parseInt(req.params.shelterId);
 
     // Query database for all animals belonging to this shelter
-    const animals = await Animals.findAll({ where: { shelterId } });
+    const animals = await Animal.findAll({ where: { shelterId } });
 
     // Return the list of animals
     res.json(animals);
@@ -198,7 +198,7 @@ router.get("/byId/:id", async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
     // Find animal by primary key
-    const animal = await Animals.findByPk(id);
+    const animal = await Animal.findByPk(id);
 
     // Return 404 if animal does not exist
     if (!animal) {
@@ -238,7 +238,7 @@ router.put(
       const id = Number(req.params.id);
 
       // Find the animal by primary key
-      const animal = await Animals.findByPk(id);
+      const animal = await Animal.findByPk(id);
       if (!animal) return res.status(404).json({ error: "Animal not found" });
 
       // Check ownership
@@ -344,7 +344,7 @@ router.delete(
       const id = Number(req.params.id);
 
       // Fetch the animal from the database by primary key
-      const animal = await Animals.findByPk(id);
+      const animal = await Animal.findByPk(id);
 
       // Return 404 if the animal doesn't exist
       if (!animal) {
@@ -384,18 +384,18 @@ router.get(
       }
 
       // Count total animals for this shelter
-      const total = await Animals.count({
+      const total = await Animal.count({
         where: { shelterId: req.shelter.id },
       });
 
       // Count by species
-      const dogs = await Animals.count({
+      const dogs = await Animal.count({
         where: { shelterId: req.shelter.id, species: "Dog" },
       });
-      const cats = await Animals.count({
+      const cats = await Animal.count({
         where: { shelterId: req.shelter.id, species: "Cat" },
       });
-      const others = await Animals.count({
+      const others = await Animal.count({
         where: {
           shelterId: req.shelter.id,
           species: ["Rabbit", "Other"],

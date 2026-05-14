@@ -26,7 +26,7 @@ const router = Router();
 
 // Destructure the Posts model from the Sequelize instance
 // Posts model will be used to query/create/update/delete posts
-const { Posts, Likes } = db;
+const { Post, Like } = db;
 
 // ----------------------------------------------
 // ----------------   ROUTES   -----------------
@@ -79,7 +79,7 @@ router.post("/", validateUserToken, async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const newPost = await Posts.create({
+    const newPost = await Post.create({
       title: title.trim(),
       postText,
       picture: picture ?? null,
@@ -116,15 +116,15 @@ router.get("/", validateUserToken, async (req: AuthRequest, res: Response) => {
     }
     // Fetch all posts from the database
     // Include associated Likes for each post
-    const listOfPosts = await Posts.findAll({
+    const listOfPosts = await Post.findAll({
       where: whereClause,
-      include: [Likes],
+      include: [Like],
       order: [["createdAt", "DESC"]],
     });
 
     // Fetch likes specifically for the authenticated user
     // This allows the frontend to know which posts the current user has liked
-    const likedPosts = await Likes.findAll({
+    const likedPosts = await Like.findAll({
       where: { userId: req.user!.id },
     });
 
@@ -153,7 +153,7 @@ router.get("/ById/:id", async (req: Request, res: Response) => {
   try {
     // Retrieve the post by primary key (ID)
     // Include associated Likes so frontend can display total likes or user-like info
-    const post = await Posts.findByPk(req.params.id, { include: [Likes] });
+    const post = await Post.findByPk(req.params.id, { include: [Like] });
 
     // If the post does not exist, return 404 Not Found
     if (!post) return res.status(404).json({ error: "Post not found" });
@@ -181,9 +181,9 @@ router.get("/byUserId/:id", async (req: Request, res: Response) => {
   try {
     // Fetch all posts where the userId matches the provided ID
     // Include Likes for each post so frontend can show like counts
-    const posts = await Posts.findAll({
+    const posts = await Post.findAll({
       where: { userId: req.params.id },
-      include: [Likes],
+      include: [Like],
     });
 
     // Respond with array of posts (empty array if no posts exist)
@@ -213,7 +213,7 @@ router.put(
       const { title, postText, type, latitude, longitude } = req.body;
       const allowedTypes = ["LOST", "FOUND", "SIGHTING"];
 
-      const post = await Posts.findByPk(req.params.id);
+      const post = await Post.findByPk(req.params.id);
       if (!post) return res.status(404).json({ error: "Post not found" });
 
       if (post.userId !== req.user!.id && req.user!.userType !== "Admin") {
@@ -276,7 +276,7 @@ router.delete(
   async (req: AuthRequest, res: Response) => {
     try {
       // Find the post by primary key (ID from URL parameter)
-      const post = await Posts.findByPk(req.params.id);
+      const post = await Post.findByPk(req.params.id);
 
       // Return 404 if the post does not exist
       if (!post) return res.status(404).json({ error: "Post not found" });
