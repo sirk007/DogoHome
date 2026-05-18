@@ -4,7 +4,7 @@ All authentication enpoints. These handle identity, not user data.
 AUTH endpoints answer 'Who am I' | WHO you are | Proves WHO you are
 CRUD Endpoints answer 'What can I do?'
 
-**Note:** Auth endpoints are mounted under '/api/users' alongside user CRUD
+**Note:** Auth endpoints are mounted under _('/api/users')_ alongside user CRUD
 
 ---
 
