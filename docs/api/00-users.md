@@ -1,4 +1,25 @@
-# Auth API
+# Users API
+
+_(User Auth)_
+
+- POST /register
+- POST /login
+- GET /auth
+
+_(User CRUD - Public)_
+
+- GET /basicinfo/:id
+
+_(User CRUD - Protected)_
+
+- PUT /me
+
+_(User CRUD - Admin Only)_
+
+- GET /
+- DELETE /:id
+
+---
 
 All authentication enpoints. These handle identity, not user data.
 AUTH endpoints answer 'Who am I' | WHO you are | Proves WHO you are
@@ -84,7 +105,7 @@ Returns currently authenticated user's info from token. (Proves WHO you are)
 
 ---
 
-_(User CRUD)_
+_(User CRUD - Public)_
 
 ## GET /api/users/basicinfo/:id
 
@@ -118,6 +139,8 @@ _(All fields except password)_
 
 ---
 
+_(User CRUD - Protected)_
+
 ## PUT /api/users/me
 
 Update your own profile.
@@ -140,6 +163,8 @@ raw JSON
 }
 
 ---
+
+_(User CRUD - Admin Only)_
 
 ## GET /api/users/
 
