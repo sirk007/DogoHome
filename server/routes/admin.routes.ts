@@ -219,7 +219,7 @@ router.put("/me", validateAdminToken, async (req: Request, res: Response) => {
   try {
     const adminId = req.admin!.id; // decoded JWT sets req.admin
 
-    const { username, email, password, age } = req.body;
+    const { username, email, password } = req.body;
 
     const updateData: any = {};
 

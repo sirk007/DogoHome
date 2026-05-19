@@ -58,7 +58,7 @@ _(Admin Auth - Public)_
 
 ## POST /api/admins/login
 
-Authenticates shelter and returns JWT token. (Who are you?)
+Authenticates admin and returns JWT token. (Who are you?)
 
 **Access:** Public
 
@@ -90,7 +90,7 @@ Returns currently authenticated Admin's info from token. (Proves WHO you are)
 
 **Access:** Protected (Admins token required)
 
-**Headers:** accessAdminToken: "<jwt_token>"
+**Headers:** adminAccessToken: "<jwt_token>"
 
 **Endpoint:** GET http://localhost:3002/api/admins/authAdmin
 
@@ -137,7 +137,7 @@ Update your own profile
 
 **Access:** Protected (Admin token required)
 
-**Headers:** adminAccessToken: "<jwt_token>
+**Headers:** adminAccessToken: "<jwt_token>"
 
 **Endpoint:** PUT http://localhost:3002/api/admins/me
 
