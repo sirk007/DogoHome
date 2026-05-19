@@ -6,7 +6,7 @@ import { verify } from "jsonwebtoken";
 // ---------------------------
 // Add `superAdmin` property to Request type for authenticated super admin info
 export interface SuperAdminAuthRequest extends Request {
-  superAdmin?: {
+  superAdmin: {
     id: number; // Super Admin ID from JWT
     email: string; // Super Admin email
     userType: string; // Super Admin type/role (e.g., "SuperAdmin")
@@ -30,7 +30,7 @@ const SUPER_ADMIN_JWT_SECRET =
 //   - Returns 401 if no token is provided
 //   - Returns 403 if token is invalid or expired
 export const validateSuperAdminToken = (
-  req: SuperAdminAuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {

@@ -19,8 +19,11 @@ import db from "../models";
 
 // Middleware to protect routes
 // validateAdminToken ensures only admins can access certain endpoints
-import { validateAdminToken } from "../middleware/admin.middleware";
-
+import {
+  validateAdminToken,
+  AdminAuthRequest,
+} from "../middleware/admin.middleware";
+import { validateSuperAdminToken } from "../middleware/super.admin.middleware";
 // ----------------------------------------------
 // -------------  CONFIG/SETUP    ---------------
 // ----------------------------------------------
@@ -54,55 +57,59 @@ interface AdminLoginResponse {
 // ---------------------------
 // CREATE A NEW ADMIN
 // ---------------------------
-// Route: POST /
-// Access: Public (or protected depending on design)
-// Middleware: None
+// Route: POST /register
+// Access: Protected (Super Admin only)
+// Middleware: validateSuperAdminToken
 // Description: Creates a new admin account with hashed password
-router.post("/", async (req: Request, res: Response) => {
-  const { username, password, email, age } = req.body;
-  try {
-    if (!username || typeof username !== "string" || username.length > 50) {
-      return res.status(400).json({ error: "Invalid username" });
+router.post(
+  "/register",
+  validateSuperAdminToken,
+  async (req: Request, res: Response) => {
+    const { username, password, email } = req.body;
+    try {
+      if (!username || typeof username !== "string" || username.length > 50) {
+        return res.status(400).json({ error: "Invalid username" });
+      }
+
+      if (!password || typeof password !== "string" || password.length < 8) {
+        return res.status(400).json({ error: "Password too short" });
+      }
+
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+        return res.status(400).json({ error: "Invalid email" });
+      }
+
+      // Check if email already exists
+      const existingAdmin = await Admin.findOne({ where: { email } });
+      if (existingAdmin) {
+        return res.status(409).json({ error: "Email already in use" });
+      }
+
+      // Get the Super Admin's ID from the validated token
+      const createdBySuperAdminId = req.superAdmin!.id;
+
+      // Hash the password with bcrypt before saving
+      // Salt rounds = 10 (moderate security, reasonable speed)
+      const hash = await bcrypt.hash(password, 10);
+
+      // Store the new Admin in the database
+      // Password stored is hashed, never store plain text
+      await Admin.create({
+        username,
+        password: hash,
+        email,
+        createdBySuperAdminId,
+      });
+
+      // Respond with a success message (JSON)
+      res.json({ message: "Admin created successfully!" });
+    } catch (error) {
+      // Log any error and respond with generic 500
+      console.error("Error creating admin:", error);
+      res.status(500).json({ error: "Failed to create admin" });
     }
-
-    if (!password || typeof password !== "string" || password.length < 8) {
-      return res.status(400).json({ error: "Password too short" });
-    }
-
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      return res.status(400).json({ error: "Invalid email" });
-    }
-
-    if (typeof age !== "number" || age < 18 || age > 120) {
-      return res.status(400).json({ error: "Invalid age" });
-    }
-
-    // Check if email already exists
-    const existingAdmin = await Admin.findOne({ where: { email } });
-    if (existingAdmin) {
-      return res.status(409).json({ error: "Email already in use" });
-    }
-
-    // Hash the password with bcrypt before saving
-    // Salt rounds = 10 (moderate security, reasonable speed)
-    const hash = await bcrypt.hash(password, 10);
-
-    // Store the new Admin in the database
-    // Password stored is hashed, never store plain text
-    await Admin.create({
-      username,
-      password: hash,
-      email,
-    });
-
-    // Respond with a success message (JSON)
-    res.json({ message: "Admin created successfully!" });
-  } catch (error) {
-    // Log any error and respond with generic 500
-    console.error("Error creating admin:", error);
-    res.status(500).json({ error: "Failed to create admin" });
-  }
-});
+  },
+);
 
 // ---------------------------
 // ADMIN LOGIN
@@ -159,7 +166,7 @@ router.post("/login", async (req: Request, res: Response) => {
 router.get(
   "/authAdmin",
   validateAdminToken,
-  async (req: Request | any, res: Response) => {
+  async (req: Request, res: Response) => {
     // validateAdminToken sets req.admin from decoded JWT
     // Here we just return it
     res.json(req.admin);
@@ -208,56 +215,45 @@ router.get(
 // Description:
 //  -- Allows an admin to update their own profile
 //  -- Supports partial updates (Only fields provided are updated)
-router.put(
-  "/me",
-  validateAdminToken,
-  async (req: Request | any, res: Response) => {
-    try {
-      const adminId = req.admin.id; // decoded JWT sets req.admin
+router.put("/me", validateAdminToken, async (req: Request, res: Response) => {
+  try {
+    const adminId = req.admin!.id; // decoded JWT sets req.admin
 
-      const { username, email, password, age } = req.body;
+    const { username, email, password, age } = req.body;
 
-      const updateData: any = {};
+    const updateData: any = {};
 
-      // Validation (only if provided)
-      if (username !== undefined) {
-        if (typeof username !== "string" || username.length > 50) {
-          return res.status(400).json({ error: "Invalid username" });
-        }
-        updateData.username = username;
+    // Validation (only if provided)
+    if (username !== undefined) {
+      if (typeof username !== "string" || username.length > 50) {
+        return res.status(400).json({ error: "Invalid username" });
       }
-
-      if (email !== undefined) {
-        if (!/^\S+@\S+\.\S+$/.test(email)) {
-          return res.status(400).json({ error: "Invalid email" });
-        }
-        updateData.email = email;
-      }
-
-      if (password !== undefined) {
-        if (typeof password !== "string" || password.length < 8) {
-          return res.status(400).json({ error: "Password too short" });
-        }
-        // Hash the new password
-        updateData.password = await bcrypt.hash(password, 10);
-      }
-
-      if (age !== undefined) {
-        if (typeof age !== "number" || age < 18 || age > 120) {
-          return res.status(400).json({ error: "Invalid age" });
-        }
-        updateData.age = age;
-      }
-
-      // Perform the update
-      await Admin.update(updateData, { where: { id: adminId } });
-
-      res.json({ message: "Admin profile updated successfully" });
-    } catch (error) {
-      console.error("Error updating admin:", error);
-      res.status(500).json({ error: "Internal server error" });
+      updateData.username = username;
     }
-  },
-);
+
+    if (email !== undefined) {
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+        return res.status(400).json({ error: "Invalid email" });
+      }
+      updateData.email = email;
+    }
+
+    if (password !== undefined) {
+      if (typeof password !== "string" || password.length < 8) {
+        return res.status(400).json({ error: "Password too short" });
+      }
+      // Hash the new password
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    // Perform the update
+    await Admin.update(updateData, { where: { id: adminId } });
+
+    res.json({ message: "Admin profile updated successfully" });
+  } catch (error) {
+    console.error("Error updating admin:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 export default router;

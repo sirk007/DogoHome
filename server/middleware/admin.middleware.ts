@@ -6,7 +6,7 @@ import { verify } from "jsonwebtoken";
 // ---------------------------
 // Add `admin` property to Request type for authenticated admin info
 export interface AdminAuthRequest extends Request {
-  admin?: {
+  admin: {
     id: number; // Admin ID from JWT
     email: string; // Admin email
     userType: string; // Admin type/role (e.g., "Admin")
@@ -29,7 +29,7 @@ const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || "defaultAdminSecret";
 //   - Returns 401 if no token is provided
 //   - Returns 403 if token is invalid or expired
 export const validateAdminToken = (
-  req: AdminAuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
@@ -53,7 +53,7 @@ export const validateAdminToken = (
     };
 
     // Attach admin info to request for use in protected admin routes
-    req.admin = validToken;
+    (req as AdminAuthRequest).admin = validToken;
 
     // Proceed to next middleware or route handler
     next();

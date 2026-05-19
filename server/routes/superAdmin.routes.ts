@@ -53,12 +53,12 @@ interface SuperAdminLoginResponse {
 // ---------------------------
 // CREATE A NEW SUPER ADMIN
 // ---------------------------
-// Route: POST /
+// Route: POST /register
 // Access: Public (or protected depending on design)
 // Middleware: None
 // Description: Creates a new super admin account with hashed password
-router.post("/", async (req: Request, res: Response) => {
-  const { username, password, email, age } = req.body;
+router.post("/register", async (req: Request, res: Response) => {
+  const { username, password, email } = req.body;
   try {
     if (!username || typeof username !== "string" || username.length > 50) {
       return res.status(400).json({ error: "Invalid username" });
@@ -68,9 +68,6 @@ router.post("/", async (req: Request, res: Response) => {
     }
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       return res.status(400).json({ error: "Invalid email" });
-    }
-    if (typeof age !== "number" || age < 18 || age > 120) {
-      return res.status(400).json({ error: "Invalid age" });
     }
 
     const existingSuperAdmin = await SuperAdmin.findOne({ where: { email } });
@@ -235,13 +232,6 @@ router.put(
         }
         // Hash the new password
         updateData.password = await bcrypt.hash(password, 10);
-      }
-
-      if (age !== undefined) {
-        if (typeof age !== "number" || age < 18 || age > 120) {
-          return res.status(400).json({ error: "Invalid age" });
-        }
-        updateData.age = age;
       }
 
       // Perform the update
