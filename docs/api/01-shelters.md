@@ -20,6 +20,13 @@ _(Shelter CRUD - Admin Only)_
 
 - DELETE /:id
 
+---
+
+**TODO:**
+
+- Shelter verification flow [/api/shelters/:id/verify] (Admin Only)
+- Staff management
+
 All authentication enpoints. These handle identity, not shelter data.
 AUTH endpoints answer 'Who am I' | WHO you are | Proves WHO you are
 CRUD Endpoints answer 'What can I do?'

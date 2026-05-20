@@ -21,6 +21,14 @@ _(User CRUD - Admin Only)_
 
 ---
 
+**TODO:**
+
+- ADD password reset flow ['/forgotPassword'], ['/resetPassword']
+- Admin user management [/users/:id/suspend], [/users/:id/unsuspend]
+- Get own full profile [/users/me]
+
+---
+
 All authentication enpoints. These handle identity, not user data.
 AUTH endpoints answer 'Who am I' | WHO you are | Proves WHO you are
 CRUD Endpoints answer 'What can I do?'
